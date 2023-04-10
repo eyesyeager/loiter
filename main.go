@@ -1,5 +1,10 @@
 package main
 
+import (
+	"net/http"
+	"zliway/test"
+)
+
 /**
  * @title				zliway(闲游)
  * @version				0.1
@@ -12,4 +17,8 @@ package main
  */
 
 func main() {
+	// 开启测试web服务器
+	test.Web()
+	// 开启网关服务
+	_ = http.ListenAndServe(":9500", nil)
 }
