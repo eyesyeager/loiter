@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"time"
 	"zliway/global"
+	"zliway/kernel/backstage/model/entity"
 )
 
 /**
@@ -22,7 +23,10 @@ import (
  * @date 2023/4/10 13:42
  */
 
-func InitializeMDB() {
+// 初始化MySQL
+func initializeMDB() {
+	fmt.Println("start connecting to MySQL server...")
+
 	dbConfig := global.Config.Persistent.Mysql
 	if dbConfig.Database == "" {
 		panic(fmt.Errorf("mysql database name cannot be empty"))
@@ -52,11 +56,15 @@ func InitializeMDB() {
 		initMySqlTables(db)
 		global.MDB = db
 	}
+
+	fmt.Println("successfully connected to MySQL server")
 }
 
 // 数据库表初始化
 func initMySqlTables(db *gorm.DB) {
-	err := db.AutoMigrate()
+	err := db.AutoMigrate(
+		entity.App{},
+	)
 	if err != nil {
 		global.Log.Error("migrate table failed", zap.Any("err", err))
 		os.Exit(0)

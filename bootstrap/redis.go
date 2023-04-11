@@ -12,7 +12,10 @@ import (
  * @date 2023/4/10 13:42
  */
 
-func InitializeRDB() {
+// initializeRDB 初始化Redis
+func initializeRDB() {
+	fmt.Println("start connecting to Redis server...")
+
 	global.RDB = redis.NewClient(&redis.Options{
 		Addr:     global.Config.Persistent.Redis.Host + ":" + global.Config.Persistent.Redis.Port,
 		Password: global.Config.Persistent.Redis.Password,
@@ -23,4 +26,6 @@ func InitializeRDB() {
 	if err != nil {
 		panic(fmt.Errorf("failed to start Redis: %s", err))
 	}
+
+	fmt.Println("successfully connected to Redis server")
 }

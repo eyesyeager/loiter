@@ -1,6 +1,7 @@
 app:
   name: zliway
   port: 9500
+  backstage_port: 9510
 
 program:
   key: key123
@@ -13,8 +14,8 @@ persistent:
     username: root
     password: root
     charset: utf8mb4
-    max_idle_conns: 5
-    max_open_conns: 10
+    max_idle_conn: 5
+    max_open_conn: 10
     log_mode: info
     enable_file_log_writer: true
     log_folder: sql
@@ -34,3 +35,26 @@ log:
   max_size: 500
   max_age: 30
   compress: true
+
+#zliway:
+#  project:
+#    - app: eyesStars
+#      host: stars.eyescode.top
+#      cors:
+#        allowedOrigins:
+#          - stars.eyescode.top
+#        allowedMethods:
+#          - "GET"
+#          - "POST"
+#          - "DELETE"
+#          - "PUT"
+#          - "OPTION"
+#        allowedHeaders: "*"
+#        allowCredentials: true
+#        maxAge: 360000
+#      rate:
+#        name: tokenBucket
+#        args:
+#          replenishRate: 10
+#          burstCapacity: 15
+#          key-resolver: ip

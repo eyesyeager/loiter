@@ -18,8 +18,10 @@ var fileName = "config"
 // 默认文件后缀，不建议修改
 var fileSuffix = ".yaml"
 
-// InitializeConfig 初始化配置信息
-func InitializeConfig() {
+// initializeConfig 初始化配置信息
+func initializeConfig() {
+	fmt.Println("start reading configuration file...")
+
 	// 初始化变量
 	v := viper.New()
 	rootFile := fileName + fileSuffix
@@ -48,4 +50,6 @@ func InitializeConfig() {
 	if err := v.Unmarshal(&global.Config); err != nil {
 		panic(fmt.Errorf("configuration file '%s' assignment failed: %s", rootFile, err))
 	}
+
+	fmt.Println("configuration file read completed")
 }

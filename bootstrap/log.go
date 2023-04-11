@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -19,8 +20,10 @@ var (
 	options []zap.Option  // zap 配置项
 )
 
-// InitializeLog 初始化日志配置
-func InitializeLog() {
+// initializeLog 初始化日志配置
+func initializeLog() {
+	fmt.Println("start initializing the logging tool...")
+
 	// 设置日志等级
 	setLogLevel()
 
@@ -30,6 +33,8 @@ func InitializeLog() {
 
 	// 初始化 zap
 	global.Log = zap.New(getZapCore(), options...)
+
+	fmt.Println("log tool initialization completed")
 }
 
 func setLogLevel() {
