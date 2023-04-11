@@ -1,0 +1,8 @@
+{"level":"dev.info","ts":"[2023-04-10 20:40:47.529]","caller":"zliway/main.go:24","msg":"info"}
+{"level":"dev.warn","ts":"[2023-04-10 20:40:47.529]","caller":"zliway/main.go:25","msg":"warn"}
+{"level":"dev.error","ts":"[2023-04-10 20:40:47.529]","caller":"zliway/main.go:26","msg":"error"}
+{"level":"dev.info","ts":"[2023-04-10 20:41:18.277]","caller":"zliway/main.go:24","msg":"info"}
+{"level":"dev.warn","ts":"[2023-04-10 20:41:18.277]","caller":"zliway/main.go:25","msg":"warn"}
+{"level":"dev.error","ts":"[2023-04-10 20:41:18.277]","caller":"zliway/main.go:26","msg":"error"}
+{"level":"dev.error","ts":"[2023-04-10 21:14:29.503]","caller":"bootstrap/mysql.go:46","msg":"mysql connect failed, err:","err":"dial tcp 192.168.204.133:3306: connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond."}
+{"level":"dev.error","ts":"[2023-04-10 21:17:16.963]","caller":"bootstrap/mysql.go:46","msg":"mysql connect failed, err:","err":"dial tcp 192.168.204.133:3306: connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond."}
