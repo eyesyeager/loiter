@@ -2,8 +2,10 @@ package backstage
 
 import (
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"zliway/global"
+	"zliway/kernel/backstage/router"
 )
 
 /**
@@ -14,9 +16,12 @@ import (
 
 // Server 启动后台管理服务
 func Server() {
-
+	// 初始化路由
+	routerRoot := httprouter.New()
+	router.InitRouter(routerRoot)
+	// 启动服务
 	fmt.Println("start running backstage service, service port:" + global.Config.App.BackstagePort)
-	if err := http.ListenAndServe(":"+global.Config.App.BackstagePort, nil); err != nil {
+	if err := http.ListenAndServe(":"+global.Config.App.BackstagePort, routerRoot); err != nil {
 		panic(fmt.Errorf("failed to execute http.ListenAndServe(:%s): %s", global.Config.App.BackstagePort, err))
 	}
 }
