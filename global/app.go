@@ -4,7 +4,7 @@ import (
 	"github.com/go-redis/redis"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	config2 "zliway/bootstrap/config"
+	"zliway/bootstrap/config"
 )
 
 /**
@@ -14,14 +14,13 @@ import (
  */
 
 // Profiles 启动环境
-var Profiles = new(config2.Profiles)
+var Profiles = new(config.Profiles)
 
 // 当前环境配置集合
 type configuration struct {
-	App        config2.App
-	Log        config2.Log
-	Persistent config2.Persistent
-	Program    config2.Program
+	App        config.App
+	Log        config.Log
+	Persistent config.Persistent
 }
 
 // Config 配置文件

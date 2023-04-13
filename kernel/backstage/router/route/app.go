@@ -12,5 +12,5 @@ import (
  */
 
 func InitAppRoute(routerRoot *httprouter.Router, group string) {
-	routerRoot.POST(group+"/registerApp", controller.RegisterApp)
+	routerRoot.POST(group+"/registerApp", controller.AddApp)
 }

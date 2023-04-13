@@ -1,6 +1,11 @@
 package result
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+	"zliway/global"
+	"zliway/kernel/utils"
+)
 
 /**
  * 返回结果封装
@@ -16,59 +21,65 @@ type Response struct {
 }
 
 // Success 成功响应
-func Success(w http.ResponseWriter, code int, msg string, data interface{}) {
-	ResponseUtil(w, Response{
+func Success(w http.ResponseWriter, r *http.Request, code int, msg string, data interface{}) {
+	result := Response{
 		code,
 		msg,
 		data,
-	})
+	}
+	ResponseUtil(w, result)
+	resultStr, _ := json.Marshal(result)
+	global.Log.Info("ip:" + utils.GetIp(r) + " browser:" + utils.GetBrowser(r) + " result:" + string(resultStr))
 }
 
 // SuccessByCustom 成功响应(使用customResult信息)
-func SuccessByCustom(w http.ResponseWriter, result customResult, data interface{}) {
-	Success(w, result.code, result.msg, data)
+func SuccessByCustom(w http.ResponseWriter, r *http.Request, result customResult, data interface{}) {
+	Success(w, r, result.code, result.msg, data)
 }
 
 // SuccessDefault 成功响应(默认模式)
-func SuccessDefault(w http.ResponseWriter, data interface{}) {
-	SuccessByCustom(w, Results.DefaultSuccess, data)
+func SuccessDefault(w http.ResponseWriter, r *http.Request, data interface{}) {
+	SuccessByCustom(w, r, Results.DefaultSuccess, data)
 }
 
 // SuccessAttachedCode 成功响应(默认模式，自选状态码)
-func SuccessAttachedCode(w http.ResponseWriter, data interface{}, code int) {
-	Success(w, code, Results.DefaultSuccess.msg, data)
+func SuccessAttachedCode(w http.ResponseWriter, r *http.Request, data interface{}, code int) {
+	Success(w, r, code, Results.DefaultSuccess.msg, data)
 }
 
 // SuccessAttachedMsg 成功响应(默认模式，自选信息)
-func SuccessAttachedMsg(w http.ResponseWriter, data interface{}, msg string) {
-	Success(w, Results.DefaultSuccess.code, msg, data)
+func SuccessAttachedMsg(w http.ResponseWriter, r *http.Request, data interface{}, msg string) {
+	Success(w, r, Results.DefaultSuccess.code, msg, data)
 }
 
 // Fail 失败响应
-func Fail(w http.ResponseWriter, code int, msg string) {
-	ResponseUtil(w, Response{
+func Fail(w http.ResponseWriter, r *http.Request, code int, msg string) {
+	result := Response{
 		code,
 		msg,
 		nil,
-	})
+	}
+	ResponseUtil(w, result)
+	resultStr, _ := json.Marshal(result)
+	global.Log.Info("ip:" + utils.GetIp(r) + " browser:" + utils.GetBrowser(r) + " result:" + string(resultStr))
 }
 
 // FailByCustom 失败响应(使用customResult信息)
-func FailByCustom(w http.ResponseWriter, result customResult) {
-	Fail(w, result.code, result.msg)
+func FailByCustom(w http.ResponseWriter, r *http.Request, result customResult) {
+	Fail(w, r, result.code, result.msg)
 }
 
 // FailDefault 失败响应(默认模式)
-func FailDefault(w http.ResponseWriter) {
-	FailByCustom(w, Results.DefaultFail)
+func FailDefault(w http.ResponseWriter, r *http.Request) {
+	FailByCustom(w, r, Results.DefaultFail)
 }
 
 // FailAttachedCode 失败响应(默认模式，自选状态码)
-func FailAttachedCode(w http.ResponseWriter, code int) {
-	Fail(w, code, Results.DefaultFail.msg)
+func FailAttachedCode(w http.ResponseWriter, r *http.Request, code int) {
+	Fail(w, r, code, Results.DefaultFail.msg)
 }
 
 // FailAttachedMsg 失败响应(默认模式，自选信息)
-func FailAttachedMsg(w http.ResponseWriter, msg string) {
-	Fail(w, Results.DefaultFail.code, msg)
+func FailAttachedMsg(w http.ResponseWriter, r *http.Request, msg string) {
+	Fail(w, r, Results.DefaultFail.code, msg)
 }

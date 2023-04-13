@@ -11,7 +11,7 @@ import "net/http"
 type webHandlerA struct {
 }
 
-func (webHandlerA) ServeHTTP(write http.ResponseWriter, request *http.Request) {
+func (webHandlerA) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
 	_, _ = write.Write([]byte("test webA"))
 }
 
@@ -22,7 +22,7 @@ func StartWebA() {
 type webHandlerB struct {
 }
 
-func (webHandlerB) ServeHTTP(write http.ResponseWriter, request *http.Request) {
+func (webHandlerB) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
 	_, _ = write.Write([]byte("test webB"))
 }
 

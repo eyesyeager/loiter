@@ -2,9 +2,8 @@ app:
   name: zliway
   port: 9500
   backstage_port: 9510
-
-program:
-  key: key123
+  token: zliway@2023
+  token_header: token
 
 persistent:
   mysql:
