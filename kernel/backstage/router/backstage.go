@@ -13,5 +13,6 @@ import (
 
 // InitRouter 初始化路由
 func InitRouter(routerRoot *httprouter.Router) {
+	// 接口路由
 	route.InitAppRoute(routerRoot, "/app")
 }

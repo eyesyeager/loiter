@@ -29,7 +29,7 @@ func Success(w http.ResponseWriter, r *http.Request, code int, msg string, data 
 	}
 	ResponseUtil(w, result)
 	resultStr, _ := json.Marshal(result)
-	global.Log.Info("ip:" + utils.GetIp(r) + " browser:" + utils.GetBrowser(r) + " result:" + string(resultStr))
+	global.Log.Info("url:" + r.Host + r.RequestURI + ";ip:" + utils.GetIp(r) + ";browser:" + utils.GetBrowser(r) + ";result:" + string(resultStr))
 }
 
 // SuccessByCustom 成功响应(使用customResult信息)
@@ -61,7 +61,7 @@ func Fail(w http.ResponseWriter, r *http.Request, code int, msg string) {
 	}
 	ResponseUtil(w, result)
 	resultStr, _ := json.Marshal(result)
-	global.Log.Info("ip:" + utils.GetIp(r) + " browser:" + utils.GetBrowser(r) + " result:" + string(resultStr))
+	global.Log.Info("url:" + r.Host + r.RequestURI + ";ip:" + utils.GetIp(r) + ";browser:" + utils.GetBrowser(r) + ";result:" + string(resultStr))
 }
 
 // FailByCustom 失败响应(使用customResult信息)

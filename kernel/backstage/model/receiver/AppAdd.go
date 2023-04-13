@@ -8,5 +8,5 @@ package receiver
 type AppAdd struct {
 	Host    string `json:"host" validate:"required"`    // 主机地址
 	Pattern int8   `json:"pattern" validate:"required"` // 模式
-	Status  uint8  `json:"status" validate:"required"`  // 状态
+	Status  int8   `json:"status" validate:"required"`  // 状态
 }
