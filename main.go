@@ -4,7 +4,6 @@ import (
 	"zliway/bootstrap"
 	"zliway/global"
 	"zliway/kernel"
-	"zliway/test"
 )
 
 /**
@@ -30,8 +29,6 @@ func main() {
 		}
 	}()
 
-	// 开启测试web服务器
-	test.Web()
 	// 启动网关服务
 	kernel.Start()
 }

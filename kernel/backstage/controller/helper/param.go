@@ -17,8 +17,9 @@ import (
 func PostData(r *http.Request, container any) error {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(container)
-	// TODO: 如果解码失败会怎么样？
-	result, _ := json.Marshal(container)
-	global.Log.Info("ip:" + utils.GetIp(r) + " browser:" + utils.GetBrowser(r) + " result:" + string(result))
+	if err == nil {
+		result, _ := json.Marshal(container)
+		global.Log.Info("ip:" + utils.GetIp(r) + " browser:" + utils.GetBrowser(r) + " result:" + string(result))
+	}
 	return err
 }

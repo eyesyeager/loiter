@@ -6,7 +6,7 @@ package receiver
  */
 
 type AppAdd struct {
-	Host    string `json:"host" validate:"required"`    // 主机地址
+	App     string `json:"app" validate:"required"`     // 应用地址
 	Pattern int8   `json:"pattern" validate:"required"` // 模式
 	Status  int8   `json:"status" validate:"required"`  // 状态
 }

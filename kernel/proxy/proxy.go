@@ -31,6 +31,9 @@ func CreateProxy() *http.ServeMux {
 	return mux
 }
 
+// 创建代理
+
+// 代理创建工具方法
 func newSingleHostReverseProxy(target string) *httputil.ReverseProxy {
 	pUrl, err := url.Parse(target)
 	if err != nil {

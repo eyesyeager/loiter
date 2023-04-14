@@ -64,6 +64,9 @@ func initializeMDB() {
 func initMySqlTables(db *gorm.DB) {
 	err := db.AutoMigrate(
 		entity.App{},
+		entity.Server{},
+		entity.LogOperate{},
+		entity.LogRuntime{},
 	)
 	if err != nil {
 		global.Log.Error("migrate table failed", zap.Any("err", err))

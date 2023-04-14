@@ -27,7 +27,6 @@ log:
   level: info
   root_dir: ./runtime/log
   log_folder_app: app
-  log_folder_server: server
   format: json
   show_line: true
   max_backups: 3
