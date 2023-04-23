@@ -9,4 +9,5 @@ package test
 func Web() {
 	go StartWebA()
 	go StartWebB()
+	go StartWebC()
 }

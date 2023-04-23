@@ -1,7 +1,7 @@
 package filter
 
 /**
- * 跨域过滤器
+ * 预处理管道
  * @author eyesYeager
- * @date 2023/4/9 21:14
+ * @date 2023/4/19 14:59
  */

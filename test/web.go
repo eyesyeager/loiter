@@ -29,3 +29,14 @@ func (webHandlerB) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
 func StartWebB() {
 	_ = http.ListenAndServe(":9502", webHandlerB{})
 }
+
+type webHandlerC struct {
+}
+
+func (webHandlerC) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
+	_, _ = write.Write([]byte("test webC"))
+}
+
+func StartWebC() {
+	_ = http.ListenAndServe(":9503", webHandlerC{})
+}

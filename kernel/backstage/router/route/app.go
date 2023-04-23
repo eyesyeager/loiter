@@ -15,4 +15,5 @@ func InitAppRoute(routerRoot *httprouter.Router, group string) {
 	routerRoot.POST(group+"/addApp", controller.AddApp)
 	routerRoot.POST(group+"/addAppServer", controller.AddAppServer)
 	routerRoot.GET(group+"/getAppAndServer", controller.GetAppAndServer)
+	routerRoot.GET(group+"/fillAppHolder", controller.FillAppHolder)
 }

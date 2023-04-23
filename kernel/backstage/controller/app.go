@@ -85,3 +85,19 @@ func GetAppAndServer(w http.ResponseWriter, r *http.Request, _ httprouter.Params
 		result.FailAttachedMsg(w, r, err.Error())
 	}
 }
+
+// FillAppHolder 填充app容器
+func FillAppHolder(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	// 权限校验
+	if !helper.CheckAuth(r) {
+		result.FailByCustom(w, r, result.Results.AuthError)
+		return
+	}
+
+	// 执行业务
+	if err := service.AppService.FillAppHolder(); err == nil {
+		result.SuccessDefault(w, r, nil)
+	} else {
+		result.FailAttachedMsg(w, r, err.Error())
+	}
+}

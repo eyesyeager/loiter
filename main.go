@@ -4,6 +4,7 @@ import (
 	"zliway/bootstrap"
 	"zliway/global"
 	"zliway/kernel"
+	"zliway/test"
 )
 
 /**
@@ -28,6 +29,9 @@ func main() {
 			_ = db.Close()
 		}
 	}()
+
+	// 启动测试服务
+	test.Web()
 
 	// 启动网关服务
 	kernel.Start()

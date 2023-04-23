@@ -11,6 +11,7 @@ import (
 	"zliway/kernel/backstage/model/entity"
 	"zliway/kernel/backstage/model/receiver"
 	"zliway/kernel/backstage/model/returnee"
+	"zliway/kernel/dispose"
 )
 
 /**
@@ -115,4 +116,48 @@ func (appService *appService) GetServerAndApp() (err error, data []returnee.AppA
 	}
 
 	return err, data
+}
+
+// FillAppHolder 填充app容器
+func (appService *appService) FillAppHolder() error {
+	err, data := appService.GetServerAndApp()
+	if err != nil {
+		global.Log.Error("fail to file app holder: " + err.Error())
+		return err
+	}
+
+	// 创建临时容器
+	// 需要构建新容器成功后再替换原有容器，避免构建失败时原有正常容器也没法使用
+	appHolderTemp := map[string]dispose.AppHolderModel{}
+	for _, item := range data {
+		if item.Status != dispose.AppStatus["normal"] {
+			// 去除非正常状态的app
+			continue
+		}
+
+		// 构建app信息
+		var appTemp dispose.AppHolderModel
+		appTemp.Pattern = item.Pattern
+		appTemp.Balancer = item.Balancer
+
+		// 构建server信息
+		var servers []dispose.ServerHolderModel
+		for _, server := range item.ServerSlice {
+			if server.Status != dispose.ServerStatus["normal"] {
+				// 去除非正常状态的server
+				continue
+			}
+			var serverTemp dispose.ServerHolderModel
+			_ = copier.Copy(&serverTemp, &server)
+			servers = append(servers, serverTemp)
+		}
+		appTemp.Servers = servers
+
+		// 装入临时容器
+		appHolderTemp[item.App] = appTemp
+	}
+
+	// 替换原有数据
+	dispose.AppHolder = appHolderTemp
+	return err
 }

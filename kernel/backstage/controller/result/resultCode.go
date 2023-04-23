@@ -6,8 +6,8 @@ package result
  */
 
 type customResult struct {
-	code int
-	msg  string
+	Code int
+	Msg  string
 }
 
 type customResults struct {
