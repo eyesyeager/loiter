@@ -11,13 +11,13 @@ import (
 )
 
 /**
- * app控制器
+ * basket控制器
  * @author eyesYeager
- * @date 2023/4/11 17:55
+ * @date 2023/4/26 16:49
  */
 
-// AddApp 注册应用
-func AddApp(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// AddBasket 给应用添加组
+func AddBasket(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// 权限校验
 	if !helper.CheckAuth(r) {
 		result.FailByCustom(w, r, result.Results.AuthError)
@@ -25,7 +25,7 @@ func AddApp(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// 参数校验
-	var data receiver.AppAdd
+	var data receiver.BasketAdd
 	if err := helper.PostData(r, &data); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
@@ -36,7 +36,7 @@ func AddApp(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// 执行业务
-	if err := service.AppService.AddApp(r, data); err == nil {
+	if err := service.BasketService.AddBasket(r, data); err == nil {
 		result.SuccessDefault(w, r, nil)
 	} else {
 		result.FailAttachedMsg(w, r, err.Error())

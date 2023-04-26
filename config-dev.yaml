@@ -33,26 +33,3 @@ log:
   max_size: 500
   max_age: 30
   compress: true
-
-#zliway:
-#  project:
-#    - app: eyesStars
-#      host: stars.eyescode.top
-#      cors:
-#        allowedOrigins:
-#          - stars.eyescode.top
-#        allowedMethods:
-#          - "GET"
-#          - "POST"
-#          - "DELETE"
-#          - "PUT"
-#          - "OPTION"
-#        allowedHeaders: "*"
-#        allowCredentials: true
-#        maxAge: 360000
-#      rate:
-#        name: tokenBucket
-#        args:
-#          replenishRate: 10
-#          burstCapacity: 15
-#          key-resolver: ip

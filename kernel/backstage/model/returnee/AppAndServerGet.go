@@ -18,7 +18,9 @@ type AppAndServerGet struct {
 
 type ServerSlice struct {
 	Id         uint   `json:"id"`          // 服务id
+	Name       string `json:"name"`        // 服务名称
 	Server     string `json:"server"`      // 服务地址
+	Path       string `json:"path"`        // 断言路径
 	Weight     uint   `json:"weight"`      // 服务权重
 	Group      string `json:"group"`       // 服务所属组
 	Status     uint8  `json:"status"`      // 服务状态

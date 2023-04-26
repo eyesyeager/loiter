@@ -1,7 +1,7 @@
 package controller
 
 /**
- * 限流相关控制器
+ * predicates控制器
  * @author eyesYeager
- * @date 2023/4/11 17:56
+ * @date 2023/4/26 16:49
  */

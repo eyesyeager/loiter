@@ -14,4 +14,6 @@ import (
 // InitRouter 初始化路由
 func InitRouter(routerRoot *httprouter.Router) {
 	route.InitAppRoute(routerRoot, "/app")
+	route.InitBasketRoute(routerRoot, "/basket")
+	route.InitServerRoute(routerRoot, "/server")
 }
