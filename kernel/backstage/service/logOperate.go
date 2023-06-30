@@ -35,18 +35,24 @@ func (logService *logService) AppOperateLog(r *http.Request, operateType string,
 // LogService 对外暴露实例
 var LogService = logService{
 	OperateType: map[string]string{
-		"addApp":           "添加应用",
-		"updateApp":        "修改应用",
-		"deleteApp":        "删除应用",
-		"onlineApp":        "上线应用",
-		"deactivateApp":    "停用应用",
-		"addBasket":        "添加服务组",
-		"updateBasket":     "修改服务组",
-		"deleteBasket":     "删除服务组",
+		"addApp":        "添加应用",
+		"updateApp":     "修改应用",
+		"deleteApp":     "删除应用",
+		"onlineApp":     "上线应用",
+		"deactivateApp": "停用应用",
+
+		"addBasket":    "添加服务组",
+		"updateBasket": "修改服务组",
+		"deleteBasket": "删除服务组",
+
 		"addServer":        "添加服务",
 		"updateServer":     "修改服务",
 		"deleteServer":     "删除服务",
 		"onlineServer":     "上线服务",
 		"deactivateServer": "停用服务",
+
+		"addPredicates":    "添加断言路径",
+		"updatePredicates": "修改断言路径",
+		"deletePredicates": "删除断言路径",
 	},
 }

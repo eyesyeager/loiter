@@ -6,6 +6,7 @@ import (
 	"zliway/global"
 	"zliway/kernel/backstage"
 	"zliway/kernel/proxy"
+	"zliway/kernel/register"
 )
 
 /**
@@ -16,14 +17,14 @@ import (
 
 // Start 网关服务启动方法
 func Start() {
-	// 启动后台web服务
-	go backstage.Server()
-
 	// 初始化网关配置
 	initZliway()
 
 	// 执行代理配置
 	proxy.StartProxy()
+
+	// 启动后台web服务
+	go backstage.Server()
 
 	// 启动网关服务
 	fmt.Println("start running gateway service, service port:" + global.Config.App.Port)
@@ -34,8 +35,10 @@ func Start() {
 
 // 初始化网关配置
 func initZliway() {
+	// 初始化注册信息
+	register.InitRegister()
+
 	// 初始化代理配置
-	proxy.InitProxy()
 
 	// 初始化过滤器配置
 }

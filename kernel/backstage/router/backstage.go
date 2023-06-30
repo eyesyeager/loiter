@@ -16,4 +16,5 @@ func InitRouter(routerRoot *httprouter.Router) {
 	route.InitAppRoute(routerRoot, "/app")
 	route.InitBasketRoute(routerRoot, "/basket")
 	route.InitServerRoute(routerRoot, "/server")
+	route.InitPredicatesRoute(routerRoot, "/predicates")
 }
