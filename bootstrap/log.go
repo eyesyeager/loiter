@@ -1,97 +1,96 @@
 package bootstrap
 
 import (
-	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"loiter/config"
+	"loiter/constant"
+	"loiter/global"
+	"os"
+	"path/filepath"
 	"time"
-	"zliway/global"
 )
 
 /**
- * 日志启动文件
+ * 日志工具初始化
+ * 参考链接：https://www.bilibili.com/video/BV1L24y1q7DA
  * @author eyesYeager
- * @date 2023/4/10 13:42
+ * @date 2023/7/2 16:31
  */
 
-var (
-	level   zapcore.Level // zap 日志等级
-	options []zap.Option  // zap 配置项
-)
-
-// initializeLog 初始化日志配置
-func initializeLog() {
-	fmt.Println("start initializing the logging tool...")
-
-	// 设置日志等级
-	setLogLevel()
-
-	if global.Config.Log.ShowLine {
-		options = append(options, zap.AddCaller())
-	}
-
-	// 初始化 zap
-	global.Log = zap.New(getZapCore(), options...)
-
-	fmt.Println("log tool initialization completed")
+// logBootstrap 日志初始化入口方法
+func logBootstrap() {
+	global.AppLogger = initAppLogger()
+	global.BackstageLogger = initBackstageLogger()
+	global.GatewayLogger = initGatewayLogger()
 }
 
-func setLogLevel() {
-	switch global.Config.Log.Level {
-	case "debug":
-		level = zap.DebugLevel
-		options = append(options, zap.AddStacktrace(level))
-	case "info":
-		level = zap.InfoLevel
-	case "warn":
-		level = zap.WarnLevel
-	case "error":
-		level = zap.ErrorLevel
-		options = append(options, zap.AddStacktrace(level))
-	case "dpanic":
-		level = zap.DPanicLevel
-	case "panic":
-		level = zap.PanicLevel
-	case "fatal":
-		level = zap.FatalLevel
-	default:
-		level = zap.InfoLevel
-	}
+func initAppLogger() *zap.SugaredLogger {
+	path := config.Program.LogBasePath + string(filepath.Separator) + config.Program.LogAppPath
+	return initLogger(path)
 }
 
-// 扩展 Zap
-func getZapCore() zapcore.Core {
-	var encoder zapcore.Encoder
+func initBackstageLogger() *zap.SugaredLogger {
+	path := config.Program.LogBasePath + string(filepath.Separator) + config.Program.LogBackstagePath
+	return initLogger(path)
+}
 
-	// 调整编码器默认配置
+func initGatewayLogger() *zap.SugaredLogger {
+	path := config.Program.LogBasePath + string(filepath.Separator) + config.Program.LogGateWayPath
+	return initLogger(path)
+}
+
+// initLogger 初始化日志对象
+func initLogger(path string) *zap.SugaredLogger {
+	core := zapcore.NewCore(getEncoder(), getWriteSyncer(path), getLogLevel())
+	return zap.New(core).Sugar()
+}
+
+// getEncoder 配置日志格式
+func getEncoder() zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = func(time time.Time, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(time.Format("[" + "2006-01-02 15:04:05.000" + "]"))
+	encoderConfig.TimeKey = "time"
+	// 日志级别大写
+	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+	// 时间格式化
+	encoderConfig.EncodeTime = func(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(t.Local().Format(time.DateTime))
 	}
-	encoderConfig.EncodeLevel = func(l zapcore.Level, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(global.Profiles.Active + "." + l.String())
-	}
-
-	// 设置编码器
-	if global.Config.Log.Format == "json" {
-		encoder = zapcore.NewJSONEncoder(encoderConfig)
-	} else {
-		encoder = zapcore.NewConsoleEncoder(encoderConfig)
-	}
-
-	return zapcore.NewCore(encoder, getLogWriter(), level)
+	// JSON格式打印
+	return zapcore.NewJSONEncoder(encoderConfig)
 }
 
-// 使用 lumberjack 作为日志写入器
-func getLogWriter() zapcore.WriteSyncer {
-	file := &lumberjack.Logger{
-		Filename:   global.Config.Log.RootDir + "/" + global.Config.Log.LogFolderApp + "/" + time.Now().Format("2006-01-02") + ".log",
-		MaxSize:    global.Config.Log.MaxSize,
-		MaxBackups: global.Config.Log.MaxBackups,
-		MaxAge:     global.Config.Log.MaxAge,
-		Compress:   global.Config.Log.Compress,
+// getWriteSyncer 配置文件打印方式
+func getWriteSyncer(path string) zapcore.WriteSyncer {
+	stSeparator := string(filepath.Separator)
+	stRootDir, _ := os.Getwd()
+	stLogFilePath := stRootDir + stSeparator + path + stSeparator + time.Now().Format(time.DateOnly) + "." + config.Program.LogSuffix
+
+	// 单个文件超出大小时进行文件分割
+	lumberjackSyncer := &lumberjack.Logger{
+		Filename: stLogFilePath,
+		MaxSize:  config.Program.LogMaxSize,  // 文件最大尺寸(MB)
+		MaxAge:   config.Program.LogMaxAge,   // 文件保存最长时间
+		Compress: config.Program.LogCompress, // 是否压缩
 	}
 
-	return zapcore.AddSync(file)
+	// 开发模式下，日志会输出到控制台，但生产模式不会
+	if config.Program.ProgramMode == constant.DEVELOP {
+		return zapcore.NewMultiWriteSyncer(zapcore.AddSync(lumberjackSyncer), zapcore.AddSync(os.Stdout))
+	} else {
+		return zapcore.AddSync(lumberjackSyncer)
+	}
+
+}
+
+// getLogLevel 设置日志级别，开发模式下为debug级别，生产模式为Info级别
+func getLogLevel() zapcore.Level {
+	var logMode zapcore.Level
+	if config.Program.ProgramMode == constant.DEVELOP {
+		logMode = zapcore.DebugLevel
+	} else {
+		logMode = zapcore.InfoLevel
+	}
+	return logMode
 }

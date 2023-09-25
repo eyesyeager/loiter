@@ -2,7 +2,6 @@ package bootstrap
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -10,11 +9,12 @@ import (
 	"gorm.io/gorm/schema"
 	"io"
 	"log"
+	"loiter/config"
+	"loiter/global"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
-	"zliway/global"
-	"zliway/kernel/backstage/model/entity"
 )
 
 /**
@@ -24,10 +24,8 @@ import (
  */
 
 // 初始化MySQL
-func initializeMDB() {
-	fmt.Println("start connecting to MySQL server...")
-
-	dbConfig := global.Config.Persistent.Mysql
+func mDbBootstrap() {
+	dbConfig := config.Program.MySQLConfig
 	if dbConfig.Database == "" {
 		panic(fmt.Errorf("mysql database name cannot be empty"))
 	}
@@ -56,22 +54,13 @@ func initializeMDB() {
 		initMySqlTables(db)
 		global.MDB = db
 	}
-
-	fmt.Println("successfully connected to MySQL server")
 }
 
 // 数据库表初始化
 func initMySqlTables(db *gorm.DB) {
-	err := db.AutoMigrate(
-		entity.App{},
-		entity.Server{},
-		entity.LogOperate{},
-		entity.LogRuntime{},
-		entity.Basket{},
-		entity.Predicates{},
-	)
+	err := db.AutoMigrate()
 	if err != nil {
-		global.Log.Error("migrate table failed", zap.Any("err", err))
+		global.AppLogger.Error("migrate table failed")
 		os.Exit(0)
 	}
 }
@@ -81,14 +70,16 @@ func getGormLogWriter() logger.Writer {
 	var writer io.Writer
 
 	// 是否启用日志文件
-	if global.Config.Persistent.Mysql.EnableFileLogWriter {
+	if config.Program.MySQLConfig.EnableFileLogWriter {
+		stSeparator := string(filepath.Separator)
+		stRootDir, _ := os.Getwd()
+		path := config.Program.LogBasePath + stSeparator + config.Program.LogSQLPath
 		// 自定义 Writer
 		writer = &lumberjack.Logger{
-			Filename:   global.Config.Log.RootDir + "/" + global.Config.Persistent.Mysql.LogFolder + "/" + time.Now().Format("2006-01-02") + ".log",
-			MaxSize:    global.Config.Log.MaxSize,
-			MaxBackups: global.Config.Log.MaxBackups,
-			MaxAge:     global.Config.Log.MaxAge,
-			Compress:   global.Config.Log.Compress,
+			Filename: stRootDir + stSeparator + path + stSeparator + time.Now().Format(time.DateOnly) + "." + config.Program.LogSuffix,
+			MaxSize:  config.Program.LogMaxSize,
+			MaxAge:   config.Program.LogMaxAge,
+			Compress: config.Program.LogCompress,
 		}
 	} else {
 		// 默认 Writer
@@ -100,7 +91,7 @@ func getGormLogWriter() logger.Writer {
 func getGormLogger() logger.Interface {
 	var logMode logger.LogLevel
 
-	switch global.Config.Persistent.Mysql.LogMode {
+	switch config.Program.MySQLConfig.LogMode {
 	case "silent":
 		logMode = logger.Silent
 	case "error":
@@ -114,9 +105,9 @@ func getGormLogger() logger.Interface {
 	}
 
 	return logger.New(getGormLogWriter(), logger.Config{
-		SlowThreshold:             200 * time.Millisecond,                              // 慢 SQL 阈值
-		LogLevel:                  logMode,                                             // 日志级别
-		IgnoreRecordNotFoundError: false,                                               // 忽略ErrRecordNotFound（记录未找到）错误
-		Colorful:                  !global.Config.Persistent.Mysql.EnableFileLogWriter, // 禁用彩色打印
+		SlowThreshold:             200 * time.Millisecond,                          // 慢 SQL 阈值
+		LogLevel:                  logMode,                                         // 日志级别
+		IgnoreRecordNotFoundError: false,                                           // 忽略ErrRecordNotFound（记录未找到）错误
+		Colorful:                  !config.Program.MySQLConfig.EnableFileLogWriter, // 禁用彩色打印
 	})
 }
