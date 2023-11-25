@@ -1,6 +1,8 @@
 package bootstrap
 
-import "loiter/global"
+import (
+	"loiter/global"
+)
 
 /**
  * @author eyesYeager
