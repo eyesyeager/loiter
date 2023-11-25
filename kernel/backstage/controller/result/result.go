@@ -1,9 +1,6 @@
 package result
 
 import (
-	"encoding/json"
-	"loiter/global"
-	"loiter/kernel/utils"
 	"net/http"
 )
 
@@ -28,8 +25,6 @@ func Success(w http.ResponseWriter, r *http.Request, code int, msg string, data 
 		data,
 	}
 	ResponseUtil(w, result)
-	resultStr, _ := json.Marshal(result)
-	global.BackstageLogger.Info("url:" + r.Host + r.RequestURI + ";ip:" + utils.GetIp(r) + ";browser:" + utils.GetBrowser(r) + ";result:" + string(resultStr))
 }
 
 // SuccessByCustom 成功响应(使用customResult信息)
@@ -60,8 +55,6 @@ func Fail(w http.ResponseWriter, r *http.Request, code int, msg string) {
 		nil,
 	}
 	ResponseUtil(w, result)
-	resultStr, _ := json.Marshal(result)
-	global.BackstageLogger.Info("url:" + r.Host + r.RequestURI + ";ip:" + utils.GetIp(r) + ";browser:" + utils.GetBrowser(r) + ";result:" + string(resultStr))
 }
 
 // FailByCustom 失败响应(使用customResult信息)

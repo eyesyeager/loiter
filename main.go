@@ -28,9 +28,7 @@ func main() {
 	kernel.Start()
 
 	// 处理程序关闭事项
-	defer func() {
-		destruction()
-	}()
+	defer destruction()
 }
 
 // destruction 析构方法，统一处理程序关闭事项

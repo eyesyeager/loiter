@@ -66,7 +66,7 @@ func AesDecrypt(str string, aesKey string) (err error, decrypt string) {
 	blockMode := cipher.NewCBCDecrypter(block, k[:blockSize])
 	orig := make([]byte, len(cratedByte))
 	blockMode.CryptBlocks(orig, cratedByte)
-	orig = sPKCS7UnPadding(orig)
+	err, orig = sPKCS7UnPadding(orig)
 
 	defer func() {
 		if aesErr := recover(); aesErr != nil {
@@ -84,8 +84,11 @@ func sPKCS7Padding(ciphered []byte, blockSize int) []byte {
 }
 
 // 去码
-func sPKCS7UnPadding(origData []byte) []byte {
+func sPKCS7UnPadding(origData []byte) (error, []byte) {
 	length := len(origData)
+	if length == 0 {
+		return errors.New("incorrect data format"), nil
+	}
 	unPadding := int(origData[length-1])
-	return origData[:(length - unPadding)]
+	return nil, origData[:(length - unPadding)]
 }
