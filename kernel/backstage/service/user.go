@@ -23,7 +23,7 @@ type userService struct {
 var UserService = userService{}
 
 // DoLogin 用户登录
-func (userService *userService) DoLogin(w http.ResponseWriter, data receiver.DoLogin) error {
+func (*userService) DoLogin(w http.ResponseWriter, r *http.Request, data receiver.DoLogin) error {
 	errorMsg := "账号或密码错误"
 
 	// 密码应该避免明文传输，因此前端使用了 AES 双向加密算法对密码加密
@@ -38,7 +38,7 @@ func (userService *userService) DoLogin(w http.ResponseWriter, data receiver.DoL
 	// 获取用户密码
 	var checkUser po.LoginUserRole
 	if tx := global.MDB.Raw(
-		"SELECT user.id userId, user.password, role.weight FROM user, role WHERE user.username = ? AND user.role_id = role.id",
+		"SELECT user.id UserId, user.password, role.weight FROM user, role WHERE user.username = ? AND user.role_id = role.id",
 		data.Username).Scan(&checkUser); tx.RowsAffected != 1 {
 		global.BackstageLogger.Warn("a user with username " + data.Username + " does not exist")
 		return errors.New(errorMsg)
@@ -52,15 +52,15 @@ func (userService *userService) DoLogin(w http.ResponseWriter, data receiver.DoL
 	}
 
 	// 生成token
-	if token, err := utils.GenerateToken(checkUser.UserId, checkUser.Weight); err != nil {
+	var token string
+	if token, err = utils.GenerateToken(checkUser.UserId, checkUser.Weight); err != nil {
 		global.BackstageLogger.Warn("token generation failed for user with username " + data.Username + "; error info:" + err.Error())
 		return errors.New("令牌生成失败:" + err.Error())
 	} else {
 		w.Header().Set(constant.ResponseHead.Token, token)
 	}
 
-	//// 添加登录日志
-	//remarks, _ := json.Marshal(data)
-	//go LogService.AppOperateLog(r, LogService.OperateType["addApp"], string(remarks))
+	// 添加登录日志
+	go LogService.Login(r, checkUser.UserId, token)
 	return nil
 }

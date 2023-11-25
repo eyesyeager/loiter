@@ -64,7 +64,7 @@ func DoLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// 执行业务
-	if err := service.UserService.DoLogin(w, data); err == nil {
+	if err := service.UserService.DoLogin(w, r, data); err == nil {
 		result.SuccessDefault(w, r, nil)
 	} else {
 		result.FailAttachedMsg(w, r, err.Error())
