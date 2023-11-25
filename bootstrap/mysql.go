@@ -11,6 +11,7 @@ import (
 	"log"
 	"loiter/config"
 	"loiter/global"
+	"loiter/kernel/backstage/model/entity"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -23,7 +24,7 @@ import (
  * @date 2023/4/10 13:42
  */
 
-// 初始化MySQL
+// 初始化 MySQL
 func mDbBootstrap() {
 	dbConfig := config.Program.MySQLConfig
 	if dbConfig.Database == "" {
@@ -56,9 +57,22 @@ func mDbBootstrap() {
 	}
 }
 
+// mDbClose 关闭 MySQL 连接
+func mDbClose() {
+	if global.MDB != nil {
+		db, _ := global.MDB.DB()
+		_ = db.Close()
+	}
+}
+
 // 数据库表初始化
 func initMySqlTables(db *gorm.DB) {
-	err := db.AutoMigrate()
+	err := db.AutoMigrate(
+		entity.App{},
+		entity.Role{},
+		entity.User{},
+		entity.LogLogin{},
+	)
 	if err != nil {
 		global.AppLogger.Error("migrate table failed")
 		os.Exit(0)

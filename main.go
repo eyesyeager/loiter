@@ -1,6 +1,10 @@
 package main
 
-import "loiter/bootstrap"
+import (
+	"loiter/bootstrap"
+	"loiter/kernel"
+	"loiter/test"
+)
 
 /**
  * @title				loiter(闲游)
@@ -16,4 +20,19 @@ import "loiter/bootstrap"
 func main() {
 	// 启动基础服务
 	bootstrap.Start()
+
+	// 启动测试程序
+	test.Start()
+
+	// 启动网关
+	kernel.Start()
+
+	// 处理程序关闭事项
+	defer destruction()
+}
+
+// destruction 析构方法，统一处理程序关闭事项
+func destruction() {
+	// 关闭程序环境
+	bootstrap.End()
 }

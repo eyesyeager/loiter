@@ -14,7 +14,7 @@ var Program = programConfig{
 	constant.DEVELOP,
 	"loiter",
 	"9500",
-	"9501",
+	"9510",
 	"log",
 	"runtime" + string(filepath.Separator) + "log",
 	"app",
@@ -25,6 +25,9 @@ var Program = programConfig{
 	30,
 	true,
 	mysqlConfig,
+	"hello,bestLoiter",
+	"hello,loiter!",
+	5,
 }
 
 var mysqlConfig = mySQLConfig{
@@ -62,6 +65,13 @@ type programConfig struct {
 
 	// MySQL
 	MySQLConfig mySQLConfig
+
+	// secret key
+	AESSecretKey string // AES双向加密密钥，必须是16位
+
+	// JWT
+	JWTSecretKey string // JWT签名加密密钥
+	JWTExpire    int    // JWT签名过期时间(min)
 }
 
 type mySQLConfig struct {
