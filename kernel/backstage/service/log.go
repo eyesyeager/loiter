@@ -24,10 +24,9 @@ func (*logService) Operate() {
 }
 
 // Login 登录日志
-func (*logService) Login(r *http.Request, userId uint, token string) {
+func (*logService) Login(r *http.Request, userId uint) {
 	logLogin := entity.LogLogin{
 		UserId:  userId,
-		Token:   token,
 		Ip:      utils.GetIp(r),
 		Browser: utils.GetBrowser(r),
 	}

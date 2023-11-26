@@ -3,7 +3,6 @@ package utils
 import (
 	"errors"
 	"github.com/golang-jwt/jwt/v4"
-	"loiter/config"
 	"time"
 )
 
@@ -13,13 +12,10 @@ import (
  * @date 2023/9/27 11:11
  */
 
-// 把签发的秘钥 抛出来
-var stSignKey = []byte(config.Program.JWTSecretKey)
-
 // JwtCustomClaims 注册声明是JWT声明集的结构化版本，仅限于注册声明名称
 type JwtCustomClaims struct {
-	Id               uint
-	Role             uint
+	Uid              uint
+	Weight           uint
 	RegisteredClaims jwt.RegisteredClaims
 }
 
@@ -28,18 +24,18 @@ func (j JwtCustomClaims) Valid() error {
 }
 
 // GenerateToken 生成Token
-func GenerateToken(uid uint, weight uint) (string, error) {
+func GenerateToken(subject string, stSignKey []byte, uid uint, weight uint, expire int) (string, error) {
 	// 初始化
 	iJwtCustomClaims := JwtCustomClaims{
-		Id:   uid,
-		Role: weight,
+		Uid:    uid,
+		Weight: weight,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// 设置过期时间
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(config.Program.JWTExpire) * time.Minute)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(expire) * time.Minute)),
 			// 令牌颁发时间
 			IssuedAt: jwt.NewNumericDate(time.Now()),
 			// 主题
-			Subject: config.Program.Name,
+			Subject: subject,
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, iJwtCustomClaims)
@@ -47,20 +43,14 @@ func GenerateToken(uid uint, weight uint) (string, error) {
 }
 
 // ParseToken 解析token
-func ParseToken(tokenStr string) (JwtCustomClaims, error) {
+func ParseToken(stSignKey []byte, tokenStr string) (JwtCustomClaims, error) {
 	iJwtCustomClaims := JwtCustomClaims{}
 	token, err := jwt.ParseWithClaims(tokenStr, &iJwtCustomClaims, func(token *jwt.Token) (interface{}, error) {
 		return stSignKey, nil
 	})
 
 	if err == nil && !token.Valid {
-		err = errors.New("invalid Token")
+		err = errors.New("invalid Token:" + tokenStr)
 	}
 	return iJwtCustomClaims, err
-}
-
-// IsTokenValid 检查token是否有效
-func IsTokenValid(tokenStr string) bool {
-	_, err := ParseToken(tokenStr)
-	return err == nil
 }

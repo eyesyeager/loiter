@@ -11,7 +11,6 @@ import "gorm.io/gorm"
 type LogLogin struct {
 	gorm.Model
 	UserId  uint   `json:"user_id" gorm:"not null"`
-	Token   string `json:"token" gorm:"not null;size:1000"`
 	Ip      string `json:"ip" gorm:"not null"`
 	Browser string `json:"browser"`
 }

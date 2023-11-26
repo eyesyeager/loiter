@@ -10,10 +10,12 @@ var Role = role{
 	100,
 	50,
 	1,
+	0,
 }
 
 type role struct {
 	SuperAdmin uint
-	admin      uint
-	user       uint
+	Admin      uint
+	User       uint
+	Visitor    uint
 }

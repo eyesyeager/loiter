@@ -6,7 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"loiter/config"
 	"loiter/global"
-	"loiter/kernel/backstage/constant"
+	"loiter/kernel/backstage/foundation"
 	"loiter/kernel/backstage/model/po"
 	"loiter/kernel/backstage/model/receiver"
 	"loiter/kernel/backstage/utils"
@@ -53,24 +53,19 @@ func (*userService) DoLogin(w http.ResponseWriter, r *http.Request, data receive
 	}
 
 	// 生成token
-	var token string
-	if token, err = utils.GenerateToken(checkUser.UserId, checkUser.Weight); err != nil {
-		global.BackstageLogger.Warn("token generation failed for user with username " + data.Username + "; error info:" + err.Error())
-		return errors.New("令牌生成失败:" + err.Error())
-	} else {
-		w.Header().Set(constant.ResponseHead.Token, token)
+	if err = foundation.AuthFoundation.RefreshToken(w, checkUser.UserId, checkUser.Weight); err != nil {
+		global.BackstageLogger.Warn("token generation failed for user with username " + data.Username + ", error:" + err.Error())
+		return errors.New("令牌生成失败，请联系管理员处理")
 	}
 
 	// 添加登录日志
-	go LogService.Login(r, checkUser.UserId, token)
+	go LogService.Login(r, checkUser.UserId)
 	return nil
 }
 
 // DoRegister 用户注册
-func (*userService) DoRegister(w http.ResponseWriter, r *http.Request, data receiver.DoRegister) error {
+func (*userService) DoRegister(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.DoRegister) error {
 	// 验证码校验
-
-	//
 	hash, err := bcrypt.GenerateFromPassword([]byte("loiter"), bcrypt.DefaultCost)
 	if err != nil {
 		fmt.Println(err)
