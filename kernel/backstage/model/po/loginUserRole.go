@@ -6,7 +6,7 @@ package po
  */
 
 type LoginUserRole struct {
-	UserId   uint
+	Uid      uint
 	Password string
 	Role     string
 }

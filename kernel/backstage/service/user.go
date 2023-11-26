@@ -7,6 +7,7 @@ import (
 	"loiter/config"
 	"loiter/global"
 	"loiter/kernel/backstage/foundation"
+	"loiter/kernel/backstage/model/entity"
 	"loiter/kernel/backstage/model/po"
 	"loiter/kernel/backstage/model/receiver"
 	"loiter/kernel/backstage/utils"
@@ -53,34 +54,54 @@ func (*userService) DoLogin(w http.ResponseWriter, r *http.Request, data receive
 	}
 
 	// 生成token
-	if err = foundation.AuthFoundation.RefreshToken(w, checkUser.UserId, checkUser.Role); err != nil {
+	if err = foundation.AuthFoundation.RefreshToken(w, checkUser.Uid, checkUser.Role); err != nil {
 		global.BackstageLogger.Warn("token generation failed for user with username " + data.Username + ", error:" + err.Error())
 		return errors.New("令牌生成失败，请联系管理员处理")
 	}
 
 	// 添加登录日志
-	go LogService.Login(r, checkUser.UserId)
+	go LogService.Login(r, checkUser.Uid)
 	return nil
 }
 
 // DoRegister 用户注册
-func (*userService) DoRegister(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.DoRegister) error {
+func (*userService) DoRegister(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.DoRegister) (err error) {
 	// 验证码校验？？
 
 	// 校验操作可行性，高级别用户只可创建低级别用户
-	//if userClaims.Weight <= 1 {
-	//
-	//}
+	var compareResult int
+	if err, compareResult = foundation.RoleFoundation.CompareRole(userClaims.Role, data.Role); err != nil {
+		global.BackstageLogger.Warn("permission judgment error, incorrect data present, error:" + err.Error())
+		return errors.New("角色非法，系统不存在类型为 " + data.Role + " 的角色")
+	}
+	if compareResult <= 0 {
+		return errors.New("您的权限不足以创建类型为" + data.Role + " 的角色")
+	}
 
-	// 创建用户
-	hash, err := bcrypt.GenerateFromPassword([]byte("loiter"), bcrypt.DefaultCost)
+	// 生成随机密码
+	initialPsd := utils.GenerateRandString(config.Context.InitialPsdLen)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(initialPsd), bcrypt.DefaultCost)
 	if err != nil {
 		fmt.Println(err)
 	}
-	encodePWD := string(hash)
-	fmt.Println(encodePWD)
 
-	// 发送邮件通知新用户
+	// 创建用户
+	_, rid := foundation.RoleFoundation.GetRidByRole(data.Role)
+	user := entity.User{
+		Username: data.Username,
+		Password: string(passwordHash),
+		Rid:      rid,
+		Email:    data.Email,
+		Remarks:  data.Remarks,
+	}
+	if err = global.MDB.Create(&user).Error; err != nil {
+		global.BackstageLogger.Warn("failed to create user, error:" + err.Error())
+		return errors.New("创建用户失败，请联系管理员")
+	}
+
+	// 发送邮件通知被创建的用户
+
+	// 记录操作日志
 
 	return nil
 }

@@ -24,15 +24,15 @@ func (*logService) Operate() {
 }
 
 // Login 登录日志
-func (*logService) Login(r *http.Request, userId uint) {
+func (*logService) Login(r *http.Request, uid uint) {
 	logLogin := entity.LogLogin{
-		UserId:  userId,
+		Uid:     uid,
 		Ip:      utils.GetIp(r),
 		Browser: utils.GetBrowser(r),
 	}
 
 	// 插入数据库
 	if err := global.MDB.Create(&logLogin).Error; err != nil {
-		global.BackstageLogger.Error("User login log insertion failed for userId " + strconv.Itoa(int(userId)) + ", error:" + err.Error())
+		global.BackstageLogger.Error("User login log insertion failed for userId " + strconv.Itoa(int(uid)) + ", error:" + err.Error())
 	}
 }

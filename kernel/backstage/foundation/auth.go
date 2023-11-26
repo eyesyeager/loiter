@@ -51,8 +51,9 @@ func (authFoundation *authFoundation) TokenAnalysis(w http.ResponseWriter, r *ht
 	}
 	// 权限判断
 	var compareResult int
-	if err, compareResult = RoleFoundation.compareRole(userClaims.Role, role); err != nil {
+	if err, compareResult = RoleFoundation.CompareRole(userClaims.Role, role); err != nil {
 		global.BackstageLogger.Warn("permission judgment error, incorrect data present, error:" + err.Error())
+		return userClaims, errors.New("角色身份非法，请联系管理员")
 	}
 	if compareResult < 0 {
 		global.BackstageLogger.Warn("the user with ID " + strconv.Itoa(int(userClaims.Uid)) + " has insufficient permissions. His role is " + userClaims.Role + ", which is less than " + role)

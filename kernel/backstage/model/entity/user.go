@@ -12,7 +12,7 @@ type User struct {
 	gorm.Model
 	Username string `json:"name" gorm:"not null;unique;comment:用户名"`
 	Password string `json:"password" gorm:"not null;comment:密码"`
-	RoleId   uint   `json:"role" gorm:"not null;comment:角色id"`
+	Rid      uint   `json:"rid" gorm:"not null;comment:角色id"`
 	Email    string `json:"email"`
 	Avatar   string `json:"avatar" gorm:"comment:头像链接"`
 	Status   uint8  `json:"status" gorm:"not null;default:1;comment:1(正常),2(停用),3(删除)"`
