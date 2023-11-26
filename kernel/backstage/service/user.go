@@ -39,7 +39,7 @@ func (*userService) DoLogin(w http.ResponseWriter, r *http.Request, data receive
 	// 获取用户密码
 	var checkUser po.LoginUserRole
 	if tx := global.MDB.Raw(
-		"SELECT user.id UserId, user.password, role.weight FROM user, role WHERE user.username = ? AND user.role_id = role.id",
+		"SELECT user.id UserId, user.password, role.name Role FROM user, role WHERE user.username = ? AND user.role_id = role.id",
 		data.Username).Scan(&checkUser); tx.RowsAffected != 1 {
 		global.BackstageLogger.Warn("a user with username " + data.Username + " does not exist")
 		return errors.New(errorMsg)
@@ -53,7 +53,7 @@ func (*userService) DoLogin(w http.ResponseWriter, r *http.Request, data receive
 	}
 
 	// 生成token
-	if err = foundation.AuthFoundation.RefreshToken(w, checkUser.UserId, checkUser.Weight); err != nil {
+	if err = foundation.AuthFoundation.RefreshToken(w, checkUser.UserId, checkUser.Role); err != nil {
 		global.BackstageLogger.Warn("token generation failed for user with username " + data.Username + ", error:" + err.Error())
 		return errors.New("令牌生成失败，请联系管理员处理")
 	}
@@ -65,12 +65,22 @@ func (*userService) DoLogin(w http.ResponseWriter, r *http.Request, data receive
 
 // DoRegister 用户注册
 func (*userService) DoRegister(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.DoRegister) error {
-	// 验证码校验
+	// 验证码校验？？
+
+	// 校验操作可行性，高级别用户只可创建低级别用户
+	//if userClaims.Weight <= 1 {
+	//
+	//}
+
+	// 创建用户
 	hash, err := bcrypt.GenerateFromPassword([]byte("loiter"), bcrypt.DefaultCost)
 	if err != nil {
 		fmt.Println(err)
 	}
 	encodePWD := string(hash)
 	fmt.Println(encodePWD)
+
+	// 发送邮件通知新用户
+
 	return nil
 }

@@ -7,15 +7,15 @@ package constant
  */
 
 var Role = role{
-	100,
-	50,
-	1,
-	0,
+	"super_admin",
+	"admin",
+	"user",
+	"visitor",
 }
 
 type role struct {
-	SuperAdmin uint
-	Admin      uint
-	User       uint
-	Visitor    uint
+	SuperAdmin string
+	Admin      string
+	User       string
+	Visitor    string
 }

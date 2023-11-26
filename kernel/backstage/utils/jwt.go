@@ -15,7 +15,7 @@ import (
 // JwtCustomClaims 注册声明是JWT声明集的结构化版本，仅限于注册声明名称
 type JwtCustomClaims struct {
 	Uid              uint
-	Weight           uint
+	Role             string
 	RegisteredClaims jwt.RegisteredClaims
 }
 
@@ -24,11 +24,11 @@ func (j JwtCustomClaims) Valid() error {
 }
 
 // GenerateToken 生成Token
-func GenerateToken(subject string, stSignKey []byte, uid uint, weight uint, expire int) (string, error) {
+func GenerateToken(subject string, stSignKey []byte, uid uint, role string, expire int) (string, error) {
 	// 初始化
 	iJwtCustomClaims := JwtCustomClaims{
-		Uid:    uid,
-		Weight: weight,
+		Uid:  uid,
+		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// 设置过期时间
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(expire) * time.Minute)),

@@ -5,6 +5,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"loiter/config"
 	"loiter/global"
+	"loiter/kernel/backstage/foundation"
 	"loiter/kernel/backstage/router"
 	"net/http"
 )
@@ -21,6 +22,9 @@ func Start() {
 	routerRoot := httprouter.New()
 	router.InitRouter(routerRoot)
 
+	// 初始化后台服务
+	initBackstage()
+
 	// 启动服务
 	global.AppLogger.Info("start running backstage service, service port:" + config.Program.BackstagePort)
 	if err := http.ListenAndServe(":"+config.Program.BackstagePort, routerRoot); err != nil {
@@ -28,7 +32,11 @@ func Start() {
 	}
 }
 
-// InitRegister 初始化注册信息
-func InitRegister() {
-
+// initBackstage 初始化后台服务
+func initBackstage() {
+	// 初始化角色容器
+	global.AppLogger.Info("start initializing role container")
+	if err := foundation.RoleFoundation.InitRoleContainer(); err != nil {
+		panic(fmt.Errorf("failed to initialize role container, error: %s", err.Error()))
+	}
 }

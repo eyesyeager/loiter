@@ -8,5 +8,5 @@ package po
 type LoginUserRole struct {
 	UserId   uint
 	Password string
-	Weight   uint
+	Role     string
 }
