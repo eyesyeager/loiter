@@ -11,6 +11,7 @@ import (
 )
 
 /**
+ * 加解密工具类
  * @author eyesYeager
  * @date 2023/9/26 15:13
  */

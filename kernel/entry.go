@@ -5,6 +5,7 @@ import (
 	"loiter/config"
 	"loiter/global"
 	"loiter/kernel/backstage"
+	"loiter/kernel/proxy"
 	"net/http"
 )
 
@@ -17,8 +18,10 @@ import (
 // Start 启动网关服务
 func Start() {
 	// 加载注册信息
+	backstage.InitRegister()
 
 	// 执行代理配置
+	proxy.StartProxy()
 
 	// 启动后台web服务
 	go backstage.Start()

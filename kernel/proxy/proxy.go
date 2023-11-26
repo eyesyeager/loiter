@@ -19,18 +19,11 @@ func StartProxy() {
 		// 进入后置管道
 
 		// 获取代理信息
-		//err, targetServer := balancer.SpecifyURL(r)
-		//if err != nil {
-		//	_, _ = w.Write([]byte(err.Error()))
-		//	return
-		//}
 
 		// 创建代理
-		//proxy := httputil.NewSingleHostReverseProxy(targetServer)
 
 		// 进入响应管道（异步执行）
 
 		// 执行反向代理
-		//proxy.ServeHTTP(w, r)
 	})
 }

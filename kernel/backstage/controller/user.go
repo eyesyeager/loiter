@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"golang.org/x/crypto/bcrypt"
 	"loiter/kernel/backstage/controller/parser"
 	"loiter/kernel/backstage/controller/result"
 	"loiter/kernel/backstage/controller/validator"
@@ -31,12 +29,25 @@ import (
 // @Failure			400					{object}	result.Response
 // @Router			/user/doRegister [post]
 func DoRegister(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	hash, err := bcrypt.GenerateFromPassword([]byte("loiter"), bcrypt.DefaultCost)
-	if err != nil {
-		fmt.Println(err)
+	// 权限校验
+
+	// 参数校验
+	var data receiver.DoRegister
+	if err := parser.PostData(r, &data); err != nil {
+		result.FailAttachedMsg(w, r, err.Error())
+		return
 	}
-	encodePWD := string(hash)
-	fmt.Println(encodePWD)
+	if err := validator.Checker.Struct(data); err != nil {
+		result.FailAttachedMsg(w, r, err.Error())
+		return
+	}
+
+	// 执行业务
+	if err := service.UserService.DoRegister(w, r, data); err == nil {
+		result.SuccessDefault(w, r, nil)
+	} else {
+		result.FailAttachedMsg(w, r, err.Error())
+	}
 }
 
 // DoLogin

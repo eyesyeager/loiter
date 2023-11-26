@@ -15,11 +15,6 @@ import (
  * @date 2023/4/11 15:45
  */
 
-// InitRegister 初始化注册信息
-func InitRegister() {
-
-}
-
 // Start loiter后台服务启动器
 func Start() {
 	// 初始化路由
@@ -31,4 +26,9 @@ func Start() {
 	if err := http.ListenAndServe(":"+config.Program.BackstagePort, routerRoot); err != nil {
 		panic(fmt.Errorf("failed to execute http.ListenAndServe(:%s): %s", config.Program.BackstagePort, err))
 	}
+}
+
+// InitRegister 初始化注册信息
+func InitRegister() {
+
 }

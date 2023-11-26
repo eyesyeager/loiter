@@ -2,13 +2,14 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"loiter/config"
 	"loiter/global"
 	"loiter/kernel/backstage/constant"
 	"loiter/kernel/backstage/model/po"
 	"loiter/kernel/backstage/model/receiver"
-	"loiter/kernel/utils"
+	"loiter/kernel/backstage/utils"
 	"net/http"
 )
 
@@ -62,5 +63,19 @@ func (*userService) DoLogin(w http.ResponseWriter, r *http.Request, data receive
 
 	// 添加登录日志
 	go LogService.Login(r, checkUser.UserId, token)
+	return nil
+}
+
+// DoRegister 用户注册
+func (*userService) DoRegister(w http.ResponseWriter, r *http.Request, data receiver.DoRegister) error {
+	// 验证码校验
+
+	//
+	hash, err := bcrypt.GenerateFromPassword([]byte("loiter"), bcrypt.DefaultCost)
+	if err != nil {
+		fmt.Println(err)
+	}
+	encodePWD := string(hash)
+	fmt.Println(encodePWD)
 	return nil
 }

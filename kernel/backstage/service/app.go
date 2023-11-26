@@ -8,8 +8,3 @@ type appService struct {
 }
 
 var AppService = appService{}
-
-// AddApp 添加应用
-//func (appService *appService) AddApp(r *http.Request, data receiver.AppAdd) error {
-//	return nil
-//}
