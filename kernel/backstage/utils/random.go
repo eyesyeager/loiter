@@ -12,7 +12,7 @@ import (
  * @date 2023/11/26 20:39
  */
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 // GenerateRandString 生成指定长度的随机字符串
 // 伪随机，安全性不高

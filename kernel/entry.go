@@ -31,7 +31,7 @@ func Start() {
 	printBanner()
 
 	// 启动网关服务
-	global.AppLogger.Info("start running gateway service, service port:" + config.Program.GateWayPort)
+	global.AppLogger.Info("start running gateway service, service port:", config.Program.GateWayPort)
 	if err := http.ListenAndServe(":"+config.Program.GateWayPort, nil); err != nil {
 		panic(fmt.Errorf("failed to execute http.ListenAndServe(:%s): %s", config.Program.GateWayPort, err))
 	}

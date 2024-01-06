@@ -68,10 +68,14 @@ func mDbClose() {
 // 数据库表初始化
 func initMySqlTables(db *gorm.DB) {
 	err := db.AutoMigrate(
-		entity.App{},
 		entity.Role{},
 		entity.User{},
 		entity.LogLogin{},
+		entity.LogUniversal{},
+		entity.App{},
+		entity.Server{},
+		entity.Balance{},
+		entity.AppBalance{},
 	)
 	if err != nil {
 		global.AppLogger.Error("migrate table failed")

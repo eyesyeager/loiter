@@ -13,6 +13,9 @@ import (
 
 // InitRouter 初始化路由
 func InitRouter(routerRoot *httprouter.Router) {
-	route.InitAppRoute(routerRoot, "/app")
 	route.InitUserRoute(routerRoot, "/user")
+	route.InitLogRoute(routerRoot, "/log")
+	route.InitAppRoute(routerRoot, "/app")
+	route.InitServerRoute(routerRoot, "/server")
+	route.InitBalanceRoute(routerRoot, "/balance")
 }

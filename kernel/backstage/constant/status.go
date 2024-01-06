@@ -12,7 +12,7 @@ var Status = status{
 }
 
 type status struct {
-	Normal  uint
-	Invalid uint
-	Delete  uint
+	Normal  uint8
+	Invalid uint8
+	Delete  uint8
 }

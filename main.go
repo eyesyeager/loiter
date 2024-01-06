@@ -31,6 +31,8 @@ func main() {
 	defer destruction()
 }
 
+// loiter	loiter		6e0Pu/FT9KNXrkf1e6ReIQ==
+
 // destruction 析构方法，统一处理程序关闭事项
 func destruction() {
 	// 关闭程序环境

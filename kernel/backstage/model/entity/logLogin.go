@@ -10,7 +10,7 @@ import "gorm.io/gorm"
 
 type LogLogin struct {
 	gorm.Model
-	Uid     uint   `json:"user_id" gorm:"not null"`
-	Ip      string `json:"ip" gorm:"not null"`
-	Browser string `json:"browser"`
+	Uid     uint   `json:"user_id" gorm:"not null;comment:用户id"`
+	Ip      string `json:"ip" gorm:"not null;comment:ip地址"`
+	Browser string `json:"browser" gorm:"comment:浏览器"`
 }

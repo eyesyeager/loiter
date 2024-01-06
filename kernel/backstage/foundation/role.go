@@ -35,6 +35,7 @@ func (roleFoundation *roleFoundation) InitRoleContainer() error {
 
 	// 初始化各类容器
 	roleFoundation.initWeightByRoleMap(roleSlice)
+	roleFoundation.initRidByRoleMap(roleSlice)
 	return nil
 }
 

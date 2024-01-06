@@ -14,13 +14,9 @@ import (
 
 // JwtCustomClaims 注册声明是JWT声明集的结构化版本，仅限于注册声明名称
 type JwtCustomClaims struct {
-	Uid              uint
-	Role             string
-	RegisteredClaims jwt.RegisteredClaims
-}
-
-func (j JwtCustomClaims) Valid() error {
-	return nil
+	Uid  uint
+	Role string
+	jwt.RegisteredClaims
 }
 
 // GenerateToken 生成Token
@@ -44,13 +40,25 @@ func GenerateToken(subject string, stSignKey []byte, uid uint, role string, expi
 
 // ParseToken 解析token
 func ParseToken(stSignKey []byte, tokenStr string) (JwtCustomClaims, error) {
-	iJwtCustomClaims := JwtCustomClaims{}
-	token, err := jwt.ParseWithClaims(tokenStr, &iJwtCustomClaims, func(token *jwt.Token) (interface{}, error) {
+	claims := JwtCustomClaims{}
+	token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
 		return stSignKey, nil
 	})
-
-	if err == nil && !token.Valid {
-		err = errors.New("invalid Token:" + tokenStr)
+	if err != nil {
+		if ve, ok := err.(*jwt.ValidationError); ok {
+			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+				return claims, errors.New("that's not even a token, " + tokenStr)
+			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
+				return claims, errors.New("token is expired, " + tokenStr)
+			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
+				return claims, errors.New("token not active yet, " + tokenStr)
+			} else {
+				return claims, errors.New("couldn't handle this token, " + tokenStr)
+			}
+		}
 	}
-	return iJwtCustomClaims, err
+	if !token.Valid {
+		err = errors.New("couldn't handle this token")
+	}
+	return claims, err
 }

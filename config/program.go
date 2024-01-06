@@ -24,13 +24,15 @@ var Program = programConfig{
 	50,
 	30,
 	true,
-	mysqlConfig,
+	mysqlConfigInstance,
 	"hello,bestLoiter",
 	"hello,loiter!",
 	5,
+	emailConfigInstance,
+	10,
 }
 
-var mysqlConfig = mySQLConfig{
+var mysqlConfigInstance = mysqlConfig{
 	"192.168.204.133",
 	3306,
 	"loiter",
@@ -41,6 +43,14 @@ var mysqlConfig = mySQLConfig{
 	10,
 	"info",
 	true,
+}
+
+var emailConfigInstance = emailConfig{
+	"",
+	"",
+	"",
+	"",
+	"",
 }
 
 type programConfig struct {
@@ -64,7 +74,7 @@ type programConfig struct {
 	LogCompress      bool   // 日志文件是否开启压缩
 
 	// MySQL
-	MySQLConfig mySQLConfig
+	MySQLConfig mysqlConfig
 
 	// secret key
 	AESSecretKey string // AES双向加密密钥，必须是16位
@@ -72,9 +82,15 @@ type programConfig struct {
 	// JWT
 	JWTSecretKey string // JWT签名加密密钥
 	JWTExpire    int    // JWT签名过期时间(min)
+
+	// email
+	EmailConfig emailConfig
+
+	// 默认应用实例名长度
+	ServerDefaultNameLen int
 }
 
-type mySQLConfig struct {
+type mysqlConfig struct {
 	Host                string // 主机地址
 	Port                int    // 端口号
 	Database            string // 数据库名
@@ -85,4 +101,12 @@ type mySQLConfig struct {
 	MaxOpenConn         int    // 打开数据库连接的最大数量
 	LogMode             string // 日志级别
 	EnableFileLogWriter bool   // 是否启用日志文件
+}
+
+type emailConfig struct {
+	Addr     string // SMTP服务器的地址
+	Identity string // 身份证明
+	Username string // 用户名
+	Password string // 密码
+	Host     string // 主机地址
 }

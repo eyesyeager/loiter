@@ -1,6 +1,7 @@
 package receiver
 
 /**
+ * 登录请求参数
  * @author eyesYeager
  * @date 2023/9/26 15:24
  */

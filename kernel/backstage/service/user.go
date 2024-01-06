@@ -6,6 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"loiter/config"
 	"loiter/global"
+	"loiter/kernel/backstage/constant"
 	"loiter/kernel/backstage/foundation"
 	"loiter/kernel/backstage/model/entity"
 	"loiter/kernel/backstage/model/po"
@@ -33,45 +34,45 @@ func (*userService) DoLogin(w http.ResponseWriter, r *http.Request, data receive
 	if err, decrypt := utils.AesDecrypt(data.Password, config.Program.AESSecretKey); err == nil {
 		data.Password = decrypt
 	} else {
-		global.BackstageLogger.Warn("password " + data.Password + " does not comply with decryption rules, error:" + err.Error())
+		global.BackstageLogger.Warn("password ", data.Password, " does not comply with decryption rules, error:", err.Error())
 		return errors.New(errorMsg)
 	}
 
 	// 获取用户密码
 	var checkUser po.LoginUserRole
 	if tx := global.MDB.Raw(
-		"SELECT user.id UserId, user.password, role.name Role FROM user, role WHERE user.username = ? AND user.role_id = role.id",
+		"SELECT user.id Uid, user.password, role.name Role FROM user, role WHERE user.username = ? AND user.rid = role.id",
 		data.Username).Scan(&checkUser); tx.RowsAffected != 1 {
-		global.BackstageLogger.Warn("a user with username " + data.Username + " does not exist")
+		global.BackstageLogger.Warn("a user with username ", data.Username, " does not exist")
 		return errors.New(errorMsg)
 	}
 
 	// 密码校验
 	err := bcrypt.CompareHashAndPassword([]byte(checkUser.Password), []byte(data.Password))
 	if err != nil {
-		global.BackstageLogger.Warn("the password with username " + data.Username + " is not " + data.Password)
+		global.BackstageLogger.Warn("the password with username ", data.Username, " is not the given value")
 		return errors.New(errorMsg)
 	}
 
 	// 生成token
 	if err = foundation.AuthFoundation.RefreshToken(w, checkUser.Uid, checkUser.Role); err != nil {
-		global.BackstageLogger.Warn("token generation failed for user with username " + data.Username + ", error:" + err.Error())
+		global.BackstageLogger.Warn("token generation failed for user with username ", data.Username, ", error:"+err.Error())
 		return errors.New("令牌生成失败，请联系管理员处理")
 	}
 
 	// 添加登录日志
 	go LogService.Login(r, checkUser.Uid)
-	return nil
+	return err
 }
 
-// DoRegister 用户注册
+// DoRegister 开通新账号
 func (*userService) DoRegister(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.DoRegister) (err error) {
-	// 验证码校验？？
+	// TODO：验证码校验
 
 	// 校验操作可行性，高级别用户只可创建低级别用户
 	var compareResult int
 	if err, compareResult = foundation.RoleFoundation.CompareRole(userClaims.Role, data.Role); err != nil {
-		global.BackstageLogger.Warn("permission judgment error, incorrect data present, error:" + err.Error())
+		global.BackstageLogger.Warn("permission judgment error, incorrect data present, error:", err.Error())
 		return errors.New("角色非法，系统不存在类型为 " + data.Role + " 的角色")
 	}
 	if compareResult <= 0 {
@@ -95,13 +96,17 @@ func (*userService) DoRegister(r *http.Request, userClaims utils.JwtCustomClaims
 		Remarks:  data.Remarks,
 	}
 	if err = global.MDB.Create(&user).Error; err != nil {
-		global.BackstageLogger.Warn("failed to create user, error:" + err.Error())
+		global.BackstageLogger.Warn("failed to create user, error:", err.Error())
 		return errors.New("创建用户失败，请联系管理员")
 	}
 
 	// 发送邮件通知被创建的用户
+	// TODO: 待测试
+	//template := emailTemplate.GetRegisterEmailTemplate()
+	//foundation.MessageFoundation.SendEmailWithHTML(template.Subject, "", "", "", template.Content)
 
 	// 记录操作日志
-
-	return nil
+	go LogService.Universal(r, userClaims.Uid,
+		constant.BuildUniversalLog(constant.LogUniversal.DoRegister, user.Username, user.Email, user.Remarks))
+	return err
 }

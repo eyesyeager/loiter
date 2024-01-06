@@ -60,6 +60,9 @@ func AesEncrypt(str string, aesKey string) string {
 // AesDecrypt AES(CBC)解密
 func AesDecrypt(str string, aesKey string) (err error, decrypt string) {
 	cratedByte, _ := base64.StdEncoding.DecodeString(str)
+	if len(cratedByte) != 16 {
+		return errors.New("非法待解密字符串"), ""
+	}
 	k := []byte(aesKey)
 
 	block, _ := aes.NewCipher(k)

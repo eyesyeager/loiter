@@ -1,6 +1,7 @@
 package receiver
 
 /**
+ * 开通新账号请求参数
  * @author eyesYeager
  * @date 2023/11/26 16:02
  */

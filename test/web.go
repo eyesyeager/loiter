@@ -12,7 +12,7 @@ type webHandlerA struct {
 }
 
 func (webHandlerA) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
-	_, _ = write.Write([]byte("test webA"))
+	_, _ = write.Write([]byte("我是耶瞳空间"))
 }
 
 func StartWebA() {
@@ -23,7 +23,7 @@ type webHandlerB struct {
 }
 
 func (webHandlerB) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
-	_, _ = write.Write([]byte("test webB"))
+	_, _ = write.Write([]byte("我是耶瞳星空"))
 }
 
 func StartWebB() {
@@ -34,7 +34,7 @@ type webHandlerC struct {
 }
 
 func (webHandlerC) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
-	_, _ = write.Write([]byte("test webC"))
+	_, _ = write.Write([]byte("我是耶瞳用户中心"))
 }
 
 func StartWebC() {
