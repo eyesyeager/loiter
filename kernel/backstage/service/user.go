@@ -76,7 +76,7 @@ func (*userService) DoRegister(r *http.Request, userClaims utils.JwtCustomClaims
 		return errors.New("角色非法，系统不存在类型为 " + data.Role + " 的角色")
 	}
 	if compareResult <= 0 {
-		return errors.New("您的权限不足以创建类型为" + data.Role + " 的角色")
+		return errors.New("您的权限不足以创建类型为 " + data.Role + " 的角色")
 	}
 
 	// 生成随机密码
