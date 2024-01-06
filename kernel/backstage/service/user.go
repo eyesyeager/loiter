@@ -11,6 +11,7 @@ import (
 	"loiter/kernel/backstage/model/entity"
 	"loiter/kernel/backstage/model/po"
 	"loiter/kernel/backstage/model/receiver"
+	"loiter/kernel/backstage/template/email"
 	"loiter/kernel/backstage/utils"
 	"net/http"
 )
@@ -101,9 +102,16 @@ func (*userService) DoRegister(r *http.Request, userClaims utils.JwtCustomClaims
 	}
 
 	// 发送邮件通知被创建的用户
-	// TODO: 待测试
-	//template := emailTemplate.GetRegisterEmailTemplate()
-	//foundation.MessageFoundation.SendEmailWithHTML(template.Subject, "", "", "", template.Content)
+	// 此处不能异步，因为邮件中含有初始密码，因此必须保证邮件发送成功
+	template := email.GetRegisterEmailTemplate(config.Program.Name, data.Username, initialPsd)
+	err = foundation.MessageFoundation.SendEmailWithHTML(template.Subject, []string{data.Email}, template.Content)
+	if err != nil {
+		global.BackstageLogger.Error("email sending failed when registering a new user,",
+			"username:", data.Username,
+			";email:", data.Email,
+			";error:", err.Error())
+		return errors.New("邮件通知新用户失败！请记住初始密码：" + initialPsd)
+	}
 
 	// 记录操作日志
 	go LogService.Universal(r, userClaims.Uid,

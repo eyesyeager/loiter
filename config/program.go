@@ -12,7 +12,7 @@ import (
 
 var Program = programConfig{
 	constant.DEVELOP,
-	"loiter",
+	"Loiter",
 	"9500",
 	"9510",
 	"log",
