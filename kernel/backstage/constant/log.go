@@ -24,12 +24,17 @@ var LogUniversal = logUniversal{
 		Title:   "注册应用实例",
 		Content: "应用名：%s；实例名：%s；实例地址：%s；备注：%s",
 	},
+	UpdateAppBalance: logStructure{
+		Title:   "更新应用负载均衡策略",
+		Content: "应用名：%s；原负载策略：%s；更新后负载策略：%s",
+	},
 }
 
 type logUniversal struct {
-	DoRegister logStructure
-	AddApp     logStructure
-	AddServer  logStructure
+	DoRegister       logStructure
+	AddApp           logStructure
+	AddServer        logStructure
+	UpdateAppBalance logStructure
 }
 
 type logStructure struct {

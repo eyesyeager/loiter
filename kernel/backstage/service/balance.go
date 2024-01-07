@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"loiter/global"
+	"loiter/kernel/backstage/constant"
 	"loiter/kernel/backstage/controller/result"
 	"loiter/kernel/backstage/model/entity"
 	"loiter/kernel/backstage/model/receiver"
@@ -44,27 +45,67 @@ func (*balanceService) UpdateAppBalance(r *http.Request, userClaims utils.JwtCus
 	}
 
 	// 校验是否存在对应策略
+	var balanceIdSlice []uint
+	if checkAppBalanceTX.RowsAffected == 0 {
+		balanceIdSlice = []uint{data.BalanceId}
+	} else {
+		balanceIdSlice = []uint{checkAppBalance.BalanceId, data.BalanceId}
+	}
 	var balanceSlice []entity.Balance
-	if err := global.MDB.Find(&balanceSlice, []uint{checkAppBalance.BalanceId, data.BalanceId}).Error; err != nil {
+	if err := global.MDB.Find(&balanceSlice, balanceIdSlice).Error; err != nil {
 		errMsg := fmt.Sprintf(result.ResultInfo.DbOperateError, checkAppBalanceTX.Error.Error())
 		global.BackstageLogger.Error(errMsg)
 		return errors.New(errMsg)
 	}
-	if len(balanceSlice) != 2 {
-		return errors.New(fmt.Sprintf("非法负载均衡策略id！[%s, %s]中存在无效BalanceId!"))
+	if checkAppBalanceTX.RowsAffected == 0 && len(balanceSlice) < 1 {
+		return errors.New(fmt.Sprintf("非法负载均衡策略id！%d是无效BalanceId!", data.BalanceId))
+	} else if checkAppBalanceTX.RowsAffected != 0 && len(balanceSlice) < 2 {
+		return errors.New(fmt.Sprintf("非法负载均衡策略id！[%d(原id), %d(新id)]中存在无效BalanceId!", checkAppBalance.BalanceId, data.BalanceId))
+	}
+
+	// 如果原应用未配置策略，则直接插入
+	if checkAppBalanceTX.RowsAffected == 0 {
+		if err := global.MDB.Create(&entity.AppBalance{
+			AppId:     data.AppID,
+			BalanceId: data.BalanceId,
+		}).Error; err != nil {
+			errMsg := fmt.Sprintf(result.ResultInfo.DbOperateError, checkAppBalanceTX.Error.Error())
+			global.BackstageLogger.Error(errMsg)
+			return errors.New(errMsg)
+		}
+		// 记录操作日志
+		go func() {
+			var app entity.App
+			if err := global.MDB.First(&app, data.AppID).Error; err != nil {
+				global.BackstageLogger.Error(fmt.Sprintf(result.ResultInfo.DbOperateError, checkAppBalanceTX.Error.Error()))
+			}
+			LogService.Universal(r, userClaims.Uid,
+				constant.BuildUniversalLog(constant.LogUniversal.UpdateAppBalance, app.Name, "", balanceSlice[0].Name))
+		}()
+		return nil
 	}
 
 	// Slice转Map
+	balanceEntityById := make(map[uint]entity.Balance)
+	for _, item := range balanceSlice {
+		balanceEntityById[item.ID] = item
+	}
 
-	if checkAppBalanceTX.RowsAffected == 0 {
-		// 如果对应应用没有配置策略，则添加策略
-		//global.MDB.Create()
-	} else {
-		// 如果对应应用已经配置了策略，则修改策略
+	// 更新应用策略
+	if err := global.MDB.Model(&entity.AppBalance{AppId: data.AppID}).Update("balance_id", data.BalanceId).Error; err != nil {
+		errMsg := fmt.Sprintf(result.ResultInfo.DbOperateError, checkAppBalanceTX.Error.Error())
+		global.BackstageLogger.Error(errMsg)
+		return errors.New(errMsg)
 	}
 
 	// 记录操作日志
-	//go LogService.Universal(r, userClaims.Uid,
-	//	constant.BuildUniversalLog(constant.LogUniversal.AddApp, data.Name, data.Host, data.Remarks))
+	//go func() {
+	//	var app []entity.App
+	//	if err := global.MDB.Find(&app, data.AppID).Error; err != nil {
+	//		global.BackstageLogger.Error(fmt.Sprintf(result.ResultInfo.DbOperateError, checkAppBalanceTX.Error.Error()))
+	//	}
+	//	LogService.Universal(r, userClaims.Uid,
+	//		constant.BuildUniversalLog(constant.LogUniversal.UpdateAppBalance, app.Name, "", balanceSlice[0].Name))
+	//}()
 	return nil
 }
