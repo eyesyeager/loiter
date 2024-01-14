@@ -30,6 +30,7 @@ var Program = programConfig{
 	5,
 	emailConfigInstance,
 	10,
+	1,
 }
 
 var mysqlConfigInstance = mysqlConfig{
@@ -46,11 +47,11 @@ var mysqlConfigInstance = mysqlConfig{
 }
 
 var emailConfigInstance = emailConfig{
+	"smtp.163.com:25",
 	"",
+	"eyesyeager@163.com",
 	"",
-	"",
-	"",
-	"",
+	"smtp.163.com",
 }
 
 type programConfig struct {
@@ -88,6 +89,9 @@ type programConfig struct {
 
 	// 默认应用实例名长度
 	ServerDefaultNameLen int
+
+	// 默认负载均衡策略(值为策略id)
+	BalanceDefaultStrategy uint
 }
 
 type mysqlConfig struct {

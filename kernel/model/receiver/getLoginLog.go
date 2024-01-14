@@ -1,6 +1,8 @@
 package receiver
 
-import "loiter/kernel/backstage/model/structure"
+import (
+	"loiter/kernel/model/structure"
+)
 
 /**
  * 查询登录日志请求参数

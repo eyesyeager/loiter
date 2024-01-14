@@ -2,7 +2,7 @@ package utils
 
 import (
 	"errors"
-	"loiter/kernel/backstage/model/structure"
+	"loiter/kernel/model/structure"
 	"strconv"
 )
 

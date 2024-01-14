@@ -34,11 +34,10 @@ func Start() {
 
 // initBackstage 初始化后台服务
 func initBackstage() {
-	// 初始化角色数据
-
 	// 初始化角色容器
 	global.AppLogger.Info("start initializing role container")
 	if err := foundation.RoleFoundation.InitRoleContainer(); err != nil {
 		panic(fmt.Errorf("failed to initialize role container, error: %s", err.Error()))
 	}
+	global.AppLogger.Info("role container initialization completed")
 }

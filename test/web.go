@@ -11,8 +11,8 @@ import "net/http"
 type webHandlerA struct {
 }
 
-func (webHandlerA) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
-	_, _ = write.Write([]byte("我是耶瞳空间"))
+func (webHandlerA) ServeHTTP(write http.ResponseWriter, r *http.Request) {
+	_, _ = write.Write([]byte("r"))
 }
 
 func StartWebA() {

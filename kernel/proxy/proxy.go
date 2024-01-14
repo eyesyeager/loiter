@@ -1,9 +1,14 @@
 package proxy
 
 import (
+	"fmt"
+	"loiter/constant"
+	"loiter/global"
 	"loiter/kernel/balancer"
-	"loiter/kernel/pipeline"
+	"loiter/kernel/helper"
+	"loiter/kernel/passageway"
 	"net/http"
+	"net/http/httputil"
 )
 
 /**
@@ -16,26 +21,31 @@ func StartProxy() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		host := r.Host
 
-		// 进入前置管道
-		pipeline.FrontEntry(host, w, r)
-
-		// 进入过滤器
-
-		// 进入后置管道
-		pipeline.RearEntry(host, w, r)
+		// 进入通道
+		err, success := passageway.Entry(w, r, host)
+		if err != nil {
+			statusCode, contentType, content := helper.HtmlSimpleTemplate(constant.ResponseTitle.BadGateway, constant.ResponseNotice.Empty)
+			helper.Response(w, statusCode, contentType, content)
+			global.GatewayLogger.Warn(fmt.Sprintf("channel filtering execution failed. Error message: %s", err.Error()))
+			return
+		}
+		if !success {
+			return
+		}
 
 		// 获取代理信息
-		targetUrl := balancer.Entry(host)
-		println("-----------")
-		println(targetUrl)
-		println("-----------")
+		err, targetUrl := balancer.Entry(r, host)
+		if err != nil {
+			statusCode, contentType, content := helper.HtmlSimpleTemplate(constant.ResponseTitle.BadGateway, constant.ResponseNotice.Empty)
+			helper.Response(w, statusCode, contentType, content)
+			global.GatewayLogger.Warn(fmt.Sprintf("the load balancing policy execution failed and the proxy could not be used. Error message: %s", err.Error()))
+			return
+		}
 
 		// 创建代理
-		//proxy := httputil.NewSingleHostReverseProxy(targetUrl)
-
-		// 进入响应管道（异步执行）
+		proxy := httputil.NewSingleHostReverseProxy(targetUrl)
 
 		// 执行反向代理
-		//proxy.ServeHTTP(w, r)
+		proxy.ServeHTTP(w, r)
 	})
 }

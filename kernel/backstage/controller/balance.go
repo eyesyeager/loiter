@@ -7,8 +7,8 @@ import (
 	"loiter/kernel/backstage/controller/result"
 	"loiter/kernel/backstage/controller/validator"
 	"loiter/kernel/backstage/foundation"
-	"loiter/kernel/backstage/model/receiver"
 	"loiter/kernel/backstage/service"
+	"loiter/kernel/model/receiver"
 	"net/http"
 )
 
@@ -21,7 +21,7 @@ import (
 // UpdateAppBalance
 // @Summary			更新应用负载均衡策略
 // @Description		权限：admin
-// @Tags			log
+// @Tags			balance
 // @Accept			json
 // @Produce			json
 // @Security		token

@@ -5,7 +5,9 @@ import (
 	"loiter/config"
 	"loiter/global"
 	"loiter/kernel/backstage"
-	"loiter/kernel/backstage/capacity"
+	"loiter/kernel/balancer"
+	"loiter/kernel/container"
+	"loiter/kernel/passageway"
 	"loiter/kernel/proxy"
 	"net/http"
 )
@@ -18,8 +20,17 @@ import (
 
 // Start 启动网关服务
 func Start() {
+	// 初始化初始数据
+	//initializer.InitData()
+
 	// 加载注册信息
-	capacity.InitRegister()
+	container.InitRegister()
+
+	// 加载负载均衡器
+	balancer.InitLoadBalancer()
+
+	// 加载通道
+	passageway.InitAisle()
 
 	// 执行代理配置
 	proxy.StartProxy()

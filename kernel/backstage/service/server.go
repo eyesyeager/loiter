@@ -7,9 +7,9 @@ import (
 	"loiter/global"
 	"loiter/kernel/backstage/constant"
 	"loiter/kernel/backstage/controller/result"
-	"loiter/kernel/backstage/model/entity"
-	"loiter/kernel/backstage/model/receiver"
 	"loiter/kernel/backstage/utils"
+	"loiter/kernel/model/entity"
+	"loiter/kernel/model/receiver"
 	"net/http"
 	"strconv"
 )
@@ -53,7 +53,7 @@ func (*serverService) AddServer(r *http.Request, userClaims utils.JwtCustomClaim
 		Address: data.Address,
 		Remarks: data.Remarks,
 	}).Error; err != nil {
-		errMsg := fmt.Sprintf(result.ResultInfo.DbOperateError, err.Error())
+		errMsg := fmt.Sprintf(result.CommonInfo.DbOperateError, "AddServer()-Create", err.Error())
 		global.BackstageLogger.Error(errMsg)
 		return errors.New(errMsg)
 	}

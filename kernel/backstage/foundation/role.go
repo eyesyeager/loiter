@@ -3,7 +3,7 @@ package foundation
 import (
 	"errors"
 	"loiter/global"
-	"loiter/kernel/backstage/model/entity"
+	"loiter/kernel/model/entity"
 )
 
 /**

@@ -8,11 +8,11 @@ import (
 	"loiter/global"
 	"loiter/kernel/backstage/constant"
 	"loiter/kernel/backstage/foundation"
-	"loiter/kernel/backstage/model/entity"
-	"loiter/kernel/backstage/model/po"
-	"loiter/kernel/backstage/model/receiver"
 	"loiter/kernel/backstage/template/email"
 	"loiter/kernel/backstage/utils"
+	"loiter/kernel/model/entity"
+	"loiter/kernel/model/po"
+	"loiter/kernel/model/receiver"
 	"net/http"
 )
 

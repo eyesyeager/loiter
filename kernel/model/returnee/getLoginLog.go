@@ -1,7 +1,7 @@
 package returnee
 
 import (
-	"loiter/kernel/backstage/model/structure"
+	"loiter/kernel/model/structure"
 )
 
 /**

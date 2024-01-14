@@ -6,10 +6,10 @@ package result
  * @date 2024/1/4 16:49
  */
 
-var ResultInfo = resultInfo{
-	"数据库操作失败，error: %s",
+var CommonInfo = commonInfo{
+	"数据库操作失败，失败位置：%s，错误信息: %s",
 }
 
-type resultInfo struct {
+type commonInfo struct {
 	DbOperateError string
 }

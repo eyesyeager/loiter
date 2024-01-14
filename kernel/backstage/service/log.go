@@ -6,12 +6,13 @@ import (
 	"github.com/jinzhu/copier"
 	"loiter/global"
 	"loiter/kernel/backstage/controller/result"
-	"loiter/kernel/backstage/model/entity"
-	"loiter/kernel/backstage/model/po"
-	"loiter/kernel/backstage/model/receiver"
-	"loiter/kernel/backstage/model/returnee"
-	"loiter/kernel/backstage/model/structure"
 	"loiter/kernel/backstage/utils"
+	"loiter/kernel/helper"
+	"loiter/kernel/model/entity"
+	"loiter/kernel/model/po"
+	"loiter/kernel/model/receiver"
+	"loiter/kernel/model/returnee"
+	"loiter/kernel/model/structure"
 	"net/http"
 	"strconv"
 	"time"
@@ -31,8 +32,8 @@ var LogService = logService{}
 func (*logService) Login(r *http.Request, uid uint) {
 	logLogin := entity.LogLogin{
 		Uid:     uid,
-		Ip:      utils.GetIp(r),
-		Browser: utils.GetBrowser(r),
+		Ip:      helper.GetIp(r),
+		Browser: helper.GetBrowser(r),
 	}
 
 	// 插入数据库
@@ -45,8 +46,8 @@ func (*logService) Login(r *http.Request, uid uint) {
 func (*logService) Universal(r *http.Request, operatorId uint, logUniversalStruct structure.LogUniversalStruct) {
 	logUniversal := entity.LogUniversal{
 		OperatorId: operatorId,
-		Ip:         utils.GetIp(r),
-		Browser:    utils.GetBrowser(r),
+		Ip:         helper.GetIp(r),
+		Browser:    helper.GetBrowser(r),
 		Title:      logUniversalStruct.Title,
 		Content:    logUniversalStruct.Content,
 	}
@@ -77,13 +78,13 @@ func (*logService) GetLoginLog(data receiver.GetLoginLog) (err error, res return
 	// 查总数
 	var total int64
 	if err = tx.Count(&total).Error; err != nil {
-		return errors.New(fmt.Sprintf(result.ResultInfo.DbOperateError, err.Error())), res
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, "GetLoginLog()-Count", err.Error())), res
 	}
 	// 查数据
 	var resDataPO []po.GetLoginLogInner
 	limit, offset := utils.BuildPageSearch(data.PageStruct)
 	if err = tx.Order("ll.created_at DESC").Limit(limit).Offset(offset).Find(&resDataPO).Error; err != nil {
-		return errors.New(fmt.Sprintf(result.ResultInfo.DbOperateError, err.Error())), res
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, "GetLoginLog()-List", err.Error())), res
 	}
 	// 时间格式化
 	var resData []returnee.GetLoginLogInner
@@ -122,13 +123,13 @@ func (*logService) GetUniversalLog(data receiver.GetUniversalLog) (err error, re
 	// 查总数
 	var total int64
 	if err = tx.Count(&total).Error; err != nil {
-		return errors.New(fmt.Sprintf(result.ResultInfo.DbOperateError, err.Error())), res
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, "GetUniversalLog()-Count", err.Error())), res
 	}
 	// 查数据
 	var resDataPO []po.GetUniversalLogInner
 	limit, offset := utils.BuildPageSearch(data.PageStruct)
 	if err = tx.Order("lu.created_at DESC").Limit(limit).Offset(offset).Find(&resDataPO).Error; err != nil {
-		return errors.New(fmt.Sprintf(result.ResultInfo.DbOperateError, err.Error())), res
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, "GetUniversalLog()-List", err.Error())), res
 	}
 	// 时间格式化
 	var resData []returnee.GetUniversalLogInner

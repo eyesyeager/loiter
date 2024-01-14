@@ -18,4 +18,6 @@ func InitRouter(routerRoot *httprouter.Router) {
 	route.InitAppRoute(routerRoot, "/app")
 	route.InitServerRoute(routerRoot, "/server")
 	route.InitBalanceRoute(routerRoot, "/balance")
+	route.InitContainerRoute(routerRoot, "/container")
+	route.InitPassagewayRoute(routerRoot, "/passageway")
 }

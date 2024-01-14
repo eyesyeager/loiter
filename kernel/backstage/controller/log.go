@@ -7,9 +7,9 @@ import (
 	"loiter/kernel/backstage/controller/result"
 	"loiter/kernel/backstage/controller/validator"
 	"loiter/kernel/backstage/foundation"
-	"loiter/kernel/backstage/model/receiver"
 	"loiter/kernel/backstage/service"
 	"loiter/kernel/backstage/utils"
+	receiver2 "loiter/kernel/model/receiver"
 	"net/http"
 )
 
@@ -33,25 +33,24 @@ import (
 // @Router			/log/getLoginLog [post]
 func GetLoginLog(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// 权限校验
-	_, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User)
-	if err != nil {
+	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
 	}
 
 	// 参数校验
-	var data receiver.GetLoginLog
-	if err = parser.PostData(r, &data); err != nil {
+	var data receiver2.GetLoginLog
+	if err := parser.PostData(r, &data); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
 	}
-	if err = validator.Checker.Struct(data); err != nil {
+	if err := validator.Checker.Struct(data); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
 	}
 
 	// 分页处理
-	if err = utils.CheckPageStruct(data.PageStruct); err != nil {
+	if err := utils.CheckPageStruct(data.PageStruct); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
 	}
@@ -78,25 +77,24 @@ func GetLoginLog(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 // @Router			/log/getUniversalLog [post]
 func GetUniversalLog(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// 权限校验
-	_, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User)
-	if err != nil {
+	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
 	}
 
 	// 参数校验
-	var data receiver.GetUniversalLog
-	if err = parser.PostData(r, &data); err != nil {
+	var data receiver2.GetUniversalLog
+	if err := parser.PostData(r, &data); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
 	}
-	if err = validator.Checker.Struct(data); err != nil {
+	if err := validator.Checker.Struct(data); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
 	}
 
 	// 分页处理
-	if err = utils.CheckPageStruct(data.PageStruct); err != nil {
+	if err := utils.CheckPageStruct(data.PageStruct); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
 	}

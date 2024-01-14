@@ -3,12 +3,13 @@ package service
 import (
 	"errors"
 	"fmt"
+	"loiter/config"
 	"loiter/global"
 	"loiter/kernel/backstage/constant"
 	"loiter/kernel/backstage/controller/result"
-	"loiter/kernel/backstage/model/entity"
-	"loiter/kernel/backstage/model/receiver"
 	"loiter/kernel/backstage/utils"
+	"loiter/kernel/model/entity"
+	"loiter/kernel/model/receiver"
 	"net/http"
 )
 
@@ -29,12 +30,19 @@ func (*appService) AddApp(r *http.Request, userClaims utils.JwtCustomClaims, dat
 		return errors.New(fmt.Sprintf("host为'%s'的应用已存在，应用名为'%s'", data.Host, checkApp.Name))
 	}
 	// 插入应用
-	if err := global.MDB.Create(&entity.App{
+	var newApp = entity.App{
 		Name:    data.Name,
 		Host:    data.Host,
 		Remarks: data.Remarks,
-	}).Error; err != nil {
-		errMsg := fmt.Sprintf(result.ResultInfo.DbOperateError, err.Error())
+	}
+	if err := global.MDB.Create(&newApp).Error; err != nil {
+		errMsg := fmt.Sprintf(result.CommonInfo.DbOperateError, "AddApp()-CreateApp", err.Error())
+		global.BackstageLogger.Error(errMsg)
+		return errors.New(errMsg)
+	}
+	// 插入默认负载均衡策略
+	if err := BalanceService.AddAppBalance(newApp.ID, config.Program.BalanceDefaultStrategy); err != nil {
+		errMsg := fmt.Sprintf(result.CommonInfo.DbOperateError, "AddApp()-AddAppBalance", err.Error())
 		global.BackstageLogger.Error(errMsg)
 		return errors.New(errMsg)
 	}
