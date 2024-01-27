@@ -11,6 +11,6 @@ import (
  * @date 2024/1/5 16:50
  */
 
-func InitBalanceRoute(routerRoot *httprouter.Router, group string) {
-	routerRoot.POST(group+"/updateAppBalance", controller.UpdateAppBalance)
+func InitBalancerRoute(routerRoot *httprouter.Router, group string) {
+	routerRoot.POST(group+"/updateAppBalancer", controller.UpdateAppBalancer)
 }

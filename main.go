@@ -2,6 +2,8 @@ package main
 
 import (
 	"loiter/bootstrap"
+	"loiter/config"
+	"loiter/constant"
 	"loiter/kernel"
 	"loiter/test"
 )
@@ -21,8 +23,10 @@ func main() {
 	// 启动基础服务
 	bootstrap.Start()
 
-	// 启动测试程序
-	test.Start()
+	// 启动测试程序(仅在开发模式执行)
+	if config.Program.Mode == constant.DEVELOP {
+		test.Start()
+	}
 
 	// 启动网关
 	kernel.Start()
@@ -30,8 +34,6 @@ func main() {
 	// 处理程序关闭事项
 	defer destruction()
 }
-
-// loiter	loiter		6e0Pu/FT9KNXrkf1e6ReIQ==
 
 // destruction 析构方法，统一处理程序关闭事项
 func destruction() {

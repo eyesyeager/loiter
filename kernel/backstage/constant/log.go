@@ -24,37 +24,47 @@ var LogUniversal = logUniversal{
 		Title:   "注册应用实例",
 		Content: "应用名：%s；实例名：%s；实例地址：%s；备注：%s",
 	},
-	UpdateAppBalance: logStructure{
+	UpdateAppBalancer: logStructure{
 		Title:   "更新应用负载均衡策略",
 		Content: "应用名：%s；原负载策略：%s；更新后负载策略：%s",
 	},
-	RefreshAllContainer: logStructure{
-		Title:   "刷新指定应用下的所有容器",
-		Content: "应用名：%s；",
-	},
-	RefreshAppServerContainer: logStructure{
-		Title:   "刷新指定应用下的应用实例容器",
-		Content: "应用名：%s；",
-	},
-	RefreshBalanceContainer: logStructure{
-		Title:   "刷新指定应用下的负载均衡容器",
-		Content: "应用名：%s；",
+	RefreshContainer: logStructure{
+		Title:   "刷新指定应用下的容器",
+		Content: "应用名：%s；容器名：%s",
 	},
 	UpdateAppPassageway: logStructure{
 		Title:   "更新应用通道配置",
 		Content: "应用名：%s；原通道配置：%s；更新后通道配置：%s",
 	},
+	UpdateAppLimiter: logStructure{
+		Title:   "更新应用限流器配置",
+		Content: "应用名：%s；原限流器名：%s；原限流器参数：%s；更新限流器名：%s；更新限流器参数：%s",
+	},
+	UpdateAppNameList: logStructure{
+		Title:   "更新应用黑白名单配置",
+		Content: "应用名：%s；名单类型：%s；更新类型：%s",
+	},
+	AddNameListIp: logStructure{
+		Title:   "添加黑白名单ip",
+		Content: "应用名：%s；名单类型：%s；添加ip：%s",
+	},
+	DeleteNameListIp: logStructure{
+		Title:   "删除黑白名单ip",
+		Content: "应用名：%s；名单类型：%s；删除ip：%s",
+	},
 }
 
 type logUniversal struct {
-	DoRegister                logStructure
-	AddApp                    logStructure
-	AddServer                 logStructure
-	UpdateAppBalance          logStructure
-	RefreshAllContainer       logStructure
-	RefreshAppServerContainer logStructure
-	RefreshBalanceContainer   logStructure
-	UpdateAppPassageway       logStructure
+	DoRegister          logStructure
+	AddApp              logStructure
+	AddServer           logStructure
+	UpdateAppBalancer   logStructure
+	RefreshContainer    logStructure
+	UpdateAppPassageway logStructure
+	UpdateAppLimiter    logStructure
+	UpdateAppNameList   logStructure
+	AddNameListIp       logStructure
+	DeleteNameListIp    logStructure
 }
 
 type logStructure struct {

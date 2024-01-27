@@ -8,7 +8,7 @@ import (
 	"loiter/kernel/backstage/controller/validator"
 	"loiter/kernel/backstage/foundation"
 	"loiter/kernel/backstage/service"
-	receiver2 "loiter/kernel/model/receiver"
+	"loiter/kernel/model/receiver"
 	"net/http"
 )
 
@@ -31,7 +31,7 @@ import (
 // @Router			/user/doLogin [post]
 func DoLogin(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// 参数校验
-	var data receiver2.DoLogin
+	var data receiver.DoLogin
 	if err := parser.PostData(r, &data); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
@@ -70,7 +70,7 @@ func DoRegister(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// 参数校验
-	var data receiver2.DoRegister
+	var data receiver.DoRegister
 	if err := parser.PostData(r, &data); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return

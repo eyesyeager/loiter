@@ -71,14 +71,12 @@ func RefreshAppServer(appId uint) error {
 	// 获取对应应用
 	var app entity.App
 	if tx := global.MDB.Where(&entity.App{Status: constant.Status.Normal}).First(&app, appId); tx.RowsAffected == 0 {
-		errMsg := fmt.Sprintf("there are currently no valid app requiring service under the application with appId %d", appId)
-		global.AppLogger.Warn(errMsg)
-		return errors.New(errMsg)
+		return errors.New(fmt.Sprintf("appId为%d的应用刷新应用与实例容器失败，其为无效应用！", appId))
 	}
 	// 获取有效应用实例
 	var serverSlice []entity.Server
 	if tx := global.MDB.Where(&entity.Server{Status: constant.Status.Normal, AppId: appId}).Find(&serverSlice); tx.RowsAffected == 0 {
-		global.AppLogger.Warn(fmt.Sprintf("there are currently no valid server requiring service under the application with appId %d", appId))
+		global.AppLogger.Warn(fmt.Sprintf("appId为%d的应用刷新应用与实例容器失败，当前应用不存在有效实例！", appId))
 		delete(ServerByAppMap, app.Host)
 		return nil
 	}

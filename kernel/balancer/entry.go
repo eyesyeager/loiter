@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"loiter/global"
 	"loiter/kernel/container"
+	"loiter/plugin/loadbalancer"
 	"net/http"
 	"net/url"
 )
@@ -15,34 +16,25 @@ import (
  * @date 2024/1/5 16:14
  */
 
-// loadBalancer 负载均衡策略方法类型
-type loadBalancer func(string) (error, string)
-
-// balancerByNameMap 负载均衡策略 by 策略名
-var balancerByNameMap = make(map[string]loadBalancer)
-
-// InitLoadBalancer 加载负载均衡器
-func InitLoadBalancer() {
-	balancerByNameMap = make(map[string]loadBalancer)
-	balancerByNameMap["random"] = randomBalancer
-	balancerByNameMap["polling"] = pollingBalancer
-	balancerByNameMap["pollingWeighted"] = pollingWeightedBalancer
-}
-
 // Entry 进入负载均衡
 func Entry(r *http.Request, host string) (error, *url.URL) {
 	// 获取host对应的负载均衡策略
-	if _, ok := container.BalanceByAppMap[host]; !ok {
-		errMsg := fmt.Sprintf("the application whose host is %s does not have a load balancing policy configured", host)
+	if _, ok := container.BalancerByAppMap[host]; !ok {
+		errMsg := fmt.Sprintf("the application whose host is %s does not have a Balancer", host)
 		global.GatewayLogger.Error(errMsg)
 		return errors.New(errMsg), nil
 	}
-	strategy := container.BalanceByAppMap[host]
+	strategy := container.BalancerByAppMap[host]
 
 	// 执行负载策略
-	err, targetUrl := balancerByNameMap[strategy](host)
+	if _, ok := loadbalancer.BalancerByNameMap[strategy]; !ok {
+		errMsg := fmt.Sprintf("the application whose host is %s does not registered in container", host)
+		global.GatewayLogger.Error(errMsg)
+		return errors.New(errMsg), nil
+	}
+	err, targetUrl := loadbalancer.BalancerByNameMap[strategy](host)
 	if err != nil {
-		errMsg := fmt.Sprintf("the application whose host is %s fails to execute load balancing policy, error: %s", targetUrl, err.Error())
+		errMsg := fmt.Sprintf("the application whose host is %s fails to execute Balancer, error: %s", targetUrl, err.Error())
 		global.GatewayLogger.Error(errMsg)
 		return errors.New(errMsg), nil
 	}

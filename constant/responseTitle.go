@@ -13,10 +13,20 @@ var ResponseTitle = responseTitle{
 		Title:  "502 Bad Gateway",
 		Status: http.StatusBadGateway,
 	},
+	RateLimit: ResponseTitleStruct{
+		Title:  "429 Too Many Requests",
+		Status: http.StatusTooManyRequests,
+	},
+	Forbidden: ResponseTitleStruct{
+		Title:  "403 Forbidden",
+		Status: http.StatusForbidden,
+	},
 }
 
 type responseTitle struct {
 	BadGateway ResponseTitleStruct
+	RateLimit  ResponseTitleStruct
+	Forbidden  ResponseTitleStruct
 }
 
 type ResponseTitleStruct struct {

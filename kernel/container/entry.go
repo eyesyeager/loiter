@@ -15,9 +15,11 @@ import (
 func InitRegister() {
 	global.BackstageLogger.Info("start initializing all containers")
 	InitAppServer()
-	InitBalance()
+	InitBalancer()
 	InitPassageway()
 	InitLimiter()
+	InitNameList()
+	InitAid()
 	global.BackstageLogger.Info("all containers initialization completed")
 }
 
@@ -27,13 +29,19 @@ func RefreshRegister(appId uint) error {
 	if err := RefreshAppServer(appId); err != nil {
 		return err
 	}
-	if err := RefreshBalance(appId); err != nil {
+	if err := RefreshBalancer(appId); err != nil {
 		return err
 	}
 	if err := RefreshPassageway(appId); err != nil {
 		return err
 	}
 	if err := RefreshLimiter(appId); err != nil {
+		return err
+	}
+	if err := RefreshNameList(appId); err != nil {
+		return err
+	}
+	if err := RefreshAid(appId); err != nil {
 		return err
 	}
 	global.BackstageLogger.Info(fmt.Sprintf("complete the refresh of all containers under the application with appId %d", appId))

@@ -10,6 +10,6 @@ import "gorm.io/gorm"
 
 type AppPassageway struct {
 	gorm.Model
-	AppId          uint   `json:"appId" gorm:"not null;unique;comment:应用id"`
-	PassagewayName string `json:"passageway_name" gorm:"not null;comment:用英文逗号有序拼接的通道名"`
+	AppId          uint   `json:"app_id" gorm:"not null;unique;comment:应用id"`
+	PassagewayName string `json:"passageway_name" gorm:"not null;comment:用符号有序拼接的通道名"`
 }

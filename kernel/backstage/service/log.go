@@ -4,10 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jinzhu/copier"
+	"gorm.io/gorm"
 	"loiter/global"
+	"loiter/helper"
 	"loiter/kernel/backstage/controller/result"
 	"loiter/kernel/backstage/utils"
-	"loiter/kernel/helper"
 	"loiter/kernel/model/entity"
 	"loiter/kernel/model/po"
 	"loiter/kernel/model/receiver"
@@ -44,22 +45,38 @@ func (*logService) Login(r *http.Request, uid uint) {
 
 // Universal 记录通用日志
 func (*logService) Universal(r *http.Request, operatorId uint, logUniversalStruct structure.LogUniversalStruct) {
+	// 获取用户信息
+	var checkUser = entity.User{
+		Model: gorm.Model{ID: operatorId},
+	}
+	if err := global.MDB.First(checkUser).Error; err != nil {
+		global.BackstageLogger.Error("failed to obtain user information,",
+			" operatorId: ", operatorId,
+			" error: ", err.Error())
+		return
+	}
+	// 构建日志结构
 	logUniversal := entity.LogUniversal{
-		OperatorId: operatorId,
-		Ip:         helper.GetIp(r),
-		Browser:    helper.GetBrowser(r),
-		Title:      logUniversalStruct.Title,
-		Content:    logUniversalStruct.Content,
+		Operator: checkUser.Username,
+		Ip:       helper.GetIp(r),
+		Browser:  helper.GetBrowser(r),
+		Title:    logUniversalStruct.Title,
+		Content:  logUniversalStruct.Content,
 	}
 
 	// 插入数据库
 	if err := global.MDB.Create(&logUniversal).Error; err != nil {
 		global.BackstageLogger.Error("general log persistence failed,",
-			" operatorId: ", strconv.Itoa(int(logUniversal.OperatorId)),
+			" operator: ", logUniversal.Operator,
 			" title: ", logUniversalStruct.Title,
 			" content: ", logUniversalStruct.Content,
 			" error: ", err.Error())
 	}
+}
+
+// App 记录应用操作日志
+func (*logService) App(r *http.Request, operatorId uint, logUniversalStruct structure.LogUniversalStruct) {
+
 }
 
 // GetLoginLog 获取登录日志

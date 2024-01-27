@@ -74,13 +74,17 @@ func initMySqlTables(db *gorm.DB) {
 		entity.LogUniversal{},
 		entity.App{},
 		entity.Server{},
-		entity.Balance{},
-		entity.AppBalance{},
+		entity.Balancer{},
+		entity.AppBalancer{},
 		entity.Passageway{},
 		entity.AppPassageway{},
 		entity.RequestLog{},
 		entity.Limiter{},
 		entity.AppLimiter{},
+		entity.NameList{},
+		entity.AppNameList{},
+		entity.Aid{},
+		entity.AppAid{},
 	)
 	if err != nil {
 		global.AppLogger.Error("migrate table failed")
@@ -96,13 +100,13 @@ func getGormLogWriter() logger.Writer {
 	if config.Program.MySQLConfig.EnableFileLogWriter {
 		stSeparator := string(filepath.Separator)
 		stRootDir, _ := os.Getwd()
-		path := config.Program.LogBasePath + stSeparator + config.Program.LogSQLPath
+		path := config.Program.LogConfig.LogBasePath + stSeparator + config.Program.LogConfig.LogSQLPath
 		// 自定义 Writer
 		writer = &lumberjack.Logger{
-			Filename: stRootDir + stSeparator + path + stSeparator + time.Now().Format(time.DateOnly) + "." + config.Program.LogSuffix,
-			MaxSize:  config.Program.LogMaxSize,
-			MaxAge:   config.Program.LogMaxAge,
-			Compress: config.Program.LogCompress,
+			Filename: stRootDir + stSeparator + path + stSeparator + time.Now().Format(time.DateOnly) + "." + config.Program.LogConfig.LogSuffix,
+			MaxSize:  config.Program.LogConfig.LogMaxSize,
+			MaxAge:   config.Program.LogConfig.LogMaxAge,
+			Compress: config.Program.LogConfig.LogCompress,
 		}
 	} else {
 		// 默认 Writer

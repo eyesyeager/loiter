@@ -9,7 +9,7 @@ import (
 	"loiter/kernel/backstage/foundation"
 	"loiter/kernel/backstage/service"
 	"loiter/kernel/backstage/utils"
-	receiver2 "loiter/kernel/model/receiver"
+	"loiter/kernel/model/receiver"
 	"net/http"
 )
 
@@ -39,7 +39,7 @@ func GetLoginLog(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 
 	// 参数校验
-	var data receiver2.GetLoginLog
+	var data receiver.GetLoginLog
 	if err := parser.PostData(r, &data); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return
@@ -83,7 +83,7 @@ func GetUniversalLog(w http.ResponseWriter, r *http.Request, _ httprouter.Params
 	}
 
 	// 参数校验
-	var data receiver2.GetUniversalLog
+	var data receiver.GetUniversalLog
 	if err := parser.PostData(r, &data); err != nil {
 		result.FailAttachedMsg(w, r, err.Error())
 		return

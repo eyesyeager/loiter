@@ -27,17 +27,17 @@ func logBootstrap() {
 }
 
 func initAppLogger() *zap.SugaredLogger {
-	path := config.Program.LogBasePath + string(filepath.Separator) + config.Program.LogAppPath
+	path := config.Program.LogConfig.LogBasePath + string(filepath.Separator) + config.Program.LogConfig.LogAppPath
 	return initLogger(path)
 }
 
 func initBackstageLogger() *zap.SugaredLogger {
-	path := config.Program.LogBasePath + string(filepath.Separator) + config.Program.LogBackstagePath
+	path := config.Program.LogConfig.LogBasePath + string(filepath.Separator) + config.Program.LogConfig.LogBackstagePath
 	return initLogger(path)
 }
 
 func initGatewayLogger() *zap.SugaredLogger {
-	path := config.Program.LogBasePath + string(filepath.Separator) + config.Program.LogGateWayPath
+	path := config.Program.LogConfig.LogBasePath + string(filepath.Separator) + config.Program.LogConfig.LogGateWayPath
 	return initLogger(path)
 }
 
@@ -65,18 +65,18 @@ func getEncoder() zapcore.Encoder {
 func getWriteSyncer(path string) zapcore.WriteSyncer {
 	stSeparator := string(filepath.Separator)
 	stRootDir, _ := os.Getwd()
-	stLogFilePath := stRootDir + stSeparator + path + stSeparator + time.Now().Format(time.DateOnly) + "." + config.Program.LogSuffix
+	stLogFilePath := stRootDir + stSeparator + path + stSeparator + time.Now().Format(time.DateOnly) + "." + config.Program.LogConfig.LogSuffix
 
 	// 单个文件超出大小时进行文件分割
 	lumberjackSyncer := &lumberjack.Logger{
 		Filename: stLogFilePath,
-		MaxSize:  config.Program.LogMaxSize,  // 文件最大尺寸(MB)
-		MaxAge:   config.Program.LogMaxAge,   // 文件保存最长时间
-		Compress: config.Program.LogCompress, // 是否压缩
+		MaxSize:  config.Program.LogConfig.LogMaxSize,  // 文件最大尺寸(MB)
+		MaxAge:   config.Program.LogConfig.LogMaxAge,   // 文件保存最长时间
+		Compress: config.Program.LogConfig.LogCompress, // 是否压缩
 	}
 
 	// 开发模式下，日志会输出到控制台，但生产模式不会
-	if config.Program.ProgramMode == constant.DEVELOP {
+	if config.Program.Mode == constant.DEVELOP {
 		return zapcore.NewMultiWriteSyncer(zapcore.AddSync(lumberjackSyncer), zapcore.AddSync(os.Stdout))
 	} else {
 		return zapcore.AddSync(lumberjackSyncer)
@@ -87,7 +87,7 @@ func getWriteSyncer(path string) zapcore.WriteSyncer {
 // getLogLevel 设置日志级别，开发模式下为debug级别，生产模式为Info级别
 func getLogLevel() zapcore.Level {
 	var logMode zapcore.Level
-	if config.Program.ProgramMode == constant.DEVELOP {
+	if config.Program.Mode == constant.DEVELOP {
 		logMode = zapcore.DebugLevel
 	} else {
 		logMode = zapcore.InfoLevel

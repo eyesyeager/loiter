@@ -14,7 +14,6 @@ type User struct {
 	Password string `json:"password" gorm:"not null;comment:密码"`
 	Rid      uint   `json:"rid" gorm:"not null;comment:角色id"`
 	Email    string `json:"email"`
-	Avatar   string `json:"avatar" gorm:"comment:头像链接"`
 	Status   uint8  `json:"status" gorm:"not null;default:1;comment:1(正常),2(停用),3(删除)"`
 	Remarks  string `json:"remarks" gorm:"type:TEXT;comment:备注"`
 }

@@ -17,7 +17,8 @@ func InitRouter(routerRoot *httprouter.Router) {
 	route.InitLogRoute(routerRoot, "/log")
 	route.InitAppRoute(routerRoot, "/app")
 	route.InitServerRoute(routerRoot, "/server")
-	route.InitBalanceRoute(routerRoot, "/balance")
+	route.InitBalancerRoute(routerRoot, "/balancer")
 	route.InitContainerRoute(routerRoot, "/container")
 	route.InitPassagewayRoute(routerRoot, "/passageway")
+	route.InitAidRoute(routerRoot, "/aid")
 }

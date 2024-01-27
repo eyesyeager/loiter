@@ -1,5 +1,7 @@
 package constant
 
+import "loiter/config"
+
 /**
  * 角色权值
  * @author eyesYeager
@@ -7,9 +9,9 @@ package constant
  */
 
 var Role = role{
-	"super_admin",
-	"admin",
-	"user",
+	config.RoleConfig.SuperAdmin.Name,
+	config.RoleConfig.Admin.Name,
+	config.RoleConfig.User.Name,
 	"visitor",
 }
 

@@ -13,4 +13,8 @@ import (
 
 func InitPassagewayRoute(routerRoot *httprouter.Router, group string) {
 	routerRoot.POST(group+"/updateAppPassageway", controller.UpdateAppPassageway)
+	routerRoot.POST(group+"/updateAppLimiter", controller.UpdateAppLimiter)
+	routerRoot.POST(group+"/updateAppNameList", controller.UpdateAppNameList)
+	routerRoot.POST(group+"/addNameListIp", controller.AddNameListIp)
+	routerRoot.POST(group+"/deleteNameListIp", controller.DeleteNameListIp)
 }

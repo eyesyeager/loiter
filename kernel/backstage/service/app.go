@@ -41,8 +41,8 @@ func (*appService) AddApp(r *http.Request, userClaims utils.JwtCustomClaims, dat
 		return errors.New(errMsg)
 	}
 	// 插入默认负载均衡策略
-	if err := BalanceService.AddAppBalance(newApp.ID, config.Program.BalanceDefaultStrategy); err != nil {
-		errMsg := fmt.Sprintf(result.CommonInfo.DbOperateError, "AddApp()-AddAppBalance", err.Error())
+	if err := BalancerService.AddAppBalancer(newApp.ID, config.Program.BalancerDefaultStrategy); err != nil {
+		errMsg := fmt.Sprintf(result.CommonInfo.DbOperateError, "AddApp()-AddAppBalancer", err.Error())
 		global.BackstageLogger.Error(errMsg)
 		return errors.New(errMsg)
 	}

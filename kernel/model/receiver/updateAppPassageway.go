@@ -7,6 +7,6 @@ package receiver
  */
 
 type UpdateAppPassageway struct {
-	AppID               uint     `json:"appId" validate:"required"`               // 应用id
-	PassagewayNameSlice []string `json:"passagewayNameSlice" validate:"required"` // 负载均衡策略id
+	AppId               uint     `json:"appId" validate:"required"`               // 应用id
+	PassagewayNameSlice []string `json:"passagewayNameSlice" validate:"required"` // 应用通道名切片
 }

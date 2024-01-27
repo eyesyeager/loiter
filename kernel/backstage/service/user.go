@@ -81,7 +81,7 @@ func (*userService) DoRegister(r *http.Request, userClaims utils.JwtCustomClaims
 	}
 
 	// 生成随机密码
-	initialPsd := utils.GenerateRandString(config.Context.InitialPsdLen)
+	initialPsd := utils.GenerateRandString(config.Program.InitialPsdLen)
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(initialPsd), bcrypt.DefaultCost)
 	if err != nil {
 		fmt.Println(err)

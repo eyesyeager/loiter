@@ -56,3 +56,5 @@ func AddApp(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		result.FailAttachedMsg(w, r, err.Error())
 	}
 }
+
+// TODO：删除应用

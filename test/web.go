@@ -1,6 +1,8 @@
 package test
 
-import "net/http"
+import (
+	"net/http"
+)
 
 /**
  * 测试入口
@@ -12,7 +14,7 @@ type webHandlerA struct {
 }
 
 func (webHandlerA) ServeHTTP(write http.ResponseWriter, r *http.Request) {
-	_, _ = write.Write([]byte("r"))
+	_, _ = write.Write([]byte("1"))
 }
 
 func StartWebA() {
@@ -23,7 +25,7 @@ type webHandlerB struct {
 }
 
 func (webHandlerB) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
-	_, _ = write.Write([]byte("我是耶瞳星空"))
+	_, _ = write.Write([]byte("2"))
 }
 
 func StartWebB() {
@@ -34,7 +36,7 @@ type webHandlerC struct {
 }
 
 func (webHandlerC) ServeHTTP(write http.ResponseWriter, _ *http.Request) {
-	_, _ = write.Write([]byte("我是耶瞳用户中心"))
+	_, _ = write.Write([]byte("3"))
 }
 
 func StartWebC() {
