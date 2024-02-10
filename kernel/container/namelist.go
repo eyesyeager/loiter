@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"loiter/backstage/constant"
+	"loiter/backstage/controller/result"
 	"loiter/global"
-	"loiter/kernel/backstage/constant"
-	"loiter/kernel/backstage/controller/result"
 	"loiter/kernel/model/entity"
 	"loiter/kernel/model/po"
-	"loiter/plugin/passageway/filter/namelist"
+	"loiter/plugin/filter/namelist"
 )
 
 /**
@@ -81,7 +81,7 @@ func RefreshNameList(appId uint) error {
 						WHERE a.id = ? AND a.status = ? AND a.id = anl.app_id`, appId, constant.Status.Normal).Scan(&appNameListSlice)
 	// 查询错误则返回错误信息
 	if tx.Error != nil {
-		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, "RefreshNameList()-Raw", tx.Error.Error()))
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, tx.Error.Error()))
 	}
 	// 查询为空则删除容器元素
 	if tx.RowsAffected == 0 {

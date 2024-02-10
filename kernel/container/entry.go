@@ -13,26 +13,26 @@ import (
 
 // InitRegister 初始化所有注册信息
 func InitRegister() {
-	global.BackstageLogger.Info("start initializing all containers")
+	global.AppLogger.Info("start initializing all containers")
 	InitAppServer()
 	InitBalancer()
-	InitPassageway()
+	InitFilter()
 	InitLimiter()
 	InitNameList()
 	InitAid()
-	global.BackstageLogger.Info("all containers initialization completed")
+	global.AppLogger.Info("all containers initialization completed")
 }
 
 // RefreshRegister 刷新所有注册信息
 func RefreshRegister(appId uint) error {
-	global.BackstageLogger.Info(fmt.Sprintf("start refreshing all containers under the application with appId %d", appId))
+	global.AppLogger.Info(fmt.Sprintf("start refreshing all containers under the application with appId %d", appId))
 	if err := RefreshAppServer(appId); err != nil {
 		return err
 	}
 	if err := RefreshBalancer(appId); err != nil {
 		return err
 	}
-	if err := RefreshPassageway(appId); err != nil {
+	if err := RefreshFilter(appId); err != nil {
 		return err
 	}
 	if err := RefreshLimiter(appId); err != nil {
@@ -44,6 +44,6 @@ func RefreshRegister(appId uint) error {
 	if err := RefreshAid(appId); err != nil {
 		return err
 	}
-	global.BackstageLogger.Info(fmt.Sprintf("complete the refresh of all containers under the application with appId %d", appId))
+	global.AppLogger.Info(fmt.Sprintf("complete the refresh of all containers under the application with appId %d", appId))
 	return nil
 }

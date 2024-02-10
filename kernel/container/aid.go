@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"loiter/backstage/constant"
+	"loiter/backstage/controller/result"
 	"loiter/config"
 	"loiter/global"
-	"loiter/kernel/backstage/constant"
-	"loiter/kernel/backstage/controller/result"
 	"loiter/kernel/model/entity"
 	"loiter/kernel/model/po"
 	"strings"
@@ -39,7 +39,7 @@ func InitAid() {
 		if item.AidName == "" {
 			continue
 		}
-		nameSlice := strings.Split(item.AidName, config.Program.AidDelimiter)
+		nameSlice := strings.Split(item.AidName, config.Program.PluginConfig.AidDelimiter)
 		containerMap[item.Host] = nameSlice
 	}
 	AidByAppMap = containerMap
@@ -56,7 +56,7 @@ func RefreshAid(appId uint) error {
 					WHERE a.id = ? AND a.status = ? AND a.id = aa.app_id`, appId, constant.Status.Normal).Scan(&appAidName)
 	// 查询错误则返回错误信息
 	if tx.Error != nil {
-		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, "RefreshAid()-Raw", tx.Error.Error()))
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, tx.Error.Error()))
 	}
 	// 查询结果为空则删除容器元素
 	if tx.RowsAffected == 0 {
@@ -68,7 +68,7 @@ func RefreshAid(appId uint) error {
 		return nil
 	}
 	// 刷新容器
-	AidByAppMap[appAidName.Host] = strings.Split(appAidName.AidName, config.Program.AidDelimiter)
+	AidByAppMap[appAidName.Host] = strings.Split(appAidName.AidName, config.Program.PluginConfig.AidDelimiter)
 	global.AppLogger.Info(fmt.Sprintf("complete the initialization of Aid container under the application with appId %d", appId))
 	return nil
 }

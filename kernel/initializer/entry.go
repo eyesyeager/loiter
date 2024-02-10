@@ -1,14 +1,15 @@
 package initializer
 
 import (
+	"errors"
 	"fmt"
 	"loiter/config"
 	"loiter/global"
 	"loiter/kernel/model/entity"
 	"loiter/plugin/aid"
-	"loiter/plugin/loadbalancer"
-	"loiter/plugin/passageway"
-	"loiter/plugin/passageway/filter/limiter"
+	"loiter/plugin/balancer"
+	"loiter/plugin/filter"
+	"loiter/plugin/filter/limiter"
 	"reflect"
 )
 
@@ -25,7 +26,7 @@ func InitData() {
 	initUserData()
 	initBalancerData()
 	initLimiterData()
-	initPassagewayData()
+	initFilterData()
 	initAidData()
 	global.AppLogger.Info("system data initialization completed")
 }
@@ -85,12 +86,16 @@ func initUserData() {
 // initBalancerData 初始化负载均衡数据
 func initBalancerData() {
 	global.AppLogger.Info("start initializing Balancer data")
+	// 不允许没有可用的负载均衡插件
+	if len(balancer.IBalancerConfigSlice) == 0 {
+		panic(errors.New("not allowed No Balancer plugin available"))
+	}
 	// 清空所有负载均衡器数据
 	if err := global.MDB.Where("1 = 1").Unscoped().Delete(&entity.Balancer{}).Error; err != nil {
 		panic(fmt.Errorf("balancer data initialization failed! An error occurred while clearing all Balancer data: %s", err.Error()))
 	}
 	// 插入新数据
-	if err := global.MDB.Create(&loadbalancer.BalancerConfigSlice).Error; err != nil {
+	if err := global.MDB.Create(&balancer.IBalancerConfigSlice).Error; err != nil {
 		panic(fmt.Errorf("balancer data initialization failed! An error occurred while creating Balancer data: %s", err.Error()))
 	}
 	global.AppLogger.Info("balancer data initialization completed")
@@ -107,28 +112,32 @@ func initLimiterData() {
 	var limiterEntitySlice []entity.Limiter
 	var valInfo = reflect.ValueOf(limiter.LimiterConfig)
 	num := valInfo.NumField()
-	for i := 0; i < num; i++ {
-		val := valInfo.Field(i).Interface()
-		limiterEntitySlice = append(limiterEntitySlice, val.(entity.Limiter))
-	}
-	if err := global.MDB.Create(&limiterEntitySlice).Error; err != nil {
-		panic(fmt.Errorf("limiter data initialization failed! An error occurred while creating limiter data: %s", err.Error()))
+	if num != 0 {
+		for i := 0; i < num; i++ {
+			val := valInfo.Field(i).Interface()
+			limiterEntitySlice = append(limiterEntitySlice, val.(entity.Limiter))
+		}
+		if err := global.MDB.Create(&limiterEntitySlice).Error; err != nil {
+			panic(fmt.Errorf("limiter data initialization failed! An error occurred while creating limiter data: %s", err.Error()))
+		}
 	}
 	global.AppLogger.Info("limiter data initialization completed")
 }
 
-// initPassagewayData 初始化通道数据
-func initPassagewayData() {
-	global.AppLogger.Info("start initializing passageway data")
-	// 清空所有通道
-	if err := global.MDB.Where("1 = 1").Unscoped().Delete(&entity.Passageway{}).Error; err != nil {
-		panic(fmt.Errorf("passageway data initialization failed! An error occurred while clearing all passageway data: %s", err.Error()))
+// initFilterData 初始化过滤器数据
+func initFilterData() {
+	global.AppLogger.Info("start initializing filter data")
+	// 清空所有过滤器
+	if err := global.MDB.Where("1 = 1").Unscoped().Delete(&entity.Filter{}).Error; err != nil {
+		panic(fmt.Errorf("filter data initialization failed! An error occurred while clearing all filter data: %s", err.Error()))
 	}
 	// 插入新数据
-	if err := global.MDB.Create(&passageway.PassageConfigSlice).Error; err != nil {
-		panic(fmt.Errorf("passageway data initialization failed! An error occurred while creating passageway data: %s", err.Error()))
+	if len(filter.IFilterConfigSlice) != 0 {
+		if err := global.MDB.Create(&filter.IFilterConfigSlice).Error; err != nil {
+			panic(fmt.Errorf("filter data initialization failed! An error occurred while creating filter data: %s", err.Error()))
+		}
 	}
-	global.AppLogger.Info("passageway data initialization completed")
+	global.AppLogger.Info("filter data initialization completed")
 }
 
 // initAidData 初始化响应处理器数据
@@ -139,8 +148,10 @@ func initAidData() {
 		panic(fmt.Errorf("aid data initialization failed! An error occurred while clearing all aid data: %s", err.Error()))
 	}
 	// 插入新数据
-	if err := global.MDB.Create(&aid.IAidConfigSlice).Error; err != nil {
-		panic(fmt.Errorf("aid data initialization failed! An error occurred while creating aid data: %s", err.Error()))
+	if len(aid.IAidConfigSlice) != 0 {
+		if err := global.MDB.Create(&aid.IAidConfigSlice).Error; err != nil {
+			panic(fmt.Errorf("aid data initialization failed! An error occurred while creating aid data: %s", err.Error()))
+		}
 	}
 	global.AppLogger.Info("aid data initialization completed")
 }

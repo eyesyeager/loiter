@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"loiter/global"
 	"loiter/kernel/container"
-	"loiter/plugin/loadbalancer"
+	"loiter/plugin/balancer"
 	"net/http"
 	"net/url"
 )
@@ -27,12 +27,12 @@ func Entry(r *http.Request, host string) (error, *url.URL) {
 	strategy := container.BalancerByAppMap[host]
 
 	// 执行负载策略
-	if _, ok := loadbalancer.BalancerByNameMap[strategy]; !ok {
+	if _, ok := balancer.IBalancerByNameMap[strategy]; !ok {
 		errMsg := fmt.Sprintf("the application whose host is %s does not registered in container", host)
 		global.GatewayLogger.Error(errMsg)
 		return errors.New(errMsg), nil
 	}
-	err, targetUrl := loadbalancer.BalancerByNameMap[strategy](host)
+	err, targetUrl := balancer.IBalancerByNameMap[strategy](host)
 	if err != nil {
 		errMsg := fmt.Sprintf("the application whose host is %s fails to execute Balancer, error: %s", targetUrl, err.Error())
 		global.GatewayLogger.Error(errMsg)

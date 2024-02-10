@@ -2,9 +2,9 @@ package kernel
 
 import (
 	"fmt"
+	"loiter/backstage"
 	"loiter/config"
 	"loiter/global"
-	"loiter/kernel/backstage"
 	"loiter/kernel/container"
 	"loiter/kernel/initializer"
 	"loiter/kernel/proxy"

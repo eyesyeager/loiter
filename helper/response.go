@@ -22,14 +22,17 @@ func Response(w http.ResponseWriter, statusCode int, contentType string, content
 // HtmlSimpleTemplate HTML简单响应模版
 func HtmlSimpleTemplate(titleStruct constant.ResponseTitleStruct, msg string) (int, string, string) {
 	systemName := config.Program.Name
+	// 线上环境不展示具体错误信息
+	if config.Program.Mode == constant.ONLINE {
+		msg = constant.ResponseNotice.Empty
+	}
 	return titleStruct.Status, "text/html;charset=utf-8", `
-<!DOCTYPE html>
 <html>
 <head><title>` + titleStruct.Title + `</title></head>
-<body bgcolor="white">
+<body>
     <center><h1>` + titleStruct.Title + `</h1></center>
     <hr />
-    <center><p>` + systemName + `</p></center>
+    <center>` + systemName + `</center>
 	<br />
     <p>` + msg + `</p>
 </body>

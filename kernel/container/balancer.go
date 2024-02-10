@@ -3,9 +3,9 @@ package container
 import (
 	"errors"
 	"fmt"
+	"loiter/backstage/constant"
+	"loiter/backstage/controller/result"
 	"loiter/global"
-	"loiter/kernel/backstage/constant"
-	"loiter/kernel/backstage/controller/result"
 	"loiter/kernel/model/po"
 )
 
@@ -50,7 +50,7 @@ func RefreshBalancer(appId uint) error {
 						WHERE a.id = ? AND a.status = ? AND a.id = ab.app_id AND ab.balancer_id = b.id`, appId, constant.Status.Normal).Scan(&appBalancerName)
 	// 查询错误则返回错误信息
 	if tx.Error != nil {
-		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, "RefreshBalancer()-Raw", tx.Error.Error()))
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, tx.Error.Error()))
 	}
 	// 查询为空则返回错误信息
 	if tx.RowsAffected == 0 {

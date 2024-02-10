@@ -3,11 +3,11 @@ package container
 import (
 	"errors"
 	"fmt"
+	"loiter/backstage/constant"
+	"loiter/backstage/controller/result"
 	"loiter/global"
-	"loiter/kernel/backstage/constant"
-	"loiter/kernel/backstage/controller/result"
 	"loiter/kernel/model/po"
-	"loiter/plugin/passageway/filter/limiter"
+	"loiter/plugin/filter/limiter"
 )
 
 /**
@@ -54,10 +54,11 @@ func RefreshLimiter(appId uint) error {
 				WHERE a.id = ? AND a.status = ? AND a.id = al.app_id`, appId, constant.Status.Normal).Scan(&appLimiterName)
 	// 查询错误则返回错误信息
 	if tx.Error != nil {
-		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, "RefreshLimiter()-Raw", tx.Error.Error()))
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, tx.Error.Error()))
 	}
-	// 如果想关闭限流，应该去改passageway，而不是让limiter为空，因此如果配置为空，那就直接返回
+	// 如果想关闭限流，应该去改filter，而不是让limiter为空，因此如果配置为空，那就直接返回
 	if tx.RowsAffected == 0 {
+		global.AppLogger.Info(fmt.Sprintf("the application with appId %d does not have a Limiter container configured", appId))
 		return nil
 	}
 	// 刷新限流容器

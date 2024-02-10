@@ -22,17 +22,11 @@ import (
 // logBootstrap 日志初始化入口方法
 func logBootstrap() {
 	global.AppLogger = initAppLogger()
-	global.BackstageLogger = initBackstageLogger()
 	global.GatewayLogger = initGatewayLogger()
 }
 
 func initAppLogger() *zap.SugaredLogger {
 	path := config.Program.LogConfig.LogBasePath + string(filepath.Separator) + config.Program.LogConfig.LogAppPath
-	return initLogger(path)
-}
-
-func initBackstageLogger() *zap.SugaredLogger {
-	path := config.Program.LogConfig.LogBasePath + string(filepath.Separator) + config.Program.LogConfig.LogBackstagePath
 	return initLogger(path)
 }
 

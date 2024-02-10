@@ -7,6 +7,6 @@ package receiver
  */
 
 type UpdateAppBalancer struct {
-	AppID      uint `json:"appId" validate:"required"`      // 应用id
+	AppId      uint `json:"appId" validate:"required"`      // 应用id
 	BalancerId uint `json:"balancerId" validate:"required"` // 负载均衡策略id
 }

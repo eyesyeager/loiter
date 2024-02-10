@@ -11,8 +11,7 @@ import (
  */
 
 var (
-	AppLogger       *zap.SugaredLogger
-	BackstageLogger *zap.SugaredLogger
-	GatewayLogger   *zap.SugaredLogger
-	MDB             *gorm.DB
+	AppLogger     *zap.SugaredLogger
+	GatewayLogger *zap.SugaredLogger
+	MDB           *gorm.DB
 )
