@@ -1,5 +1,7 @@
 <template>
-    <div>error</div>
+    <div class="plugin">
+        plugin
+    </div>
 </template>
 
 <script setup lang="ts">

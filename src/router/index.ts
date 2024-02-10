@@ -1,11 +1,12 @@
 import { createRouter, RouteRecordRaw, createWebHashHistory } from 'vue-router';
+import { publicPath, content } from './path';
 
 // 定义路由规则
 const routes: Array<RouteRecordRaw> = [
     {
-        path: "/",
-        name: "index",
-        component: () => import("@/pages/Index.vue"),
+        path: publicPath.home,
+        component: () => import("@/App.vue"),
+        children: content
     },
 ]
 
