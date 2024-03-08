@@ -13,16 +13,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { site, responseCode } from "@/config";
+import { ref, onMounted } from "vue";
+import { site, responseCode, storage } from "@/config";
 import { User, Lock } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
+import api from "@/apis/api";
 import { useRouter } from "vue-router";
 import { publicPath } from "@/router/path";
-import api from "@/apis/api";
 
 const router = useRouter();
-
 const username = ref('');
 const password = ref('');
 
@@ -32,21 +31,36 @@ function forgetPsd() {
 }
 
 // 执行登录操作
-async function doLogin() {
+function doLogin() {
     // 校验请求信息
+    if (username.value.length > site.usernameMaxLen || username.value.length < site.usernameMinLen 
+        || password.value.length > site.userPasMaxLen || password.value.length < site.userPasMinLen) {
+        ElMessage({ type: "warning", message: "登录信息格式不规范" });
+        return;
+    }
     // 发送登录请求
     api.doLogin({
         username: username.value,
         password: password.value
     }).then(({code, msg}) => {
         if (code == responseCode.success) {
-            console.log(msg);
-            router.replace(publicPath.dashboard);
+            location.reload();
         } else {
-            ElMessage({ type: "error", message: "登录失败，错误信息：" + msg });
+            ElMessage({ type: "error", message: "登录失败：" + msg });
         }
     });
 }
+
+// 不允许已登录用户进入登录页
+function goHome() {
+    if (localStorage.getItem(storage.token)) {
+        router.replace(publicPath.home);
+    }
+}
+
+onMounted(() => {
+    goHome();
+});
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,6 @@
 <template>
-    <div class="message">
-        message
+    <div class="nameList">
+        nameList
     </div>
 </template>
 

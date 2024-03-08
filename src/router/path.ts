@@ -1,11 +1,16 @@
-import { RouteRecordRaw } from 'vue-router';
+import { RouteRecordRaw } from "vue-router";
 
 const publicPath = {
     home: "/dashboard",
     dashboard: "/dashboard",
     application: "/application",
-    plugin: "/plugin",
-    message: "/message",
+    balancer: "/balancer",
+    plugin: {
+        manage: "/plugin/manage",
+        limiter: "/plugin/limiter",
+        nameList: "/plugin/nameList",
+    },
+    notice: "/notice",
     log: "/log",
     common: {
         login: "/login",
@@ -43,19 +48,31 @@ const content: Array<RouteRecordRaw> = [
                 component: () => import("@/pages/application/index.vue"),
             },
             {
-                path: publicPath.plugin,
-                component: () => import("@/pages/plugin/index.vue"),
+                path: publicPath.balancer,
+                component: () => import("@/pages/balancer/index.vue"),
             },
             {
-                path: publicPath.message,
-                component: () => import("@/pages/message/index.vue"),
+                path: publicPath.plugin.manage,
+                component: () => import("@/pages/plugin/manage/index.vue"),
+            },
+            {
+                path: publicPath.plugin.limiter,
+                component: () => import("@/pages/plugin/limiter/index.vue"),
+            },
+            {
+                path: publicPath.plugin.nameList,
+                component: () => import("@/pages/plugin/nameList/index.vue"),
+            },
+            {
+                path: publicPath.notice,
+                component: () => import("@/pages/notice/index.vue"),
             },
             {
                 path: publicPath.log,
                 component: () => import("@/pages/log/index.vue"),
             },
         ]
-    }
+    },
 ];
 
 export { publicPath, content };

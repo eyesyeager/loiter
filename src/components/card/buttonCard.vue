@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 let props = defineProps({
-    value: { type: String },
+    value: { type: Number },
     describe: { type: String },
 });
 </script>
@@ -17,10 +17,7 @@ let props = defineProps({
 @import "@/assets/css/size.scss";
 
 .buttonCard {
-    border: 1px solid $darkerBorder;
     border-radius: $cardBorder;
-    width: 200px;
-    height: 80px;
     text-align: center;
     display: flex;
     flex-direction: column;

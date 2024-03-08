@@ -1,6 +1,6 @@
 <template>
-    <div class="plugin">
-        plugin
+    <div class="limiter">
+        limiter
     </div>
 </template>
 

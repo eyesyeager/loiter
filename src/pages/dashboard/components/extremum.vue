@@ -3,51 +3,93 @@
         <ButtonCard class="buttonCard" 
             v-for="item in extremumData" 
             :value="item.value" :describe="item.describe"
+            :key="item.describe + refreshKey"
         />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import ButtonCard from "@/components/card/buttonCard.vue";
+import api from "@/apis/api";
+import { ElMessage } from "element-plus";
+import { responseCode } from "@/config";
 
-const extremumData = ref([
+interface ExtremumDataInterface {
+    key: string,
+    value: number,
+    describe: string
+};
+
+const props = defineProps({
+    condition: Object,
+});
+const refreshKey = ref(0);
+const extremumData = reactive<ExtremumDataInterface[]>([
     {
-        value: "57829",
+        key: "requestNum",
+        value: 0,
         describe: "总请求数"
     },
     {
-        value: "5ms",
-        describe: "最小响应时间"
+        key: "runTimeMin",
+        value: 0,
+        describe: "最小响应时间(ms)"
     },
     {
-        value: "1128ms",
-        describe: "最大响应时间"
+        key: "runTimeMax",
+        value: 0,
+        describe: "最大响应时间(ms)"
     },
     {
-        value: "57ms",
-        describe: "平均响应时间"
+        key: "runTimeAvg",
+        value: 0,
+        describe: "平均响应时间(ms)"
     },
     {
-        value: "5",
+        key: "qpsAvg",
+        value: 0,
         describe: "平均QPS"
     },
     {
-        value: "2",
+        key: "requestReject",
+        value: 0,
         describe: "请求拒绝数"
     },
 ]);
 
+// 获取极值数据
+function getDetailedRequestExtremumLog() {
+    api.getDetailedRequestExtremumLog(props.condition).then(({code, msg, data}) => {
+        if (code != responseCode.success) {
+            ElMessage({ type: "error", message: "极值信息获取失败：" + msg });
+            return;
+        }
+        for (let index in extremumData) {
+            extremumData[index].value = data[extremumData[index].key];
+        }
+        refreshKey.value++;
+    })
+}
+
+onMounted(() => {
+    getDetailedRequestExtremumLog();
+});
+
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/css/color.scss";
+
 .extremum {
-    margin-top: 20px;
-    margin-bottom: 10px;
+    margin: 15px auto;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
+
     .buttonCard {
-        margin: 0 5px;
+        width: 15%;
+        height: 80px;
+        background: $baseBackground;
     }
 }
 </style>

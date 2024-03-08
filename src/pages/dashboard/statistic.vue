@@ -1,13 +1,60 @@
 <template>
     <div class="statistic">
-        <el-statistic class="item" title="今日接口调用量" :value="268500" />
-        <el-statistic class="item" title="今日接口总数" :value="252" />
-        <el-statistic class="item" title="今日访问总数" :value="859" />
-        <el-statistic class="item" title="今日请求拒绝总数" :value="120" />
+        <el-statistic class="item" v-for="item in statisticData" :title="item.title" :value="item.value" />
     </div>
 </template>
 
 <script setup lang="ts">
+import { onMounted, reactive } from "vue";
+import api from "@/apis/api";
+import { ElMessage } from "element-plus";
+import { responseCode } from "@/config";
+
+interface statisticDataInterface {
+    key: string,
+    title: string
+    value: number,
+}
+
+let statisticData = reactive<statisticDataInterface[]>([
+    {
+        key: "requestNum",
+        title: "今日接口调用量",
+        value: 0
+    },
+    {
+        key: "avgRunTime",
+        title: "今日接口平均耗时(ms)",
+        value: 0
+    },
+    {
+        key: "visitorNum",
+        title: "今日访客总数",
+        value: 0
+    },
+    {
+        key: "rejectNum",
+        title: "今日请求拒绝总数",
+        value: 0
+    },
+])
+
+// 获取请求信息概览
+function getOverviewRequestLog() {
+    api.getOverviewRequestLog().then(({code, msg, data}) => {
+        if (code == responseCode.success) {
+            for (let index in statisticData) {
+                statisticData[index].value = data[statisticData[index].key];
+            }
+        } else {
+            ElMessage({ type: "error", message: "请求信息概览获取失败：" + msg });
+        }
+    })
+}
+
+onMounted(() => {
+    getOverviewRequestLog();
+})
 </script>
 
 <style lang="scss" scoped>
