@@ -11,7 +11,7 @@ import (
 	"log"
 	"loiter/config"
 	"loiter/global"
-	"loiter/kernel/model/entity"
+	"loiter/model/entity"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -70,21 +70,19 @@ func initMySqlTables(db *gorm.DB) {
 	err := db.AutoMigrate(
 		entity.Role{},
 		entity.User{},
-		entity.LogLogin{},
 		entity.LogUniversal{},
 		entity.App{},
 		entity.Server{},
 		entity.Balancer{},
 		entity.AppBalancer{},
-		entity.Filter{},
-		entity.AppFilter{},
+		entity.Processor{},
+		entity.AppProcessor{},
 		entity.RequestLog{},
 		entity.Limiter{},
 		entity.AppLimiter{},
 		entity.NameList{},
 		entity.AppNameList{},
-		entity.Aid{},
-		entity.AppAid{},
+		entity.Notice{},
 	)
 	if err != nil {
 		global.AppLogger.Error("migrate table failed")

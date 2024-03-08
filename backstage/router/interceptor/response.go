@@ -11,9 +11,15 @@ import (
  */
 
 func ResponseInterceptor(w http.ResponseWriter, r *http.Request) {
-
+	printRespLog(r)
 }
 
-func cors() {
-
+// printRespLog 打印响应日志
+func printRespLog(r *http.Request) {
+	//responseDump, err := httputil.DumpResponse(r.Response, true)
+	//if err != nil {
+	//	global.AppLogger.Error(fmt.Sprintf("response log printing error: %s", err.Error()))
+	//	return
+	//}
+	//global.AppLogger.Info(string(responseDump))
 }

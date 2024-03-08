@@ -2,7 +2,7 @@ package config
 
 import (
 	"gorm.io/gorm"
-	"loiter/kernel/model/entity"
+	"loiter/model/entity"
 )
 
 /**
@@ -60,15 +60,11 @@ var RoleConfig = roleConfig{
  *                       用户数据
  *******************************************************/
 
-type userConfig struct {
-	Loiter entity.User
-}
-
-var UserConfig = userConfig{
-	Loiter: entity.User{
+var UserConfig = []entity.User{
+	{
 		Model:    gorm.Model{ID: 1},
 		Username: "loiter",
-		Password: "$2a$10$Zr7oRTuFnIu9t/Pa1Hs9N.S..c0/y3XfaYyn25yKBgT9Q0ey11r.q",
+		Password: "loiter",
 		Rid:      1,
 		Remarks:  "默认用户，超级管理员",
 	},

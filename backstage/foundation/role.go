@@ -3,7 +3,7 @@ package foundation
 import (
 	"errors"
 	"loiter/global"
-	"loiter/kernel/model/entity"
+	"loiter/model/entity"
 )
 
 /**
@@ -13,8 +13,8 @@ import (
  */
 
 type roleFoundation struct {
-	weightByRoleMap map[string]uint // map[role]weight 结构
-	ridByRoleMap    map[string]uint // map[role]rid 结构
+	WeightByRoleMap map[string]uint // map[role]weight 结构
+	RidByRoleMap    map[string]uint // map[role]rid 结构
 }
 
 var RoleFoundation = roleFoundation{}
@@ -22,8 +22,8 @@ var RoleFoundation = roleFoundation{}
 // InitRoleContainer 初始化角色容器
 func (roleFoundation *roleFoundation) InitRoleContainer() error {
 	// 获取角色信息
-	var roleSlice []entity.Role
-	tx := global.MDB.Find(&roleSlice)
+	var roleList []entity.Role
+	tx := global.MDB.Find(&roleList)
 	// 获取角色信息异常
 	if tx.Error != nil {
 		return errors.New("role information query failed, error:" + tx.Error.Error())
@@ -34,34 +34,34 @@ func (roleFoundation *roleFoundation) InitRoleContainer() error {
 	}
 
 	// 初始化各类容器
-	roleFoundation.initWeightByRoleMap(roleSlice)
-	roleFoundation.initRidByRoleMap(roleSlice)
+	roleFoundation.initWeightByRoleMap(roleList)
+	roleFoundation.initRidByRoleMap(roleList)
 	return nil
 }
 
 // InitWeightByRoleMap 初始化 weightByRoleMap
-func (roleFoundation *roleFoundation) initWeightByRoleMap(roleSlice []entity.Role) {
+func (roleFoundation *roleFoundation) initWeightByRoleMap(roleList []entity.Role) {
 	// 初始化/清空 weightByRoleMap
-	roleFoundation.weightByRoleMap = make(map[string]uint)
+	roleFoundation.WeightByRoleMap = make(map[string]uint)
 	// 填充 weightByRoleMap
-	for _, roleEntity := range roleSlice {
-		roleFoundation.weightByRoleMap[roleEntity.Name] = roleEntity.Weight
+	for _, roleEntity := range roleList {
+		roleFoundation.WeightByRoleMap[roleEntity.Name] = roleEntity.Weight
 	}
 }
 
 // initRidByRoleMap 初始化 ridByRoleMap
-func (roleFoundation *roleFoundation) initRidByRoleMap(roleSlice []entity.Role) {
+func (roleFoundation *roleFoundation) initRidByRoleMap(roleList []entity.Role) {
 	// 初始化/清空 ridByRoleMap
-	roleFoundation.ridByRoleMap = make(map[string]uint)
+	roleFoundation.RidByRoleMap = make(map[string]uint)
 	// 填充 ridByRoleMap
-	for _, roleEntity := range roleSlice {
-		roleFoundation.ridByRoleMap[roleEntity.Name] = roleEntity.ID
+	for _, roleEntity := range roleList {
+		roleFoundation.RidByRoleMap[roleEntity.Name] = roleEntity.ID
 	}
 }
 
 // GetWeightByRole 获取角色对应的权重
 func (roleFoundation *roleFoundation) GetWeightByRole(role string) (error, uint) {
-	weight := roleFoundation.weightByRoleMap[role]
+	weight := roleFoundation.WeightByRoleMap[role]
 	if weight == 0 {
 		return errors.New("role " + role + " not defined"), 0
 	}
@@ -70,7 +70,7 @@ func (roleFoundation *roleFoundation) GetWeightByRole(role string) (error, uint)
 
 // GetRidByRole 获取角色对应的id
 func (roleFoundation *roleFoundation) GetRidByRole(role string) (error, uint) {
-	rid := roleFoundation.ridByRoleMap[role]
+	rid := roleFoundation.RidByRoleMap[role]
 	if rid == 0 {
 		return errors.New("role " + role + " not defined"), 0
 	}
@@ -82,11 +82,11 @@ func (roleFoundation *roleFoundation) GetRidByRole(role string) (error, uint) {
 // int 等于 0 则 role1 等于 role2
 // int 小于 0 则 role1 小于 role2
 func (roleFoundation *roleFoundation) CompareRole(role1 string, role2 string) (error, int) {
-	weight1 := roleFoundation.weightByRoleMap[role1]
+	weight1 := roleFoundation.WeightByRoleMap[role1]
 	if weight1 == 0 {
 		return errors.New("role " + role1 + " not defined"), 0
 	}
-	weight2 := roleFoundation.weightByRoleMap[role2]
+	weight2 := roleFoundation.WeightByRoleMap[role2]
 	if weight2 == 0 {
 		return errors.New("role " + role2 + " not defined"), 0
 	}

@@ -3,13 +3,12 @@ package container
 import (
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
+	"loiter/app/plugin/filter/namelist"
 	"loiter/backstage/constant"
 	"loiter/backstage/controller/result"
 	"loiter/global"
-	"loiter/kernel/model/entity"
-	"loiter/kernel/model/po"
-	"loiter/plugin/filter/namelist"
+	"loiter/model/entity"
+	"loiter/model/po"
 )
 
 /**
@@ -19,22 +18,22 @@ import (
  */
 
 // NameListByAppMap 黑白名单开启类型 by AppHost
-var NameListByAppMap map[string][]string
+var NameListByAppMap = make(map[string][]string)
 
 // BlackNameListByAppMap 黑名单结构体 by AppHost
-var BlackNameListByAppMap map[string]namelist.INameList
+var BlackNameListByAppMap = make(map[string]namelist.INameList)
 
 // WhiteNameListByAppMap 白名单结构体 by AppHost
-var WhiteNameListByAppMap map[string]namelist.INameList
+var WhiteNameListByAppMap = make(map[string]namelist.INameList)
 
 // InitNameList 初始化黑白名单容器
 func InitNameList() {
 	global.AppLogger.Info("start initializing the NameList container")
 	// 获取有效应用黑白名单配置
-	var appNameListSlice []po.GetAppNameList
+	var appNameListList []po.GetAppNameList
 	if affected := global.MDB.Raw(`SELECT a.host, anl.genre
 					FROM app a, app_name_list anl
-					WHERE a.status = ? AND a.id = anl.app_id`, constant.Status.Normal).Scan(&appNameListSlice).RowsAffected; affected == 0 {
+					WHERE a.status = ? AND a.id = anl.app_id`, constant.Status.Normal.Code).Scan(&appNameListList).RowsAffected; affected == 0 {
 		global.AppLogger.Info("there is currently no valid NameList configuration")
 		return
 	}
@@ -44,7 +43,7 @@ func InitNameList() {
 	var genreContainerMap = make(map[string][]string)           // 开启类型临时容器
 	var blackContainerMap = make(map[string]namelist.INameList) // 黑名单临时容器
 	var whiteContainerMap = make(map[string]namelist.INameList) // 白名单临时容器
-	for _, item := range appNameListSlice {
+	for _, item := range appNameListList {
 		// 开启类型临时容器
 		if _, ok := existMap[item.Host]; ok {
 			genreContainerMap[item.Host] = append(genreContainerMap[item.Host], item.Genre)
@@ -75,18 +74,18 @@ func InitNameList() {
 func RefreshNameList(appId uint) error {
 	global.AppLogger.Info(fmt.Sprintf("start refreshing the NameList container under the application with appId %d", appId))
 	// 获取有效黑白名单容器
-	var appNameListSlice []po.GetAppNameList
+	var appNameListList []po.GetAppNameList
 	tx := global.MDB.Raw(`SELECT a.host, anl.genre
 						FROM app a, app_name_list anl
-						WHERE a.id = ? AND a.status = ? AND a.id = anl.app_id`, appId, constant.Status.Normal).Scan(&appNameListSlice)
+						WHERE a.id = ? AND a.status = ? AND a.id = anl.app_id`, appId, constant.Status.Normal.Code).Scan(&appNameListList)
 	// 查询错误则返回错误信息
 	if tx.Error != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, tx.Error.Error()))
 	}
 	// 查询为空则删除容器元素
 	if tx.RowsAffected == 0 {
-		var checkApp = entity.App{Model: gorm.Model{ID: appId}}
-		if err := global.MDB.First(&checkApp).Error; err != nil {
+		var checkApp entity.App
+		if err := global.MDB.First(&checkApp, appId).Error; err != nil {
 			return errors.New(fmt.Sprintf("appId为%d的应用不存在或者无效！", appId))
 		}
 		delete(NameListByAppMap, checkApp.Host)
@@ -94,7 +93,7 @@ func RefreshNameList(appId uint) error {
 	}
 	// 刷新容器
 	var newNameList []string
-	for _, item := range appNameListSlice {
+	for _, item := range appNameListList {
 		newNameList = append(newNameList, item.Genre)
 		err, nameList := namelist.NewNameList(item.Host, item.Genre)
 		if err != nil {
@@ -107,7 +106,14 @@ func RefreshNameList(appId uint) error {
 			WhiteNameListByAppMap[item.Host] = nameList
 		}
 	}
-	NameListByAppMap[appNameListSlice[0].Host] = newNameList
+	NameListByAppMap[appNameListList[0].Host] = newNameList
 	global.AppLogger.Info(fmt.Sprintf("complete the refresh of NameList container under the application with appId %d", appId))
 	return nil
+}
+
+// DeleteNameList 删除黑白名单
+func DeleteNameList(host string) {
+	delete(NameListByAppMap, host)
+	delete(BlackNameListByAppMap, host)
+	delete(WhiteNameListByAppMap, host)
 }

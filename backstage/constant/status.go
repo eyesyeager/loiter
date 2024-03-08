@@ -6,13 +6,40 @@ package constant
  */
 
 var Status = status{
-	1,
-	2,
-	3,
+	Normal: StatusStructure{
+		Code: 1,
+		Name: "正常",
+	},
+	Invalid: StatusStructure{
+		Code: 2,
+		Name: "失效",
+	},
+	Delete: StatusStructure{
+		Code: 3,
+		Name: "删除",
+	},
 }
 
 type status struct {
-	Normal  uint8
-	Invalid uint8
-	Delete  uint8
+	Normal  StatusStructure
+	Invalid StatusStructure
+	Delete  StatusStructure
+}
+
+func (s *status) GetNameByCode(code uint8) string {
+	switch code {
+	case s.Normal.Code:
+		return s.Normal.Name
+	case s.Invalid.Code:
+		return s.Invalid.Name
+	case s.Delete.Code:
+		return s.Delete.Name
+	default:
+		return ""
+	}
+}
+
+type StatusStructure struct {
+	Code uint8
+	Name string
 }

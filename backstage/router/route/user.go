@@ -14,4 +14,6 @@ import (
 func InitUserRoute(routerRoot *httprouter.Router, group string) {
 	routerRoot.POST(group+"/doRegister", controller.DoRegister)
 	routerRoot.POST(group+"/doLogin", controller.DoLogin)
+	routerRoot.GET(group+"/getUserInfo", controller.GetUserInfo)
+	routerRoot.GET(group+"/getAllUser", controller.GetAllUser)
 }

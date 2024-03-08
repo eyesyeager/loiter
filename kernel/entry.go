@@ -2,13 +2,13 @@ package kernel
 
 import (
 	"fmt"
+	"loiter/app/plugin"
 	"loiter/backstage"
 	"loiter/config"
 	"loiter/global"
 	"loiter/kernel/container"
 	"loiter/kernel/initializer"
 	"loiter/kernel/proxy"
-	"loiter/plugin"
 	"net/http"
 )
 

@@ -16,9 +16,9 @@ func InitRouter(routerRoot *httprouter.Router) {
 	route.InitUserRoute(routerRoot, "/user")
 	route.InitLogRoute(routerRoot, "/log")
 	route.InitAppRoute(routerRoot, "/app")
-	route.InitServerRoute(routerRoot, "/server")
 	route.InitBalancerRoute(routerRoot, "/balancer")
 	route.InitContainerRoute(routerRoot, "/container")
-	route.InitFilterRoute(routerRoot, "/filter")
-	route.InitAidRoute(routerRoot, "/aid")
+	route.InitProcessorRoute(routerRoot, "/processor")
+	route.InitCommonRoute(routerRoot, "/common")
+	route.InitNoticeRoute(routerRoot, "/notice")
 }

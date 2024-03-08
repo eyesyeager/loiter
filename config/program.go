@@ -1,7 +1,7 @@
 package config
 
 import (
-	"loiter/constant"
+	"loiter/constants"
 	"path/filepath"
 )
 
@@ -12,15 +12,16 @@ import (
 
 // Program 程序配置
 var Program = programConfig{
-	Mode:                 constant.DEVELOP,     // 程序运行模式
+	Mode:                 constants.DEVELOP,    // 程序运行模式
 	Name:                 "Loiter",             // 应用名称
 	GateWayPort:          "9500",               // 网关服务端口号
 	BackstagePort:        "9510",               // 后台服务端口号
+	StaticDirPath:        "/static",            // 静态资源存放路径
 	LogConfig:            logConfigInstance,    // 日志配置
 	MySQLConfig:          mysqlConfigInstance,  // MySQL配置
 	AESSecretKey:         "hello,bestLoiter",   // AES双向加密密钥，必须是16位
 	JWTSecretKey:         "hello,loiter!",      // JWT签名加密密钥
-	JWTExpire:            500,                  // JWT签名过期时间(min)
+	JWTExpire:            1000,                 // JWT签名过期时间(min)
 	EmailConfig:          emailConfigInstance,  // 邮箱配置
 	InitialPsdLen:        8,                    // 初始密码长度
 	ServerDefaultNameLen: 10,                   // 默认应用实例名长度
@@ -62,27 +63,28 @@ var emailConfigInstance = emailConfig{
 	Host:     "smtp.163.com",       // 主机地址
 }
 
-// TODO：默认配置逻辑待实现
 // pluginConfigInstance 插件配置
 var pluginConfigInstance = pluginConfig{
-	BalancerDefaultStrategy:      1,     // 负载均衡-默认负载均衡策略(值为策略id)
-	DefaultFilter:                "",    // 过滤器-默认过滤器配置
-	FilterDelimiter:              ",",   // 过滤器-过滤器配置分隔符
-	NameListBloomCapacity:        10000, // 过滤器-黑白名单插件配置-布隆过滤器参数-容量
-	NameListBloomMisjudgmentRate: 0.01,  // 过滤器-黑白名单插件配置-布隆过滤器参数-误判率
-	NameListIpDelimiter:          ";",   // 过滤器-黑白名单插件配置-后台接收ip操作相关请求使用的分隔符
-	DefaultAid:                   "",    // 响应处理器-默认响应处理器配置
-	AidDelimiter:                 ",",   // 响应处理器-响应处理器配置分割符
+	BalancerDefaultStrategy:      "random",     // 默认插件-负载均衡
+	FilterDefaultStrategy:        "",           // 默认插件-过滤器(多个则用 ProcessorDelimiter 隔开)
+	AidDefaultStrategy:           "",           // 默认插件-响应处理器(多个则用 ProcessorDelimiter 隔开)
+	ExceptionDefaultStrategy:     "notice",     // 默认插件-异常处理器(多个则用 ProcessorDelimiter 隔开)
+	FinalDefaultStrategy:         "requestLog", // 默认插件-最终处理器(多个则用 ProcessorDelimiter 隔开)
+	ProcessorDelimiter:           ",",          // 处理器-分隔符
+	NameListBloomCapacity:        10000,        // 过滤器-黑白名单插件配置-布隆过滤器参数-容量
+	NameListBloomMisjudgmentRate: 0.01,         // 过滤器-黑白名单插件配置-布隆过滤器参数-误判率
+	NameListIpDelimiter:          ";",          // 过滤器-黑白名单插件配置-后台接收ip操作相关请求使用的分隔符
 }
 
 type programConfig struct {
 	// Develop
-	Mode int // 程序运行模式
+	Mode int
 
 	// Application
-	Name          string // 应用名称
-	GateWayPort   string // 网关服务端口号
-	BackstagePort string // 后台服务端口号
+	Name          string
+	GateWayPort   string
+	BackstagePort string
+	StaticDirPath string
 
 	// Log
 	LogConfig logConfig
@@ -91,17 +93,17 @@ type programConfig struct {
 	MySQLConfig mysqlConfig
 
 	// secret key
-	AESSecretKey string // AES双向加密密钥，必须是16位
+	AESSecretKey string
 
 	// JWT
-	JWTSecretKey string // JWT签名加密密钥
-	JWTExpire    int    // JWT签名过期时间(min)
+	JWTSecretKey string
+	JWTExpire    int
 
 	// email
 	EmailConfig emailConfig
 
 	// User
-	InitialPsdLen int // 初始密码长度
+	InitialPsdLen int
 
 	// 默认应用实例名长度
 	ServerDefaultNameLen int
@@ -111,44 +113,45 @@ type programConfig struct {
 }
 
 type logConfig struct {
-	LogSuffix      string // 日志文件拓展名
-	LogBasePath    string // 日志文件基础路径
-	LogAppPath     string // 系统日志文件路径
-	LogGateWayPath string // 网关日志文件路径
-	LogSQLPath     string // SQL日志文件路径
-	LogMaxSize     int    // 单个日志文件最大尺寸(MB)
-	LogMaxAge      int    // 单个日志文件最多保存多少天
-	LogCompress    bool   // 日志文件是否开启压缩
+	LogSuffix      string
+	LogBasePath    string
+	LogAppPath     string
+	LogGateWayPath string
+	LogSQLPath     string
+	LogMaxSize     int
+	LogMaxAge      int
+	LogCompress    bool
 }
 
 type mysqlConfig struct {
-	Host                string // 主机地址
-	Port                int    // 端口号
-	Database            string // 数据库名
-	Username            string // 用户名
-	Password            string // 用户密码
-	Charset             string // 编码格式
-	MaxIdleConn         int    // 空闲连接池中连接的最大数量
-	MaxOpenConn         int    // 打开数据库连接的最大数量
-	LogMode             string // 日志级别
-	EnableFileLogWriter bool   // 是否启用日志文件
+	Host                string
+	Port                int
+	Database            string
+	Username            string
+	Password            string
+	Charset             string
+	MaxIdleConn         int
+	MaxOpenConn         int
+	LogMode             string
+	EnableFileLogWriter bool
 }
 
 type emailConfig struct {
-	Addr     string // SMTP服务器的地址
-	Identity string // 身份证明
-	Username string // 用户名
-	Password string // 密码
-	Host     string // 主机地址
+	Addr     string
+	Identity string
+	Username string
+	Password string
+	Host     string
 }
 
 type pluginConfig struct {
-	BalancerDefaultStrategy      uint    // 负载均衡-默认负载均衡策略(值为策略id)
-	DefaultFilter                string  // 过滤器-默认过滤器配置
-	FilterDelimiter              string  // 过滤器-过滤器配置分隔符
-	NameListBloomCapacity        uint    // 过滤器-黑白名单插件配置-布隆过滤器参数-容量
-	NameListBloomMisjudgmentRate float64 // 过滤器-黑白名单插件配置-布隆过滤器参数-误判率
-	NameListIpDelimiter          string  // 过滤器-黑白名单插件配置-后台接收ip操作相关请求使用的分隔符
-	DefaultAid                   string  // 响应处理器-默认响应处理器配置
-	AidDelimiter                 string  // 响应处理器-响应处理器配置分割符
+	BalancerDefaultStrategy      string
+	FilterDefaultStrategy        string
+	AidDefaultStrategy           string
+	ExceptionDefaultStrategy     string
+	FinalDefaultStrategy         string
+	ProcessorDelimiter           string
+	NameListBloomCapacity        uint
+	NameListBloomMisjudgmentRate float64
+	NameListIpDelimiter          string
 }

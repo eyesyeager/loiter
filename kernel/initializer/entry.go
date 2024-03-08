@@ -3,13 +3,16 @@ package initializer
 import (
 	"errors"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
+	"loiter/app/plugin/aid"
+	"loiter/app/plugin/balancer"
+	"loiter/app/plugin/exception"
+	"loiter/app/plugin/filter"
+	"loiter/app/plugin/filter/limiter"
+	"loiter/app/plugin/final"
 	"loiter/config"
 	"loiter/global"
-	"loiter/kernel/model/entity"
-	"loiter/plugin/aid"
-	"loiter/plugin/balancer"
-	"loiter/plugin/filter"
-	"loiter/plugin/filter/limiter"
+	"loiter/model/entity"
 	"reflect"
 )
 
@@ -25,9 +28,8 @@ func InitData() {
 	initRoleData()
 	initUserData()
 	initBalancerData()
+	initProcessorData()
 	initLimiterData()
-	initFilterData()
-	initAidData()
 	global.AppLogger.Info("system data initialization completed")
 }
 
@@ -44,14 +46,17 @@ func initRoleData() {
 		return
 	}
 	// 如果现有角色为空，则初始化
-	var roleEntitySlice []entity.Role
+	var roleEntityList []entity.Role
 	var valInfo = reflect.ValueOf(config.RoleConfig)
 	num := valInfo.NumField()
+	if num <= 0 {
+		panic("role information cannot be empty, please check config.RoleConfig")
+	}
 	for i := 0; i < num; i++ {
 		val := valInfo.Field(i).Interface()
-		roleEntitySlice = append(roleEntitySlice, val.(config.RoleStruct).Entity)
+		roleEntityList = append(roleEntityList, val.(config.RoleStruct).Entity)
 	}
-	if err := global.MDB.Create(&roleEntitySlice).Error; err != nil {
+	if err := global.MDB.Create(&roleEntityList).Error; err != nil {
 		panic(fmt.Errorf("role data initialization failed! An error occurred while creating the role data: %s", err.Error()))
 	}
 	global.AppLogger.Info("role data initialization completed")
@@ -70,14 +75,14 @@ func initUserData() {
 		return
 	}
 	// 如果现有用户为空，则初始化
-	var userEntitySlice []entity.User
-	var valInfo = reflect.ValueOf(config.UserConfig)
-	num := valInfo.NumField()
-	for i := 0; i < num; i++ {
-		val := valInfo.Field(i).Interface()
-		userEntitySlice = append(userEntitySlice, val.(entity.User))
+	for index := range config.UserConfig {
+		passwordHash, err := bcrypt.GenerateFromPassword([]byte(config.UserConfig[index].Password), bcrypt.DefaultCost)
+		if err != nil {
+			panic(fmt.Errorf("user data initialization failed! An error occurred while handling initial password: %s", err.Error()))
+		}
+		config.UserConfig[index].Password = string(passwordHash)
 	}
-	if err := global.MDB.Create(&userEntitySlice).Error; err != nil {
+	if err := global.MDB.Create(&config.UserConfig).Error; err != nil {
 		panic(fmt.Errorf("user data initialization failed! An error occurred while creating the user data: %s", err.Error()))
 	}
 	global.AppLogger.Info("user data initialization completed")
@@ -87,7 +92,7 @@ func initUserData() {
 func initBalancerData() {
 	global.AppLogger.Info("start initializing Balancer data")
 	// 不允许没有可用的负载均衡插件
-	if len(balancer.IBalancerConfigSlice) == 0 {
+	if len(balancer.IBalancerConfigList) == 0 {
 		panic(errors.New("not allowed No Balancer plugin available"))
 	}
 	// 清空所有负载均衡器数据
@@ -95,10 +100,31 @@ func initBalancerData() {
 		panic(fmt.Errorf("balancer data initialization failed! An error occurred while clearing all Balancer data: %s", err.Error()))
 	}
 	// 插入新数据
-	if err := global.MDB.Create(&balancer.IBalancerConfigSlice).Error; err != nil {
+	if err := global.MDB.Create(&balancer.IBalancerConfigList).Error; err != nil {
 		panic(fmt.Errorf("balancer data initialization failed! An error occurred while creating Balancer data: %s", err.Error()))
 	}
 	global.AppLogger.Info("balancer data initialization completed")
+}
+
+// initProcessorData 初始化处理器数据
+func initProcessorData() {
+	global.AppLogger.Info("start initializing processor data")
+	// 清空所有处理器
+	if err := global.MDB.Where("1 = 1").Unscoped().Delete(&entity.Processor{}).Error; err != nil {
+		panic(fmt.Errorf("processor data initialization failed! An error occurred while clearing all processor data: %s", err.Error()))
+	}
+	// 插入新数据
+	var processorList []entity.Processor
+	processorList = append(processorList, filter.IFilterConfigList...)
+	processorList = append(processorList, aid.IAidConfigList...)
+	processorList = append(processorList, exception.IExceptionConfigList...)
+	processorList = append(processorList, final.IFinalConfigList...)
+	if len(processorList) != 0 {
+		if err := global.MDB.Create(&processorList).Error; err != nil {
+			panic(fmt.Errorf("processor data initialization failed! An error occurred while creating processor data: %s", err.Error()))
+		}
+	}
+	global.AppLogger.Info("processor data initialization completed")
 }
 
 // initLimiterData 初始化限流器数据
@@ -109,49 +135,17 @@ func initLimiterData() {
 		panic(fmt.Errorf("limiter data initialization failed! An error occurred while clearing all limiter data: %s", err.Error()))
 	}
 	// 插入新数据
-	var limiterEntitySlice []entity.Limiter
+	var limiterEntityList []entity.Limiter
 	var valInfo = reflect.ValueOf(limiter.LimiterConfig)
 	num := valInfo.NumField()
 	if num != 0 {
 		for i := 0; i < num; i++ {
 			val := valInfo.Field(i).Interface()
-			limiterEntitySlice = append(limiterEntitySlice, val.(entity.Limiter))
+			limiterEntityList = append(limiterEntityList, val.(entity.Limiter))
 		}
-		if err := global.MDB.Create(&limiterEntitySlice).Error; err != nil {
+		if err := global.MDB.Create(&limiterEntityList).Error; err != nil {
 			panic(fmt.Errorf("limiter data initialization failed! An error occurred while creating limiter data: %s", err.Error()))
 		}
 	}
 	global.AppLogger.Info("limiter data initialization completed")
-}
-
-// initFilterData 初始化过滤器数据
-func initFilterData() {
-	global.AppLogger.Info("start initializing filter data")
-	// 清空所有过滤器
-	if err := global.MDB.Where("1 = 1").Unscoped().Delete(&entity.Filter{}).Error; err != nil {
-		panic(fmt.Errorf("filter data initialization failed! An error occurred while clearing all filter data: %s", err.Error()))
-	}
-	// 插入新数据
-	if len(filter.IFilterConfigSlice) != 0 {
-		if err := global.MDB.Create(&filter.IFilterConfigSlice).Error; err != nil {
-			panic(fmt.Errorf("filter data initialization failed! An error occurred while creating filter data: %s", err.Error()))
-		}
-	}
-	global.AppLogger.Info("filter data initialization completed")
-}
-
-// initAidData 初始化响应处理器数据
-func initAidData() {
-	global.AppLogger.Info("start initializing aid data")
-	// 清空所有响应处理器
-	if err := global.MDB.Where("1 = 1").Unscoped().Delete(&entity.Aid{}).Error; err != nil {
-		panic(fmt.Errorf("aid data initialization failed! An error occurred while clearing all aid data: %s", err.Error()))
-	}
-	// 插入新数据
-	if len(aid.IAidConfigSlice) != 0 {
-		if err := global.MDB.Create(&aid.IAidConfigSlice).Error; err != nil {
-			panic(fmt.Errorf("aid data initialization failed! An error occurred while creating aid data: %s", err.Error()))
-		}
-	}
-	global.AppLogger.Info("aid data initialization completed")
 }

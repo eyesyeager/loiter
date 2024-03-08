@@ -3,11 +3,11 @@ package proxy
 import (
 	"fmt"
 	"github.com/rs/xid"
-	"loiter/constant"
+	"loiter/app/store"
+	"loiter/constants"
 	"loiter/global"
-	"loiter/helper"
 	"loiter/kernel/filter"
-	"loiter/plugin/store"
+	"loiter/utils"
 	"net/http"
 	"strconv"
 	"time"
@@ -20,12 +20,12 @@ import (
  */
 
 // pre 前置处理总入口
-func pre(w http.ResponseWriter, r *http.Request, host string) bool {
+func pre(w http.ResponseWriter, r *http.Request, host string) (error, bool) {
 	buildRequestId(r)
-	if allow := entryFilter(w, r, host); !allow {
-		return allow
+	if err, allow := entryFilter(w, r, host); !allow {
+		return err, allow
 	}
-	return true
+	return nil, true
 }
 
 // buildRequestId 生成全局唯一请求id
@@ -41,15 +41,14 @@ func buildRequestId(r *http.Request) {
 }
 
 // entryFilter 进入过滤器
-func entryFilter(w http.ResponseWriter, r *http.Request, host string) bool {
+func entryFilter(w http.ResponseWriter, r *http.Request, host string) (error, bool) {
 	// 进入过滤器
 	err, allow := filter.Entry(w, r, host)
 	if err != nil {
 		errMsg := fmt.Sprintf("filter execution failed. Error message: %s", err.Error())
-		statusCode, contentType, content := helper.HtmlSimpleTemplate(constant.ResponseTitle.BadGateway, errMsg)
-		helper.Response(w, statusCode, contentType, content)
+		statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.BadGateway, errMsg)
+		utils.Response(w, statusCode, contentType, content)
 		global.GatewayLogger.Warn(errMsg)
-		return false
 	}
-	return allow
+	return err, allow
 }

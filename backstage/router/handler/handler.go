@@ -18,8 +18,12 @@ type LoiterRouter struct {
 
 // ServeHTTP 让处理器实现 http.Handler 接口.
 func (r *LoiterRouter) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	interceptor.RequestInterceptor(w, req)
+	// 进入请求拦截器
+	if !interceptor.RequestInterceptor(w, req) {
+		return
+	}
 	r.router.ServeHTTP(w, req)
+	// 进入响应拦截器
 	interceptor.ResponseInterceptor(w, req)
 }
 

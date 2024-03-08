@@ -12,6 +12,5 @@ import (
  */
 
 func InitLogRoute(routerRoot *httprouter.Router, group string) {
-	routerRoot.POST(group+"/getLoginLog", controller.GetLoginLog)
 	routerRoot.POST(group+"/getUniversalLog", controller.GetUniversalLog)
 }

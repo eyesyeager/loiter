@@ -2,9 +2,9 @@ package filter
 
 import (
 	"fmt"
+	"loiter/app/plugin/filter"
 	"loiter/global"
 	"loiter/kernel/container"
-	"loiter/plugin/filter"
 	"net/http"
 )
 
@@ -16,13 +16,13 @@ import (
 
 // Entry 进入请求过滤器
 func Entry(w http.ResponseWriter, r *http.Request, host string) (error, bool) {
-	filterNameSlice := container.FilterByAppMap[host]
+	filterNameList := container.FilterByAppMap[host]
 	// 未配置过滤器则直接放行
-	if filterNameSlice == nil {
+	if filterNameList == nil {
 		return nil, true
 	}
 	// 配置过滤器则有序进入
-	for _, name := range filterNameSlice {
+	for _, name := range filterNameList {
 		iFilter, ok := filter.IFilterByNameMap[name]
 		if !ok {
 			global.GatewayLogger.Warn(fmt.Sprintf("there is no filter named %s, please deal with it as soon as possible!", name))

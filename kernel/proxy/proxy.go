@@ -2,10 +2,10 @@ package proxy
 
 import (
 	"fmt"
-	"loiter/constant"
+	"loiter/constants"
 	"loiter/global"
-	"loiter/helper"
 	"loiter/kernel/balancer"
+	"loiter/utils"
 	"net/http"
 	"net/http/httputil"
 )
@@ -16,13 +16,17 @@ import (
  */
 
 func StartProxy() {
-	// 初始化配置
+	// 路由
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		host := req.Host
 
 		// 请求预处理
-		if allow := pre(w, req, host); !allow {
-			post(w, req, nil, host, preEntrance)
+		if err, allow := pre(w, req, host); !allow {
+			if err == nil {
+				post(w, req, nil, host, constants.PostEntrance.Reject, "")
+			} else {
+				post(w, req, nil, host, constants.PostEntrance.Error, err.Error())
+			}
 			return
 		}
 
@@ -30,10 +34,9 @@ func StartProxy() {
 		err, targetUrl := balancer.Entry(req, host)
 		if err != nil {
 			errMsg := fmt.Sprintf("the load balancing policy execution failed and the proxy could not be used. Error message: %s", err.Error())
-			statusCode, contentType, content := helper.HtmlSimpleTemplate(constant.ResponseTitle.BadGateway, errMsg)
-			helper.Response(w, statusCode, contentType, content)
+			statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.BadGateway, errMsg)
+			utils.Response(w, statusCode, contentType, content)
 			global.GatewayLogger.Warn(errMsg)
-			post(w, req, nil, host, balancerEntrance)
 			return
 		}
 
@@ -42,7 +45,7 @@ func StartProxy() {
 
 		// 响应处理
 		proxy.ModifyResponse = func(resp *http.Response) error {
-			post(w, req, resp, host, postEntrance)
+			post(w, req, resp, host, constants.PostEntrance.Post, "")
 			return nil
 		}
 

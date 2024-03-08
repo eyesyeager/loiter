@@ -12,5 +12,10 @@ import (
  */
 
 func InitAppRoute(routerRoot *httprouter.Router, group string) {
-	routerRoot.POST(group+"/addApp", controller.AddApp)
+	routerRoot.POST(group+"/saveApp", controller.SaveApp)
+	routerRoot.POST(group+"/activateApp", controller.ActivateApp)
+	routerRoot.POST(group+"/deleteApp", controller.DeleteApp)
+	routerRoot.GET(group+"/getAllApp", controller.GetAllApp)
+	routerRoot.POST(group+"/getAppInfoByPage", controller.GetAppInfoByPage)
+	routerRoot.GET(group+"/getAppInfoById/:appId", controller.GetAppInfoById)
 }

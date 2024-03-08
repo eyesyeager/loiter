@@ -3,7 +3,7 @@ package main
 import (
 	"loiter/bootstrap"
 	"loiter/config"
-	"loiter/constant"
+	"loiter/constants"
 	"loiter/kernel"
 	"loiter/test"
 )
@@ -24,7 +24,7 @@ func main() {
 	bootstrap.Start()
 
 	// 启动测试程序(仅在开发模式执行)
-	if config.Program.Mode == constant.DEVELOP {
+	if config.Program.Mode == constants.DEVELOP {
 		test.Start()
 	}
 

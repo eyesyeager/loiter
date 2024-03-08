@@ -3,9 +3,9 @@ package balancer
 import (
 	"errors"
 	"fmt"
+	"loiter/app/plugin/balancer"
 	"loiter/global"
 	"loiter/kernel/container"
-	"loiter/plugin/balancer"
 	"net/http"
 	"net/url"
 )
@@ -43,6 +43,5 @@ func Entry(r *http.Request, host string) (error, *url.URL) {
 	return nil, &url.URL{
 		Scheme: "http", // 暂时只实现http代理
 		Host:   targetUrl,
-		Path:   r.RequestURI,
 	}
 }

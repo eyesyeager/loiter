@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"loiter/config"
-	"loiter/constant"
+	"loiter/constants"
 	"loiter/global"
 	"os"
 	"path/filepath"
@@ -70,7 +70,7 @@ func getWriteSyncer(path string) zapcore.WriteSyncer {
 	}
 
 	// 开发模式下，日志会输出到控制台，但生产模式不会
-	if config.Program.Mode == constant.DEVELOP {
+	if config.Program.Mode == constants.DEVELOP {
 		return zapcore.NewMultiWriteSyncer(zapcore.AddSync(lumberjackSyncer), zapcore.AddSync(os.Stdout))
 	} else {
 		return zapcore.AddSync(lumberjackSyncer)
@@ -81,7 +81,7 @@ func getWriteSyncer(path string) zapcore.WriteSyncer {
 // getLogLevel 设置日志级别，开发模式下为debug级别，生产模式为Info级别
 func getLogLevel() zapcore.Level {
 	var logMode zapcore.Level
-	if config.Program.Mode == constant.DEVELOP {
+	if config.Program.Mode == constants.DEVELOP {
 		logMode = zapcore.DebugLevel
 	} else {
 		logMode = zapcore.InfoLevel

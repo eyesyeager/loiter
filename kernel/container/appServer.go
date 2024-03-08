@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"loiter/backstage/constant"
 	"loiter/global"
-	"loiter/kernel/model/entity"
+	"loiter/model/entity"
 )
 
 /**
@@ -15,7 +15,7 @@ import (
  */
 
 // ServerByAppMap 应用实例 by AppHost
-var ServerByAppMap map[string][]ServerWeight
+var ServerByAppMap = make(map[string][]ServerWeight)
 
 type ServerWeight struct {
 	Server string
@@ -26,40 +26,40 @@ type ServerWeight struct {
 func InitAppServer() {
 	global.AppLogger.Info("start initializing the AppServer container")
 	// 获取有效应用实例
-	var serverSlice []entity.Server
-	if tx := global.MDB.Where(&entity.Server{Status: constant.Status.Normal}).Find(&serverSlice); tx.RowsAffected == 0 {
+	var serverList []entity.Server
+	if tx := global.MDB.Where(&entity.Server{Status: constant.Status.Normal.Code}).Find(&serverList); tx.RowsAffected == 0 {
 		global.AppLogger.Warn("there are currently no valid server requiring service")
 		return
 	}
 	// 应用id去重
-	var appIdSlice []uint
+	var appIdList []uint
 	tempMap := make(map[uint]struct{})
-	for _, item := range serverSlice {
+	for _, item := range serverList {
 		if _, ok := tempMap[item.AppId]; !ok {
 			tempMap[item.AppId] = struct{}{}
-			appIdSlice = append(appIdSlice, item.AppId)
+			appIdList = append(appIdList, item.AppId)
 		}
 	}
 	// 获取有效应用
-	var appSlice []entity.App
-	if tx := global.MDB.Where(&entity.App{Status: constant.Status.Normal}).Find(&appSlice, appIdSlice); tx.RowsAffected == 0 {
+	var appList []entity.App
+	if tx := global.MDB.Where(&entity.App{Status: constant.Status.Normal.Code}).Find(&appList, appIdList); tx.RowsAffected == 0 {
 		global.AppLogger.Warn("there are currently no valid app requiring service")
 		return
 	}
 
 	// 构建并刷新容器
 	containerMap := make(map[string][]ServerWeight)
-	for _, app := range appSlice {
-		var tempServerSlice []ServerWeight
-		for _, server := range serverSlice {
+	for _, app := range appList {
+		var tempServerList []ServerWeight
+		for _, server := range serverList {
 			if server.AppId == app.ID {
-				tempServerSlice = append(tempServerSlice, ServerWeight{
+				tempServerList = append(tempServerList, ServerWeight{
 					Server: server.Address,
 					Weight: server.Weight,
 				})
 			}
 		}
-		containerMap[app.Host] = tempServerSlice
+		containerMap[app.Host] = tempServerList
 	}
 	ServerByAppMap = containerMap
 	global.AppLogger.Info("complete the initialization of AppServer container")
@@ -70,27 +70,37 @@ func RefreshAppServer(appId uint) error {
 	global.AppLogger.Info(fmt.Sprintf("start refreshing the AppServer container under the application with appId %d", appId))
 	// 获取对应应用
 	var app entity.App
-	if tx := global.MDB.Where(&entity.App{Status: constant.Status.Normal}).First(&app, appId); tx.RowsAffected == 0 {
-		return errors.New(fmt.Sprintf("appId为%d的应用刷新应用与实例容器失败，其为无效应用！", appId))
+	if err := global.MDB.First(&app, appId).Error; err != nil {
+		return errors.New(fmt.Sprintf("appId为%d的应用刷新应用与实例容器失败，应用不存在！", appId))
+	}
+	// 若状态为无效，则删除
+	if app.Status != constant.Status.Normal.Code {
+		delete(ServerByAppMap, app.Host)
+		return nil
 	}
 	// 获取有效应用实例
-	var serverSlice []entity.Server
-	if tx := global.MDB.Where(&entity.Server{Status: constant.Status.Normal, AppId: appId}).Find(&serverSlice); tx.RowsAffected == 0 {
+	var serverList []entity.Server
+	if tx := global.MDB.Where(&entity.Server{Status: constant.Status.Normal.Code, AppId: appId}).Find(&serverList); tx.RowsAffected == 0 {
 		global.AppLogger.Warn(fmt.Sprintf("appId为%d的应用刷新应用与实例容器失败，当前应用不存在有效实例！", appId))
 		delete(ServerByAppMap, app.Host)
 		return nil
 	}
 	// 构建并刷新容器
-	var currentServerSlice []ServerWeight
-	for _, server := range serverSlice {
+	var currentServerList []ServerWeight
+	for _, server := range serverList {
 		if server.AppId == app.ID {
-			currentServerSlice = append(currentServerSlice, ServerWeight{
+			currentServerList = append(currentServerList, ServerWeight{
 				Server: server.Address,
 				Weight: server.Weight,
 			})
 		}
 	}
-	ServerByAppMap[app.Host] = currentServerSlice
+	ServerByAppMap[app.Host] = currentServerList
 	global.AppLogger.Info(fmt.Sprintf("complete the refresh of AppServer container under the application with appId %d", appId))
 	return nil
+}
+
+// DeleteAppServer 删除应用与实例容器项
+func DeleteAppServer(host string) {
+	delete(ServerByAppMap, host)
 }

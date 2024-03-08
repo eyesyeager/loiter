@@ -16,10 +16,9 @@ func InitRegister() {
 	global.AppLogger.Info("start initializing all containers")
 	InitAppServer()
 	InitBalancer()
-	InitFilter()
+	InitProcessor()
 	InitLimiter()
 	InitNameList()
-	InitAid()
 	global.AppLogger.Info("all containers initialization completed")
 }
 
@@ -32,7 +31,7 @@ func RefreshRegister(appId uint) error {
 	if err := RefreshBalancer(appId); err != nil {
 		return err
 	}
-	if err := RefreshFilter(appId); err != nil {
+	if err := RefreshProcessor(appId); err != nil {
 		return err
 	}
 	if err := RefreshLimiter(appId); err != nil {
@@ -41,9 +40,15 @@ func RefreshRegister(appId uint) error {
 	if err := RefreshNameList(appId); err != nil {
 		return err
 	}
-	if err := RefreshAid(appId); err != nil {
-		return err
-	}
 	global.AppLogger.Info(fmt.Sprintf("complete the refresh of all containers under the application with appId %d", appId))
 	return nil
+}
+
+// DeleteRegister 删除所有注册信息
+func DeleteRegister(host string) {
+	DeleteAppServer(host)
+	DeleteBalancer(host)
+	DeleteProcessor(host)
+	DeleteLimiter(host)
+	DeleteNameList(host)
 }

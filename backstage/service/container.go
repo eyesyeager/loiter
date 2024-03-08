@@ -2,8 +2,8 @@ package service
 
 import (
 	"loiter/backstage/constant"
-	"loiter/backstage/utils"
 	"loiter/kernel/container"
+	"loiter/utils"
 	"net/http"
 )
 
@@ -54,15 +54,15 @@ func (*containerService) RefreshBalancer(r *http.Request, userClaims utils.JwtCu
 	return nil
 }
 
-// RefreshFilter 刷新过滤器容器
-func (*containerService) RefreshFilter(r *http.Request, userClaims utils.JwtCustomClaims, appId uint) error {
+// RefreshProcessor 刷新处理器容器
+func (*containerService) RefreshProcessor(r *http.Request, userClaims utils.JwtCustomClaims, appId uint) error {
 	// 刷新容器
-	if err := container.RefreshFilter(appId); err != nil {
+	if err := container.RefreshProcessor(appId); err != nil {
 		return err
 	}
 	// 记录操作日志
 	go LogService.App(r, userClaims.Uid, appId,
-		constant.BuildUniversalLog(constant.LogUniversal.RefreshContainer, "过滤器容器"))
+		constant.BuildUniversalLog(constant.LogUniversal.RefreshContainer, "处理器容器"))
 	return nil
 }
 
@@ -87,17 +87,5 @@ func (*containerService) RefreshNameList(r *http.Request, userClaims utils.JwtCu
 	// 记录操作日志
 	go LogService.App(r, userClaims.Uid, appId,
 		constant.BuildUniversalLog(constant.LogUniversal.RefreshContainer, "黑白名单容器"))
-	return nil
-}
-
-// RefreshAid 刷新响应处理器容器
-func (*containerService) RefreshAid(r *http.Request, userClaims utils.JwtCustomClaims, appId uint) error {
-	// 刷新容器
-	if err := container.RefreshAid(appId); err != nil {
-		return err
-	}
-	// 记录操作日志
-	go LogService.App(r, userClaims.Uid, appId,
-		constant.BuildUniversalLog(constant.LogUniversal.RefreshContainer, "响应处理器容器"))
 	return nil
 }
