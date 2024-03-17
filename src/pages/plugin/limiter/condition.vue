@@ -1,12 +1,12 @@
 <template>
     <div class="condition">
         <span class="label">应用名</span>
-        <el-select class="appName" v-model="inputValue.appId" filterable clearable>
+        <el-select class="appName" v-model="inputValue.appName" filterable clearable>
             <el-option v-for="item in appOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
-        <span class="label">负载策略</span>
-        <el-select class="status" v-model="inputValue.balancer" clearable>
-            <el-option v-for="item in balancerOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <span class="label">限流器</span>
+        <el-select class="appName" v-model="inputValue.limiter" filterable clearable>
+            <el-option v-for="item in limiterOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
         <el-button class="search" plain @click="search">查询</el-button>
     </div>
@@ -21,10 +21,10 @@ import { OptionsInterface } from "@/d.ts/common";
 
 const emit = defineEmits([ "search" ]);
 const appOptions = reactive<OptionsInterface[]>([]);
-const balancerOptions = reactive<OptionsInterface[]>([]);
+const limiterOptions = reactive<OptionsInterface[]>([]);
 const inputValue = reactive({
-    appId: "",
-    balancer: ""
+    appName: "",
+    limiter: ""
 });
 
 // 获取所有应用信息
@@ -43,15 +43,18 @@ function getAppDictionary() {
     });
 }
 
-// 获取状态字典
-function getBalancerDictionary() {
-    api.getBalancerDictionary().then(({code, msg, data}) => {
+// 获取限流器字典
+function getLimiterDictionary() {
+    api.getLimiterDictionary().then(({code, msg, data}) => {
         if (code != responseCode.success) {
-            ElMessage({ type: "error", message: "负载均衡策略获取失败：" + msg });
+            ElMessage({ type: "error", message: "限流器信息获取失败：" + msg });
             return;
         }
         data.forEach((item: any, index: number) => {
-            balancerOptions[index] = item;
+            limiterOptions[index] = {
+                "label": item.label,
+                "value": item.value
+            };
         });
     });
 }
@@ -63,9 +66,8 @@ function search() {
 
 onMounted(() => {
     getAppDictionary();
-    getBalancerDictionary();
+    getLimiterDictionary();
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -85,8 +87,7 @@ onMounted(() => {
         margin-right: 10px;
     }
 
-    .appName,
-    .status {
+    .appName {
         width: 200px;
         margin-right: 10px;
     }

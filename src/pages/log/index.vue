@@ -7,8 +7,7 @@
                 <el-table-column v-for="item in tableColumn" :prop="item.prop" :label="item.label" :width="item.width" :align="item.align"/>
             </el-table>
             <el-pagination class="pagination" :layout="layout" :page-sizes="pageSizes" :current-page="pageNo"
-                :page-size="pageSize" :total="totalNum" @current-change="handlePageChange"
-                @size-change="handleSizeChange" 
+                :page-size="pageSize" :total="totalNum" @current-change="handlePageChange" @size-change="handleSizeChange" 
             />
         </div>
     </div>
@@ -34,7 +33,7 @@ const pageSize = ref(10);
 const totalNum = ref(0);
 const tableData = ref([]);
 const layout = "total, sizes, prev, pager, next";
-const pageSizes = [10, 20, 50, 100];
+const pageSizes = [10, 50, 100, 200];
 const tableColumn = [
     {
         prop: "title",

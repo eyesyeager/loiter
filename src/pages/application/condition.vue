@@ -1,11 +1,15 @@
 <template>
     <div class="condition">
         <span class="label">应用名</span>
-        <el-select class="appName" v-model="inputValue.appName" filterable clearable placeholder="请选择">
-            <el-option v-for="item in appNameOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <el-select class="input" v-model="inputValue.appId" filterable clearable>
+            <el-option v-for="item in appOptions" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+        <span class="label">类型</span>
+        <el-select class="input" v-model="inputValue.appGenre" filterable clearable>
+            <el-option v-for="item in appGenreOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
         <span class="label">状态</span>
-        <el-select class="status" v-model="inputValue.status" clearable placeholder="请选择">
+        <el-select class="input" v-model="inputValue.status" clearable>
             <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
         <el-button class="search" plain @click="search">查询</el-button>
@@ -20,25 +24,40 @@ import { responseCode } from "@/config";
 import { OptionsInterface } from "@/d.ts/common";
 
 const emit = defineEmits([ "search" ]);
-const appNameOptions = reactive<OptionsInterface[]>([]);
+const appOptions = reactive<OptionsInterface[]>([]);
+const appGenreOptions = reactive<OptionsInterface[]>([]);
 const statusOptions = reactive<OptionsInterface[]>([]);
 const inputValue = reactive({
-    appName: "",
+    appId: "",
+    appGenre: "",
     status: ""
 });
 
 // 获取所有应用信息
-function getAllApp() {
-    api.getAllApp().then(({ code, msg, data }) => {
+function getAppDictionary() {
+    api.getAppDictionary().then(({ code, msg, data }) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "应用信息获取失败：" + msg });
             return;
         }
         data.forEach((item: any, index: number) => {
-            appNameOptions[index] = {
-                "label": item,
-                "value": item
+            appOptions[index] = {
+                "label": item.label,
+                "value": item.value,
             };
+        });
+    });
+}
+
+// 获取应用类型字典
+function getAppGenreDictionary() {
+    api.getAppGenreDictionary().then(({code, msg, data}) => {
+        if (code != responseCode.success) {
+            ElMessage({ type: "error", message: "应用类型字典获取失败：" + msg });
+            return;
+        }
+        data.forEach((item: any, index: number) => {
+            appGenreOptions[index] = item;
         });
     });
 }
@@ -62,7 +81,8 @@ function search() {
 }
 
 onMounted(() => {
-    getAllApp();
+    getAppDictionary();
+    getAppGenreDictionary();
     getStatusDictionary();
 });
 
@@ -85,9 +105,8 @@ onMounted(() => {
         margin-right: 10px;
     }
 
-    .appName,
-    .status {
-        width: 200px;
+    .input {
+        width: 180px;
         margin-right: 10px;
     }
 

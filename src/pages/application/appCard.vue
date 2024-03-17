@@ -5,7 +5,7 @@
         </div>
         <div class="body">
             <div class="line">
-                <div>负载均衡: {{ props.data!.balancer }}</div>
+                <div>应用类型: {{ props.data!.appGenre }}</div>
                 <div>服务实例: {{ props.data!.validServerNum + "/" + props.data!.serverNum }}</div>
             </div>
             <div class="line">
@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="footer">
-            <el-popconfirm title="确认刷新容器吗?" @confirm="refreshAppServer">
+            <el-popconfirm title="确认刷新容器吗?" @confirm="refreshAppContainer">
                 <template #reference><el-button class="appBtn" plain>刷新容器</el-button></template>
             </el-popconfirm>
             <el-popconfirm title="确认应用状态吗?" @confirm="activateApp">
@@ -48,12 +48,12 @@ const props = defineProps({
 const roleStore = useRoleStore();
 
 // 刷新应用服务实例容器
-function refreshAppServer() {
+function refreshAppContainer() {
     if (!roleStore.checkAuth(role.admin)) {
         ElMessage({ type: "error", message: "权限不足" });
         return;
     }
-    api.refreshAppServer([props.data!.appId]).then(({code, msg}) => {
+    api.refreshAppContainer([props.data!.appId]).then(({code, msg}) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "应用服务实例容器刷新失败：" + msg });
             return;
@@ -135,7 +135,6 @@ function deleteApp() {
         }
 
         .remarks {
-            // height: 25px;
             line-height: 25px;
         }
     }

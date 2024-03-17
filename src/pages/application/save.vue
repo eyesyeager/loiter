@@ -1,9 +1,15 @@
 <template>
-    <el-dialog class="save" v-model="dialogVisible" :title="props.flag == SaveAppDialog.add ? '新增应用' : '编辑应用'" width="500">
+    <el-dialog class="save" v-model="dialogVisible" :title="props.flag == SaveDialog.add ? '新增应用' : '编辑应用'" width="500">
         <div>
             <div class="inputGroup">
                 <span class="label">应用名</span>
                 <el-input class="input" v-model="inputValue.appName" clearable />
+            </div>
+            <div class="inputGroup">
+                <span class="label">应用类型</span>
+                <el-select class="input" v-model="inputValue.appGenre" clearable>
+                    <el-option v-for="item in appGenreOptions" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
             </div>
             <div class="inputGroup">
                 <span class="label">代理地址</span>
@@ -13,7 +19,7 @@
             </div>
             <div class="inputGroup">
                 <span class="label">责任人</span>
-                <el-select class="input" v-model="inputValue.ownerId" clearable placeholder="请选择">
+                <el-select class="input" v-model="inputValue.ownerId" clearable>
                     <el-option v-for="item in userOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
             </div>
@@ -56,7 +62,7 @@ import { ElMessage } from "element-plus";
 import { responseCode, role } from "@/config";
 import { OptionsInterface } from "@/d.ts/common";
 import { useRoleStore } from "@/store";
-import { SaveAppDialog } from "@/constants";
+import { SaveDialog } from "@/constants";
 
 interface ServerInterface {
     address: string,
@@ -66,6 +72,7 @@ interface ServerInterface {
 interface InputValueInterface {
     appId: number,
     appName: string,
+    appGenre: string,
     host: string,
     ownerId: number | null | string,
     serverList: ServerInterface[],
@@ -80,10 +87,12 @@ const props = defineProps({
 });
 const roleStore = useRoleStore();
 const dialogVisible = ref(false);
+const appGenreOptions = reactive<OptionsInterface[]>([]);
 const userOptions = reactive<OptionsInterface[]>([]);
 const inputValue = reactive<InputValueInterface>({
     appId: 0,
     appName: "",
+    appGenre: "",
     host: "",
     serverList: [{
         address: "",
@@ -97,10 +106,9 @@ const inputValue = reactive<InputValueInterface>({
 watch(
     () => props.show,
     _ => {
-        clearCondition();
-        if (props.flag == SaveAppDialog.update) {
-            inputValue.appId = props.appId!;
-            initUpdateCondition();
+        clearInputValue();
+        if (props.flag == SaveDialog.update) {
+            initUpdateInputValue();
         }
         dialogVisible.value = true;
     }
@@ -121,6 +129,19 @@ function deleteServer(index: number) {
         return;
     }
     inputValue.serverList.splice(index, 1);
+}
+
+// 获取应用类型字典
+function getAppGenreDictionary() {
+    api.getAppGenreDictionary().then(({code, msg, data}) => {
+        if (code != responseCode.success) {
+            ElMessage({ type: "error", message: "应用类型字典获取失败：" + msg });
+            return;
+        }
+        data.forEach((item: any, index: number) => {
+            appGenreOptions[index] = item;
+        });
+    });
 }
 
 // 获取所有可选用户
@@ -165,9 +186,10 @@ function saveApp() {
 }
 
 // 清空条件
-function clearCondition() {
+function clearInputValue() {
     inputValue.appId = 0;
     inputValue.appName = "";
+    inputValue.appGenre = "";
     inputValue.host = "";
     inputValue.serverList = [{
         address: "",
@@ -178,13 +200,15 @@ function clearCondition() {
 }
 
 // 初始化编辑条件
-function initUpdateCondition() {
+function initUpdateInputValue() {
+    inputValue.appId = props.appId!;
     api.getAppInfoById([props.appId]).then(({ code, msg, data }) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "获取应用详细信息失败" + msg });
             return;
         }
         inputValue.appName = data.appName;
+        inputValue.appGenre = data.appGenre;
         inputValue.host = data.host;
         inputValue.serverList = data.serverList;
         inputValue.ownerId = String(data.ownerId);
@@ -193,6 +217,7 @@ function initUpdateCondition() {
 }
 
 onMounted(() => {
+    getAppGenreDictionary();
     getAllUser();
 });
 
@@ -217,7 +242,6 @@ onMounted(() => {
 
         .input {
             width: 380px;
-            text-align: right;
         }
 
         .serverInput {
@@ -225,7 +249,7 @@ onMounted(() => {
             width: 380px;
 
             .weightInput {
-                width: 60px;
+                width: 65px;
             }
         }
     }

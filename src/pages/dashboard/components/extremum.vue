@@ -60,7 +60,10 @@ const extremumData = reactive<ExtremumDataInterface[]>([
 
 // 获取极值数据
 function getDetailedRequestExtremumLog() {
-    api.getDetailedRequestExtremumLog(props.condition).then(({code, msg, data}) => {
+    api.getDetailedRequestExtremumLog({
+        ...props.condition,
+        appId: props.condition!.appId ? Number(props.condition!.appId) : null
+    }).then(({code, msg, data}) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "极值信息获取失败：" + msg });
             return;

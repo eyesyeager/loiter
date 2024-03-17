@@ -25,9 +25,6 @@ const app = {
     deleteApp: async (req: any) => {
         return await post("/app/deleteApp", req);
     },
-    getAllApp: async () => {
-        return await get("/app/getAllApp");
-    },
     getAppInfoByPage: async (req: any) => {
         return await post("/app/getAppInfoByPage", req);
     },
@@ -38,9 +35,6 @@ const app = {
 
 // 负载均衡相关接口
 const balancer = {
-    getAllBalancer: async () => {
-        return await get("/balancer/getAllBalancer");
-    },
     getBalancerByPage: async (req: any) => {
         return await post("/balancer/getBalancerByPage", req);
     },
@@ -60,6 +54,10 @@ const processor = {
     },
     getProcessorByGenre: async (req: any) => {
         return await get("/processor/getProcessorByGenre", req, UrlReqType.path);
+    },
+    // --------------------------- limiter ------------------------------
+    getLimiterByPage: async (req: any) => {
+        return await post("/processor/getLimiterByPage", req);
     },
     // --------------------------- requestLog ------------------------------
     getOverviewRequestLog: async () => {
@@ -100,6 +98,12 @@ const common = {
     getStatusDictionary: async () => {
         return await get("/common/getStatusDictionary");
     },
+    getAppDictionary: async () => {
+        return await get("/common/getAppDictionary");
+    },
+    getBalancerDictionary: async () => {
+        return await get("/common/getBalancerDictionary");
+    },
     getNoticeDictionary: async () => {
         return await get("/common/getNoticeDictionary");
     },
@@ -108,6 +112,15 @@ const common = {
     },
     getProcessorDictionary: async () => {
         return await get("/common/getProcessorDictionary");
+    },
+    getAppGenreDictionary: async () => {
+        return await get("/common/getAppGenreDictionary");
+    },
+    getLimiterDictionary: async () => {
+        return await get("/common/getLimiterDictionary");
+    },
+    getLimiterModeDictionary: async () => {
+        return await get("/common/getLimiterModeDictionary");
     }
 }
 
@@ -123,8 +136,8 @@ const notice = {
 
 // 容器接口
 const container = {
-    refreshAppServer: async (req: any) => {
-        return await get("/container/refreshAppServer", req, UrlReqType.path);
+    refreshAppContainer: async (req: any) => {
+        return await get("/container/refreshAppContainer", req, UrlReqType.path);
     },
     refreshBalancer: async (req: any) => {
         return await get("/container/refreshBalancer", req, UrlReqType.path);

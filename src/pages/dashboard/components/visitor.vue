@@ -54,7 +54,10 @@ const option = reactive<any>({
 
 // 获取访客统计信息
 function getDetailedRequestVisitorLog() {
-    api.getDetailedRequestVisitorLog(props.condition).then(({ code, msg, data }) => {
+    api.getDetailedRequestVisitorLog({
+        ...props.condition,
+        appId: props.condition!.appId ? Number(props.condition!.appId) : null
+    }).then(({ code, msg, data }) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "访客统计信息获取失败：" + msg });
             return;

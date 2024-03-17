@@ -1,6 +1,6 @@
 <template>
     <div class="manage">
-        <Condition @search="search"/>
+        <Condition @search="search" />
         <div class="data">
             <el-table class="table" :border="true" :data="tableData">
                 <el-table-column type="index" :align="'center'" />
@@ -8,6 +8,9 @@
                 <el-table-column prop="content" label="操作" :align="'center'">
                     <template #default="scope">
                         <el-button size="small" @click="openEditDialog(scope)">编辑</el-button>
+                        <el-popconfirm title="确认删除吗?" @confirm="refreshProcessor(scope)">
+                            <template #reference><el-button size="small">删除</el-button></template>
+                        </el-popconfirm>
                         <el-popconfirm title="确认刷新容器吗?" @confirm="refreshProcessor(scope)">
                             <template #reference><el-button size="small">刷新容器</el-button></template>
                         </el-popconfirm>
@@ -22,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted } from "vue";
 import Condition from "./condition.vue";
 import Edit from "./edit.vue";
 import api from "@/apis/api";

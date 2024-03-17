@@ -3,8 +3,8 @@
         <div class="line">
             <div class="inputGroup">
                 <span class="label">应用:</span>
-                <el-select class="input" v-model="inputValue.appName" filterable clearable placeholder="">
-                    <el-option v-for="item in appNameOptions" :key="item.value" :label="item.label" :value="item.value" />
+                <el-select class="input" v-model="inputValue.appId" filterable clearable placeholder="">
+                    <el-option v-for="item in appOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
             </div>
             <div class="inputGroup">
@@ -41,33 +41,33 @@ import { OptionsInterface } from "@/d.ts/common";
 
 const emit = defineEmits(["search"]);
 const inputValue = reactive({
-    appName: "",
+    appId: "",
     genre: "",
     title: "",
 });
-const appNameOptions = reactive<OptionsInterface[]>([]);
+const appOptions = reactive<OptionsInterface[]>([]);
 const noticeOptions = reactive<OptionsInterface[]>([]);
 const timeRange = ref<Date[]>([]);
 
 // 重置表单
 function reset() {
-    inputValue.appName = "";
+    inputValue.appId = "";
     inputValue.genre = "";
     inputValue.title = "";
     timeRange.value = [];
 }
 
 // 获取所有应用信息
-function getAllApp() {
-    api.getAllApp().then(({ code, msg, data }) => {
+function getAppDictionary() {
+    api.getAppDictionary().then(({ code, msg, data }) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "应用信息获取失败：" + msg });
             return;
         }
         data.forEach((item: any, index: number) => {
-            appNameOptions[index] = {
-                "label": item,
-                "value": item
+            appOptions[index] = {
+                "label": item.label,
+                "value": item.value
             }
         });
     });
@@ -95,7 +95,7 @@ function search() {
 }
 
 onMounted(() => {
-    getAllApp();
+    getAppDictionary();
     getNoticeDictionary();
 });
 

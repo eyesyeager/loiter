@@ -8,7 +8,7 @@
                 </div>
                 <div class="inputGroup">
                     <span class="label">负载均衡</span>
-                    <el-select class="input" v-model="balancer" clearable placeholder="请选择">
+                    <el-select class="input" v-model="balancer" clearable>
                         <el-option v-for="item in balancerOptions" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </div>
@@ -51,8 +51,8 @@ watch(
 );
 
 // 获取状态字典
-function getAllBalancer() {
-    api.getAllBalancer().then(({ code, msg, data }) => {
+function getBalancerDictionary() {
+    api.getBalancerDictionary().then(({ code, msg, data }) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "负载均衡策略获取失败：" + msg });
             return;
@@ -83,7 +83,7 @@ function updateAppBalancer() {
 }
 
 onMounted(() => {
-    getAllBalancer();
+    getBalancerDictionary();
 });
 
 </script>
@@ -105,7 +105,6 @@ onMounted(() => {
 
         .input {
             width: 290px;
-            text-align: right;
         }
     }
 }

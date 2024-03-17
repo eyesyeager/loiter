@@ -46,7 +46,10 @@ const option = reactive({
 
 // 获取响应时间统计信息
 function getDetailedRequestRuntimeLog() {
-    api.getDetailedRequestRuntimeLog(props.condition).then(({ code, msg, data }) => {
+    api.getDetailedRequestRuntimeLog({
+        ...props.condition,
+        appId: props.condition!.appId ? Number(props.condition!.appId) : null
+    }).then(({ code, msg, data }) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "响应时间信息获取失败：" + msg });
             return;

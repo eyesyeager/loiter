@@ -1,8 +1,8 @@
 <template>
     <div class="condition">
         <span class="label">应用名</span>
-        <el-select class="appName" v-model="inputValue.appName" filterable clearable placeholder="请选择">
-            <el-option v-for="item in appNameOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <el-select class="appName" v-model="inputValue.appName" filterable clearable>
+            <el-option v-for="item in appOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
         <el-button class="search" plain @click="search">查询</el-button>
     </div>
@@ -16,23 +16,22 @@ import { responseCode } from "@/config";
 import { OptionsInterface } from "@/d.ts/common";
 
 const emit = defineEmits([ "search" ]);
-const appNameOptions = reactive<OptionsInterface[]>([]);
+const appOptions = reactive<OptionsInterface[]>([]);
 const inputValue = reactive({
     appName: "",
-    processor: ""
 });
 
 // 获取所有应用信息
-function getAllApp() {
-    api.getAllApp().then(({ code, msg, data }) => {
+function getAppDictionary() {
+    api.getAppDictionary().then(({ code, msg, data }) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "应用信息获取失败：" + msg });
             return;
         }
         data.forEach((item: any, index: number) => {
-            appNameOptions[index] = {
-                "label": item,
-                "value": item
+            appOptions[index] = {
+                "label": item.label,
+                "value": item.value
             };
         });
     });
@@ -44,7 +43,7 @@ function search() {
 }
 
 onMounted(() => {
-    getAllApp();
+    getAppDictionary();
 });
 
 </script>

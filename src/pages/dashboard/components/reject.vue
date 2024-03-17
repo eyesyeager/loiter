@@ -52,7 +52,10 @@ const option = reactive({
 
 // 获取请求拒绝统计信息
 function getDetailedRequestRejectLog() {
-    api.getDetailedRequestRejectLog(props.condition).then(({ code, msg, data }) => {
+    api.getDetailedRequestRejectLog({
+        ...props.condition,
+        appId: props.condition!.appId ? Number(props.condition!.appId) : null
+    }).then(({ code, msg, data }) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "请求拒绝统计信息获取失败：" + msg });
             return;

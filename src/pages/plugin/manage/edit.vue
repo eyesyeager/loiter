@@ -8,7 +8,7 @@
                 </div>
                 <div class="inputGroup" v-for="item in processorOptions">
                     <span class="label">{{ item.label }}</span>
-                    <el-select class="input" v-model="item.model" multiple clearable placeholder="请选择">
+                    <el-select class="input" v-model="item.model" multiple clearable>
                         <el-option v-for="option in item.instansts" :key="option.value" :label="option.label" :value="option.value" />
                     </el-select>
                 </div>
@@ -144,7 +144,6 @@ onMounted(() => {
 
         .input {
             width: 350px;
-            text-align: right;
         }
     }
 }

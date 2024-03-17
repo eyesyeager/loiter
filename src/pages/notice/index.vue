@@ -16,8 +16,8 @@
                 <el-table-column prop="remarks" label="备注" :align="'center'" />
                 <el-table-column prop="createdAt" label="通知时间" :width=200 :align="'center'" />
             </el-table>
-            <el-pagination class="pagination" :layout="layout" :current-page="pageNo" :page-size="pageSize"
-                :total="totalNum" @current-change="handlePageChange" />
+            <el-pagination class="pagination" :layout="layout" :page-sizes="pageSizes" :current-page="pageNo" :page-size="pageSize"
+                :total="totalNum" @current-change="handlePageChange" @size-change="handleSizeChange" />
         </div>
     </div>
 </template>
@@ -31,7 +31,7 @@ import { responseCode } from "@/config";
 import moment from "moment";
 
 let condition = {
-    appName: "",
+    appId: "",
     genre: "",
     title: "",
     timeBegin: "",
@@ -41,11 +41,12 @@ const pageNo = ref(1);
 const pageSize = ref(10);
 const totalNum = ref(0);
 const tableData = ref([]);
-const layout = "prev, pager, next";
+const layout = "total, sizes, prev, pager, next";
+const pageSizes = [10, 50, 100, 200];
 
 // 处理请求参数，再获取通知数据
 function search(inputValue: any, timeRange: any) {
-    condition.appName = inputValue.appName;
+    condition.appId = inputValue.appId;
     condition.genre = inputValue.genre;
     condition.title = inputValue.title;
     condition.timeBegin = timeRange[0] ? moment(timeRange.value[0]).format("YYYY-MM-DD") : "";
@@ -57,6 +58,7 @@ function search(inputValue: any, timeRange: any) {
 function getNoticeList() {
     api.getNoticeList({
         ...condition,
+        appId: condition.appId ? Number(condition.appId) : null,
         pageNo: pageNo.value,
         pageSize: pageSize.value
     }).then(({ code, msg, data }) => {
@@ -72,6 +74,12 @@ function getNoticeList() {
 // 页码更改
 function handlePageChange(page: number) {
     pageNo.value = page;
+    getNoticeList();
+}
+
+// 单页大小变化
+function handleSizeChange(size: number) {
+    pageSize.value = size;
     getNoticeList();
 }
 

@@ -6,7 +6,7 @@ export enum UrlReqType {
 }
 
 // 应用弹窗类型
-export enum SaveAppDialog {
+export enum SaveDialog {
     add,
     update,
 }

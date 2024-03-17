@@ -21,10 +21,11 @@ import api from "@/apis/api";
 import { ElMessage } from "element-plus";
 import { responseCode } from "@/config";
 import { Plus } from "@element-plus/icons-vue";
-import { SaveAppDialog } from "@/constants";
+import { SaveDialog } from "@/constants";
 
 let condition = {
-    appName: "",
+    appId: "",
+    appGenre: "",
     status: "",
 };
 const pageNo = ref(1);
@@ -39,7 +40,8 @@ const appId = ref(0);
 
 // 执行条件搜索
 function search(inputValue: any) {
-    condition.appName = inputValue.appName;
+    condition.appId = inputValue.appId;
+    condition.appGenre = inputValue.appGenre;
     condition.status = inputValue.status;
     getAppInfoByPage();
 }
@@ -47,7 +49,9 @@ function search(inputValue: any) {
 // 分页获取应用详细信息
 function getAppInfoByPage() {
     api.getAppInfoByPage({
-        ...condition,
+        appId: condition.appId ? Number(condition.appId) : null,
+        appGenre: condition.appGenre,
+        status: condition.status ? Number(condition.status) : null,
         pageNo: pageNo.value,
         pageSize: pageSize.value
     }).then(({ code, msg, data }) => {
@@ -69,14 +73,14 @@ function handlePageChange(page: number) {
 
 // 打开新增弹窗
 function showAddDialog() {
-    flagDialog.value = SaveAppDialog.add;
+    flagDialog.value = SaveDialog.add;
     appId.value = 0;
     showDialog.value++;
 }
 
 // 打开编辑弹窗
 function showUpdateDialog(id: number) {
-    flagDialog.value = SaveAppDialog.update;
+    flagDialog.value = SaveDialog.update;
     appId.value = id;
     showDialog.value++;
 }

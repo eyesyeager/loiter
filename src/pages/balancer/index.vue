@@ -31,7 +31,7 @@ import { responseCode, role } from "@/config";
 import { useRoleStore } from "@/store";
 
 let condition = {
-    appName: "",
+    appId: "",
     balancer: "",
 };
 const roleStore = useRoleStore();
@@ -63,7 +63,7 @@ const balancerData = ref({});
 
 // 处理请求参数，再获取通知数据
 function search(inputValue: any) {
-    condition.appName = inputValue.appName;
+    condition.appId = inputValue.appId;
     condition.balancer = inputValue.balancer;
     getBalancerByPage();
 }
@@ -71,7 +71,8 @@ function search(inputValue: any) {
 // 分页获取应用负载均衡策略
 function getBalancerByPage() {
     api.getBalancerByPage({
-        ...condition,
+        appId: condition.appId ? Number(condition.appId) : null,
+        balancer: condition.balancer,
         pageNo: pageNo.value,
         pageSize: pageSize.value,
     }).then(({code, msg, data}) => {
