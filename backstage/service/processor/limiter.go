@@ -3,14 +3,18 @@ package processor
 import (
 	"errors"
 	"fmt"
+	"github.com/jinzhu/copier"
 	"loiter/backstage/constant"
 	"loiter/backstage/controller/result"
 	"loiter/backstage/service"
 	"loiter/global"
 	"loiter/model/entity"
+	"loiter/model/po"
 	"loiter/model/receiver"
+	"loiter/model/returnee"
 	"loiter/utils"
 	"net/http"
+	"time"
 )
 
 /**
@@ -24,8 +28,8 @@ type limiterService struct {
 
 var LimiterService = limiterService{}
 
-// UpdateAppLimiter 更新应用限流器
-func (*limiterService) UpdateAppLimiter(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.UpdateAppLimiter) error {
+// SaveAppLimiter 更新应用限流器
+func (*limiterService) SaveAppLimiter(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.SaveAppLimiter) error {
 	// 校验传入限流器的合法性
 	var count int64
 	var checkLimiter = entity.Limiter{Code: data.Limiter}
@@ -43,6 +47,7 @@ func (*limiterService) UpdateAppLimiter(r *http.Request, userClaims utils.JwtCus
 		if err := global.MDB.Create(&entity.AppLimiter{
 			AppId:     data.AppId,
 			Limiter:   data.Limiter,
+			Mode:      data.Mode,
 			Parameter: data.Parameter,
 		}).Error; err != nil {
 			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
@@ -56,6 +61,7 @@ func (*limiterService) UpdateAppLimiter(r *http.Request, userClaims utils.JwtCus
 	// 如果原先已经配置了限流器，则修改
 	if err := global.MDB.Model(&entity.AppLimiter{}).Where("app_id", data.AppId).Updates(entity.AppLimiter{
 		Limiter:   data.Limiter,
+		Mode:      data.Mode,
 		Parameter: data.Parameter,
 	}).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
@@ -65,4 +71,53 @@ func (*limiterService) UpdateAppLimiter(r *http.Request, userClaims utils.JwtCus
 	go service.LogService.App(r, userClaims.Uid, data.AppId,
 		constant.BuildUniversalLog(constant.LogUniversal.UpdateAppLimiter, checkAppLimiter.Limiter, checkAppLimiter.Parameter, data.Limiter, data.Parameter))
 	return nil
+}
+
+// DeleteAppLimiter 删除应用限流器
+func (*limiterService) DeleteAppLimiter(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.DeleteAppLimiter) error {
+	//global.MDB.Unscoped().Delete()
+	// TODO:刷新容器
+	return nil
+}
+
+// GetLimiterByPage 分页获取限流器信息
+func (*limiterService) GetLimiterByPage(data receiver.GetLimiterByPage) (err error, res returnee.GetLimiterByPage) {
+	res.PageStruct = data.PageStruct
+	// 获取明细信息列表
+	var resInnerPOList []po.GetLimiterByPage
+	limit, offset := utils.BuildPageSearch(data.PageStruct)
+	if err = global.MDB.Raw(`SELECT a.id AppId, a.name AppName, al.mode, al.limiter LimiterCode, l.name LimiterName, al.parameter, al.updated_at
+       			FROM app a, app_limiter al, limiter l
+         		WHERE a.id = al.app_id AND al.limiter = l.code 
+         		  AND ('' = ? OR a.name = ?) AND ('' = ? OR al.limiter = ?)
+				ORDER BY a.updated_at DESC
+				LIMIT ?, ?`, data.AppName, data.AppName, data.Limiter, data.Limiter, offset, limit).Scan(&resInnerPOList).Error; err != nil {
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
+	}
+	if resInnerPOList == nil || len(resInnerPOList) == 0 {
+		return err, res
+	}
+	// 处理时间格式
+	var resInnerList []returnee.GetLimiterByPageInner
+	for _, item := range resInnerPOList {
+		var resInner returnee.GetLimiterByPageInner
+		_ = copier.Copy(&resInner, &item)
+		resInner.UpdatedAt = item.UpdatedAt.Format(time.DateTime)
+		resInnerList = append(resInnerList, resInner)
+	}
+	// 查询总数
+	var total int64
+	if len(resInnerList) < data.PageSize {
+		total = int64(len(resInnerList))
+	} else {
+		if err = global.MDB.Raw(`SELECT COUNT(*) FROM app a, app_limiter al 
+                WHERE a.id = al.app_id AND (? = '' OR a.name = ?) AND (? = '' OR al.limiter = ?)`,
+			data.AppName, data.AppName, data.Limiter, data.Limiter).Scan(&total).Error; err != nil {
+			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
+		}
+	}
+	res.PageStruct = data.PageStruct
+	res.Total = total
+	res.Data = resInnerList
+	return err, res
 }

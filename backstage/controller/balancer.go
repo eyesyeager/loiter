@@ -57,31 +57,6 @@ func UpdateAppBalancer(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 }
 
-// GetAllBalancer
-// @Summary			获取所有负载均衡策略
-// @Description		权限：user
-// @Tags			balancer
-// @Accept			json
-// @Produce			json
-// @Security		token
-// @Param			token								header		string		true		"身份令牌"
-// @Success			200									{object}	result.Response
-// @Failure			400									{object}	result.Response
-// @Router			/balancer/getAllBalancer [get]
-func GetAllBalancer(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	// 权限校验
-	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
-		return
-	}
-
-	// 执行业务
-	if err, res := service.BalancerService.GetAllBalancer(); err == nil {
-		result.SuccessDefault(w, res)
-	} else {
-		result.FailAttachedMsg(w, err.Error())
-	}
-}
-
 // GetBalancerByPage
 // @Summary			分页获取应用负载均衡策略
 // @Description		权限：user

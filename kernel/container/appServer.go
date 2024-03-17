@@ -69,33 +69,33 @@ func InitAppServer() {
 func RefreshAppServer(appId uint) error {
 	global.AppLogger.Info(fmt.Sprintf("start refreshing the AppServer container under the application with appId %d", appId))
 	// 获取对应应用
-	var app entity.App
-	if err := global.MDB.First(&app, appId).Error; err != nil {
+	var checkApp entity.App
+	if err := global.MDB.First(&checkApp, appId).Error; err != nil {
 		return errors.New(fmt.Sprintf("appId为%d的应用刷新应用与实例容器失败，应用不存在！", appId))
 	}
 	// 若状态为无效，则删除
-	if app.Status != constant.Status.Normal.Code {
-		delete(ServerByAppMap, app.Host)
+	if checkApp.Status != constant.Status.Normal.Code {
+		delete(ServerByAppMap, checkApp.Host)
 		return nil
 	}
 	// 获取有效应用实例
 	var serverList []entity.Server
 	if tx := global.MDB.Where(&entity.Server{Status: constant.Status.Normal.Code, AppId: appId}).Find(&serverList); tx.RowsAffected == 0 {
 		global.AppLogger.Warn(fmt.Sprintf("appId为%d的应用刷新应用与实例容器失败，当前应用不存在有效实例！", appId))
-		delete(ServerByAppMap, app.Host)
+		delete(ServerByAppMap, checkApp.Host)
 		return nil
 	}
 	// 构建并刷新容器
 	var currentServerList []ServerWeight
 	for _, server := range serverList {
-		if server.AppId == app.ID {
+		if server.AppId == checkApp.ID {
 			currentServerList = append(currentServerList, ServerWeight{
 				Server: server.Address,
 				Weight: server.Weight,
 			})
 		}
 	}
-	ServerByAppMap[app.Host] = currentServerList
+	ServerByAppMap[checkApp.Host] = currentServerList
 	global.AppLogger.Info(fmt.Sprintf("complete the refresh of AppServer container under the application with appId %d", appId))
 	return nil
 }

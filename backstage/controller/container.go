@@ -55,8 +55,8 @@ func RefreshAllContainer(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 	}
 }
 
-// RefreshAppServer
-// @Summary			刷新应用与实例容器
+// RefreshAppContainer
+// @Summary			刷新应用容器（应用与实例容器、应用类型容器）
 // @Description		权限：admin
 // @Tags			container
 // @Accept			json
@@ -66,8 +66,8 @@ func RefreshAllContainer(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 // @Param			appId					path		string		true
 // @Success			200						{object}	result.Response
 // @Failure			400						{object}	result.Response
-// @Router			/container/refreshAppServer/:appId [get]
-func RefreshAppServer(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+// @Router			/container/refreshAppContainer/:appId [get]
+func RefreshAppContainer(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// 权限校验
 	userClaims, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.Admin)
 	if err != nil {
@@ -86,7 +86,7 @@ func RefreshAppServer(w http.ResponseWriter, r *http.Request, p httprouter.Param
 	}
 
 	// 执行业务
-	if err = service.ContainerService.RefreshAppServer(r, userClaims, uint(appId)); err == nil {
+	if err = service.ContainerService.RefreshAppContainer(r, userClaims, uint(appId)); err == nil {
 		result.SuccessDefault(w, nil)
 	} else {
 		result.FailAttachedMsg(w, err.Error())

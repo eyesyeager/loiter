@@ -13,7 +13,7 @@ import (
 
 func InitContainerRoute(routerRoot *httprouter.Router, group string) {
 	routerRoot.GET(group+"/refreshAllContainer/:appId", controller.RefreshAllContainer)
-	routerRoot.GET(group+"/refreshAppServer/:appId", controller.RefreshAppServer)
+	routerRoot.GET(group+"/refreshAppContainer/:appId", controller.RefreshAppContainer)
 	routerRoot.GET(group+"/refreshBalancer/:appId", controller.RefreshBalancer)
 	routerRoot.GET(group+"/refreshProcessor/:appId", controller.RefreshProcessor)
 	routerRoot.GET(group+"/refreshLimiter/:appId", controller.RefreshLimiter)

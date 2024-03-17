@@ -10,11 +10,11 @@ import "time"
 type GetAppInfoByPage struct {
 	AppId     uint      `json:"appId"`
 	AppName   string    `json:"appName"`
+	AppGenre  string    `json:"appGenre"`
 	Host      string    `json:"host"`
 	Status    uint8     `json:"status"`
 	Remarks   string    `json:"remarks"`
 	Owner     string    `json:"owner"`
 	CreatedAt time.Time `json:"createdAt"`
-	Balancer  string    `json:"balancer"`
 	Plugins   int       `json:"plugins"`
 }

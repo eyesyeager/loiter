@@ -18,7 +18,6 @@ import (
 	"loiter/model/returnee"
 	"loiter/utils"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -64,6 +63,7 @@ func (*appService) addApp(r *http.Request, userClaims utils.JwtCustomClaims, dat
 	var newApp = entity.App{
 		Name:    data.AppName,
 		Host:    data.Host,
+		Genre:   data.AppGenre,
 		OwnerId: userClaims.Uid,
 		Remarks: data.Remarks,
 	}
@@ -147,6 +147,7 @@ func (*appService) updateApp(r *http.Request, userClaims utils.JwtCustomClaims, 
 	if err := global.MDB.Model(&entity.App{Model: gorm.Model{ID: data.AppId}}).Updates(entity.App{
 		Model:   gorm.Model{ID: data.AppId},
 		Name:    data.AppName,
+		Genre:   data.AppGenre,
 		Host:    data.Host,
 		OwnerId: data.OwnerId,
 		Remarks: data.Remarks,
@@ -224,6 +225,10 @@ func (*appService) DeleteApp(r *http.Request, userClaims utils.JwtCustomClaims, 
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
 	}
 	remarks := ""
+	// 删除应用实例
+	if err := global.MDB.Unscoped().Where(&entity.Server{AppId: appId}).Delete(&entity.Server{}).Error; err != nil {
+		remarks += fmt.Sprintf("删除服务实例失败，错误信息:%s;", err.Error())
+	}
 	// 删除应用负载均衡器
 	if err := BalancerService.DeleteAppBalancer(appId); err != nil {
 		remarks += fmt.Sprintf("删除负载均衡器失败，错误信息:%s;", err.Error())
@@ -240,46 +245,17 @@ func (*appService) DeleteApp(r *http.Request, userClaims utils.JwtCustomClaims, 
 	return nil
 }
 
-// GetAllApp 获取所有应用信息
-func (*appService) GetAllApp() (error, []string) {
-	var appList []entity.App
-	if err := global.MDB.Find(&appList).Error; err != nil {
-		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), nil
-	}
-	var appNameList []string
-	for _, item := range appList {
-		appNameList = append(appNameList, item.Name)
-	}
-	// 如果没有应用，就返回空数组，而不是nil
-	if appNameList == nil {
-		appNameList = []string{}
-	}
-	return nil, appNameList
-}
-
 // GetAppInfoByPage 分页获取应用信息
 func (*appService) GetAppInfoByPage(data receiver.GetAppInfoByPage) (err error, res returnee.GetAppInfoByPage) {
-	var status uint8
-	if data.Status == "" {
-		status = 0
-	} else {
-		num, err := strconv.ParseUint(data.Status, 10, 8)
-		if err != nil {
-			return errors.New(fmt.Sprintf("status(%s)参数格式错误！", data.Status)), res
-		} else {
-			status = uint8(num)
-		}
-	}
 	// 查询明细主体
 	var resPOList []po.GetAppInfoByPage
 	limit, offset := utils.BuildPageSearch(data.PageStruct)
-	if err = global.MDB.Raw(`SELECT a.id AppId, a.name AppName, a.host, a.status, a.remarks, a.created_at, ab.balancer, u.username Owner
+	if err = global.MDB.Raw(`SELECT a.id AppId, a.name AppName, a.genre AppGenre, a.host, a.status, a.remarks, a.created_at, u.username Owner
 							FROM app a
-							LEFT JOIN app_balancer ab ON a.id = ab.app_id 
 							LEFT JOIN user u ON a.owner_id = u.id
-							WHERE (? = '' OR a.name = ?) AND (? = 0 OR a.status = ?) 
+							WHERE (? = 0 OR a.id = ?) AND (? = '' OR a.genre = ?) AND (? = 0 OR a.status = ?) 
 							ORDER BY a.created_at DESC
-							LIMIT ?, ?`, data.AppName, data.AppName, status, status, offset, limit).Scan(&resPOList).Error; err != nil {
+							LIMIT ?, ?`, data.AppId, data.AppId, data.AppGenre, data.AppGenre, data.Status, data.Status, offset, limit).Scan(&resPOList).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}
 	if len(resPOList) == 0 {
@@ -309,16 +285,6 @@ func (*appService) GetAppInfoByPage(data receiver.GetAppInfoByPage) (err error, 
 		numByProcessor[item.AppId] += len(split)
 	}
 
-	// 构建负载均衡器翻译map
-	err, balancerDict := BalancerService.GetAllBalancer()
-	if err != nil {
-		return err, res
-	}
-	balancerMap := make(map[string]string)
-	for _, item := range balancerDict {
-		balancerMap[item.Value] = item.Label
-	}
-
 	// 明细主体构建
 	var innerResList []returnee.GetAppInfoByPageInner
 	for _, item := range resPOList {
@@ -328,15 +294,14 @@ func (*appService) GetAppInfoByPage(data receiver.GetAppInfoByPage) (err error, 
 		innerRes.CreatedAt = item.CreatedAt.Format(time.DateOnly)
 		innerRes.ServerNum = numByServer[item.AppId]
 		innerRes.ValidServerNum = validNumByServer[item.AppId]
-		innerRes.Balancer = balancerMap[innerRes.Balancer]
 		innerRes.Plugins = numByProcessor[item.AppId]
 		innerResList = append(innerResList, innerRes)
 	}
 	// 查询总数
 	var total int64
 	if err = global.MDB.Model(&entity.App{}).Where(&entity.App{
-		Name:   data.AppName,
-		Status: status,
+		Model:  gorm.Model{ID: data.AppId},
+		Status: data.Status,
 	}).Count(&total).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}
@@ -372,6 +337,7 @@ func (*appService) GetAppInfoById(appId uint) (err error, res returnee.GetAppInf
 	return err, returnee.GetAppInfoById{
 		AppId:      appId,
 		AppName:    checkApp.Name,
+		AppGenre:   checkApp.Genre,
 		Host:       checkApp.Host,
 		OwnerId:    checkApp.OwnerId,
 		ServerList: serverList,

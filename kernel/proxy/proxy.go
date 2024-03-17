@@ -2,12 +2,16 @@ package proxy
 
 import (
 	"fmt"
+	"loiter/config"
 	"loiter/constants"
 	"loiter/global"
 	"loiter/kernel/balancer"
+	"loiter/kernel/container"
 	"loiter/utils"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
+	"os"
 )
 
 /**
@@ -16,40 +20,76 @@ import (
  */
 
 func StartProxy() {
-	// 路由
+	// 制定路由规则
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		host := req.Host
-
-		// 请求预处理
-		if err, allow := pre(w, req, host); !allow {
-			if err == nil {
-				post(w, req, nil, host, constants.PostEntrance.Reject, "")
-			} else {
-				post(w, req, nil, host, constants.PostEntrance.Error, err.Error())
-			}
-			return
-		}
-
-		// 获取代理信息
-		err, targetUrl := balancer.Entry(req, host)
-		if err != nil {
-			errMsg := fmt.Sprintf("the load balancing policy execution failed and the proxy could not be used. Error message: %s", err.Error())
+		// 获取应用代理类型
+		genre, ok := container.GenreByAppMap[host]
+		if !ok {
+			errMsg := fmt.Sprintf("the application with host %s has not been registered yet", host)
 			statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.BadGateway, errMsg)
 			utils.Response(w, statusCode, contentType, content)
 			global.GatewayLogger.Warn(errMsg)
 			return
 		}
 
-		// 创建代理
-		proxy := httputil.NewSingleHostReverseProxy(targetUrl)
-
-		// 响应处理
-		proxy.ModifyResponse = func(resp *http.Response) error {
-			post(w, req, resp, host, constants.PostEntrance.Post, "")
-			return nil
+		// 请求预处理
+		if err, allow := pre(w, req, host, genre); !allow {
+			if err == nil {
+				post(w, req, nil, host, constants.PostEntrance.Reject, "", genre)
+			} else {
+				post(w, req, nil, host, constants.PostEntrance.Error, err.Error(), genre)
+			}
+			return
 		}
 
-		// 执行反向代理
-		proxy.ServeHTTP(w, req)
+		// 获取代理信息
+		err, targetUrl := balancer.Entry(host)
+		if err != nil {
+			errMsg := fmt.Sprintf("the load balancing policy execution failed and the proxy could not be used. Error message: %s", err.Error())
+			statusCode, contentType, content := utils.ResponseTemplate(constants.ResponseTitle.BadGateway, errMsg, genre)
+			utils.Response(w, statusCode, contentType, content)
+			global.GatewayLogger.Warn(errMsg)
+			return
+		}
+
+		// 根据用户代理类型选择服务
+		if genre == constants.AppGenre.Api {
+			apiProxy(w, req, host, targetUrl)
+		} else if genre == constants.AppGenre.Static {
+			staticProxy(w, req, host, targetUrl)
+		} else {
+			errMsg := fmt.Sprintf("the application with host %s has illegal type: %s", host, genre)
+			statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.BadGateway, errMsg)
+			utils.Response(w, statusCode, contentType, content)
+			global.GatewayLogger.Warn(errMsg)
+			return
+		}
 	})
+}
+
+// apiProxy Api服务代理
+func apiProxy(w http.ResponseWriter, req *http.Request, host string, targetUrl string) {
+	// 创建代理
+	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
+		Scheme: "http", // 暂时只实现http代理
+		Host:   targetUrl,
+	})
+
+	// 响应处理
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		post(w, req, resp, host, constants.PostEntrance.Post, "", constants.AppGenre.Api)
+		return nil
+	}
+
+	// 执行反向代理
+	proxy.ServeHTTP(w, req)
+}
+
+// staticProxy 静态服务代理
+func staticProxy(w http.ResponseWriter, req *http.Request, host string, targetUrl string) {
+	// 执行静态资源服务
+	dir, _ := os.Getwd()
+	http.FileServer(http.Dir(dir+config.Program.StaticDirPath+targetUrl)).ServeHTTP(w, req)
+	post(w, req, nil, host, constants.PostEntrance.Post, "", constants.AppGenre.Static)
 }

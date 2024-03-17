@@ -7,11 +7,12 @@ package returnee
 
 type GetAppInfoById struct {
 	AppId      uint        `json:"appId"`
-	AppName    string      `json:"appName" validate:"required"`    // 应用名
-	Host       string      `json:"host" validate:"required"`       // 地址
-	OwnerId    uint        `json:"ownerId" validate:"required"`    // 责任人id
-	ServerList []AppServer `json:"serverList" validate:"required"` // 实例列表
-	Remarks    string      `json:"remarks"`                        // 备注
+	AppName    string      `json:"appName"`    // 应用名
+	AppGenre   string      `json:"appGenre"`   // 应用类型
+	Host       string      `json:"host"`       // 地址
+	OwnerId    uint        `json:"ownerId"`    // 责任人id
+	ServerList []AppServer `json:"serverList"` // 实例列表
+	Remarks    string      `json:"remarks"`    // 备注
 }
 
 type AppServer struct {

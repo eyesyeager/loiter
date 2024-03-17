@@ -89,15 +89,8 @@ func (noticeFoundation *noticeFoundation) SendEmailWithHTMLAndCC(host string, su
 
 // persistentNotice 消息持久化
 func (noticeFoundation *noticeFoundation) persistentNotice(host string, title string, content string, genre string, secret bool, remarks string) {
-	checkApp := entity.App{Host: host}
-	if host != constants.Talisman.WithoutApp {
-		if err := global.MDB.Where(&checkApp).First(&checkApp).Error; err != nil {
-			checkApp.Name = "ERROR"
-			global.GatewayLogger.Error(fmt.Sprintf("the network is abnormal or the application with host %s does not exist.", host))
-		}
-	}
 	var notice = entity.Notice{
-		AppName: checkApp.Name,
+		Host:    host,
 		Title:   title,
 		Content: content,
 		Genre:   genre,

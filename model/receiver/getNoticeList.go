@@ -9,7 +9,7 @@ import "loiter/model/structure"
 
 type GetNoticeList struct {
 	structure.PageStruct        // 分页参数
-	AppName              string `json:"appName"`   // 应用名
+	AppId                uint   `json:"appId"`     // 应用id
 	Title                string `json:"title"`     // 标题
 	Genre                string `json:"genre"`     // 类型
 	TimeBegin            string `json:"timeBegin"` // 时间从

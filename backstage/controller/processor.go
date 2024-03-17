@@ -126,7 +126,7 @@ func GetProcessorByGenre(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 	}
 }
 
-// UpdateAppLimiter
+// SaveAppLimiter
 // @Summary			更新应用限流器
 // @Description		权限：admin
 // @Tags			processor
@@ -134,11 +134,11 @@ func GetProcessorByGenre(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 // @Produce			json
 // @Security		token
 // @Param			token							header		string		true		"身份令牌"
-// @Param			receiver.UpdateAppLimiter		body		string		false		"请求参数"
+// @Param			receiver.SaveAppLimiter			body		string		false		"请求参数"
 // @Success			200								{object}	result.Response
 // @Failure			400								{object}	result.Response
-// @Router			/processor/updateAppLimiter [post]
-func UpdateAppLimiter(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// @Router			/processor/saveAppLimiter [post]
+func SaveAppLimiter(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// 权限校验
 	userClaims, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.Admin)
 	if err != nil {
@@ -146,7 +146,7 @@ func UpdateAppLimiter(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 	}
 
 	// 参数校验
-	var data receiver.UpdateAppLimiter
+	var data receiver.SaveAppLimiter
 	if err = parser.PostData(r, &data); err != nil {
 		result.FailAttachedMsg(w, err.Error())
 		return
@@ -157,8 +157,89 @@ func UpdateAppLimiter(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 	}
 
 	// 执行业务
-	if err = processor.LimiterService.UpdateAppLimiter(r, userClaims, data); err == nil {
+	if err = processor.LimiterService.SaveAppLimiter(r, userClaims, data); err == nil {
 		result.SuccessDefault(w, nil)
+	} else {
+		result.FailAttachedMsg(w, err.Error())
+	}
+}
+
+// DeleteAppLimiter
+// @Summary			删除应用限流器
+// @Description		权限：admin
+// @Tags			processor
+// @Accept			json
+// @Produce			json
+// @Security		token
+// @Param			token							header		string		true		"身份令牌"
+// @Param			receiver.DeleteAppLimiter		body		string		false		"请求参数"
+// @Success			200								{object}	result.Response
+// @Failure			400								{object}	result.Response
+// @Router			/processor/deleteAppLimiter [post]
+func DeleteAppLimiter(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	// 权限校验
+	userClaims, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.Admin)
+	if err != nil {
+		return
+	}
+
+	// 参数校验
+	var data receiver.DeleteAppLimiter
+	if err = parser.PostData(r, &data); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+	if err = validator.Checker.Struct(data); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+
+	// 执行业务
+	if err = processor.LimiterService.DeleteAppLimiter(r, userClaims, data); err == nil {
+		result.SuccessDefault(w, nil)
+	} else {
+		result.FailAttachedMsg(w, err.Error())
+	}
+}
+
+// GetLimiterByPage
+// @Summary			分页获取应用限流器信息
+// @Description		权限：user
+// @Tags			processor
+// @Accept			json
+// @Produce			json
+// @Security		token
+// @Param			token							header		string		true		"身份令牌"
+// @Param			receiver.GetLimiterByPage		body		string		false		"请求参数"
+// @Success			200								{object}	result.Response
+// @Failure			400								{object}	result.Response
+// @Router			/processor/getLimiterByPage [post]
+func GetLimiterByPage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	// 权限校验
+	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
+		return
+	}
+
+	// 参数校验
+	var data receiver.GetLimiterByPage
+	if err := parser.PostData(r, &data); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+	if err := validator.Checker.Struct(data); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+
+	// 分页处理
+	if err := utils.CheckPageStruct(data.PageStruct); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+
+	// 执行业务
+	if err, res := processor.LimiterService.GetLimiterByPage(data); err == nil {
+		result.SuccessDefault(w, res)
 	} else {
 		result.FailAttachedMsg(w, err.Error())
 	}

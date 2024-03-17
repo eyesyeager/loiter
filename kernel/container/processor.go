@@ -37,6 +37,10 @@ var processorByNameMap = make(map[string]map[string][]string)
 // InitProcessor 初始化处理器容器
 func InitProcessor() {
 	global.AppLogger.Info("start initializing the Processor container")
+	processorByNameMap[constants.Processor.Filter.Code] = FilterByAppMap
+	processorByNameMap[constants.Processor.Aid.Code] = AidByAppMap
+	processorByNameMap[constants.Processor.Exception.Code] = ExceptionByAppMap
+	processorByNameMap[constants.Processor.Final.Code] = FinalByAppMap
 	// 获取处理器配置
 	var appProcessorNameList []po.GetAppProcessorName
 	if rowsAffected := global.MDB.Raw(`SELECT a.host, ap.genre, ap.codes
@@ -71,10 +75,6 @@ func InitProcessor() {
 	AidByAppMap = aidByAppTempMap
 	ExceptionByAppMap = exceptionByAppTempMap
 	FinalByAppMap = finalByAppTempMap
-	processorByNameMap[constants.Processor.Filter.Code] = FilterByAppMap
-	processorByNameMap[constants.Processor.Aid.Code] = AidByAppMap
-	processorByNameMap[constants.Processor.Exception.Code] = ExceptionByAppMap
-	processorByNameMap[constants.Processor.Final.Code] = FinalByAppMap
 	global.AppLogger.Info("complete the initialization of Processor container")
 }
 
@@ -125,8 +125,7 @@ func refreshProcessorChild(processorMap map[string]string, genre string, host st
 	m := processorByNameMap[genre]
 	item, ok := processorMap[genre]
 	if ok {
-		processorList := strings.Split(item, config.Program.PluginConfig.ProcessorDelimiter)
-		m[host] = processorList
+		m[host] = strings.Split(item, config.Program.PluginConfig.ProcessorDelimiter)
 	} else {
 		delete(m, host)
 	}

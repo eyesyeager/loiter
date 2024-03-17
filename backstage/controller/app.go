@@ -135,31 +135,6 @@ func DeleteApp(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 }
 
-// GetAllApp
-// @Summary			分页获取应用
-// @Description		权限：user
-// @Tags			app
-// @Accept			json
-// @Produce			json
-// @Security		token
-// @Param			token					header		string		true		"身份令牌"
-// @Success			200						{object}	result.Response
-// @Failure			400						{object}	result.Response
-// @Router			/app/getAllApp [get]
-func GetAllApp(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	// 权限校验
-	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
-		return
-	}
-
-	// 执行业务
-	if err, res := service.AppService.GetAllApp(); err == nil {
-		result.SuccessDefault(w, res)
-	} else {
-		result.FailAttachedMsg(w, err.Error())
-	}
-}
-
 // GetAppInfoByPage
 // @Summary			获取所有应用
 // @Description		权限：user

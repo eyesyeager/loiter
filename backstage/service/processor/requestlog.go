@@ -3,6 +3,7 @@ package processor
 import (
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"loiter/backstage/constant"
 	"loiter/backstage/controller/result"
 	"loiter/constants"
@@ -45,10 +46,10 @@ func (*requestLogService) GetOverviewRequestLog() (error, returnee.GetOverviewRe
 // GetDetailedRequestExtremumLog 获取请求日志详细信息-极值数据
 func (*requestLogService) GetDetailedRequestExtremumLog(data receiver.GetDetailedRequestLog) (err error, res returnee.GetDetailedRequestExtremumLog) {
 	// 获取 host 信息
-	var checkApp = entity.App{Name: data.AppName}
-	if data.AppName != "" {
+	checkApp := entity.App{Model: gorm.Model{ID: data.AppId}}
+	if data.AppId != 0 {
 		if err = global.MDB.Where(&checkApp).First(&checkApp).Error; err != nil {
-			return errors.New(fmt.Sprintf("网络异常或应用 %s 不存在", data.AppName)), res
+			return errors.New(fmt.Sprintf("网络异常或id为%d的应用不存在", data.AppId)), res
 		}
 	}
 	// 时间边界处理
@@ -97,10 +98,10 @@ func (*requestLogService) GetDetailedRequestExtremumLog(data receiver.GetDetaile
 // GetDetailedRequestNumLog 获取请求日志详细信息-请求数据
 func (*requestLogService) GetDetailedRequestNumLog(data receiver.GetDetailedRequestLog) (error, returnee.GetDetailedRequestNumLog) {
 	// 获取 host 信息
-	var checkApp = entity.App{Name: data.AppName}
-	if data.AppName != "" {
+	checkApp := entity.App{Model: gorm.Model{ID: data.AppId}}
+	if data.AppId != 0 {
 		if err := global.MDB.Where(&checkApp).First(&checkApp).Error; err != nil {
-			return errors.New(fmt.Sprintf("网络异常或应用 %s 不存在", data.AppName)), returnee.GetDetailedRequestNumLog{}
+			return errors.New(fmt.Sprintf("网络异常或id为%d的应用不存在", data.AppId)), returnee.GetDetailedRequestNumLog{}
 		}
 	}
 	// 构建请求数据
@@ -150,10 +151,10 @@ func (*requestLogService) GetDetailedRequestNumLog(data receiver.GetDetailedRequ
 // GetDetailedRequestRuntimeLog 获取请求日志详细信息-响应时间
 func (*requestLogService) GetDetailedRequestRuntimeLog(data receiver.GetDetailedRequestLog) (error, returnee.GetDetailedRequestRuntimeLog) {
 	// 获取 host 信息
-	var checkApp = entity.App{Name: data.AppName}
-	if data.AppName != "" {
+	checkApp := entity.App{Model: gorm.Model{ID: data.AppId}}
+	if data.AppId != 0 {
 		if err := global.MDB.Where(&checkApp).First(&checkApp).Error; err != nil {
-			return errors.New(fmt.Sprintf("网络异常或应用 %s 不存在", data.AppName)), returnee.GetDetailedRequestRuntimeLog{}
+			return errors.New(fmt.Sprintf("网络异常或id为%d的应用不存在", data.AppId)), returnee.GetDetailedRequestRuntimeLog{}
 		}
 	}
 	// 构建请求数据
@@ -306,10 +307,10 @@ func (p *requestLogService) GetDetailedRequestQPSLog(data receiver.GetDetailedRe
 // GetDetailedRequestVisitorLog 获取请求日志详细信息-访客数据
 func (*requestLogService) GetDetailedRequestVisitorLog(data receiver.GetDetailedRequestLog) (error, returnee.GetDetailedRequestVisitorLog) {
 	// 获取 host 信息
-	var checkApp = entity.App{Name: data.AppName}
-	if data.AppName != "" {
+	checkApp := entity.App{Model: gorm.Model{ID: data.AppId}}
+	if data.AppId != 0 {
 		if err := global.MDB.Where(&checkApp).First(&checkApp).Error; err != nil {
-			return errors.New(fmt.Sprintf("网络异常或应用 %s 不存在", data.AppName)), returnee.GetDetailedRequestVisitorLog{}
+			return errors.New(fmt.Sprintf("网络异常或id为%d的应用不存在", data.AppId)), returnee.GetDetailedRequestVisitorLog{}
 		}
 	}
 	// 构建请求数据
@@ -454,10 +455,10 @@ func getDetailedRequestVisitorMonthLog(host string, day string) (error, []string
 func (*requestLogService) GetDetailedRequestTopApiLog(data receiver.GetDetailedRequestLog) (error, []returnee.GetDetailedRequestTopApiLog) {
 	limitNum := 10
 	// 获取 host 信息
-	var checkApp = entity.App{Name: data.AppName}
-	if data.AppName != "" {
+	checkApp := entity.App{Model: gorm.Model{ID: data.AppId}}
+	if data.AppId != 0 {
 		if err := global.MDB.Where(&checkApp).First(&checkApp).Error; err != nil {
-			return errors.New(fmt.Sprintf("网络异常或应用 %s 不存在", data.AppName)), nil
+			return errors.New(fmt.Sprintf("网络异常或id为%d的应用不存在", data.AppId)), nil
 		}
 	}
 	// 时间处理
@@ -505,10 +506,10 @@ func (*requestLogService) GetDetailedRequestTopApiLog(data receiver.GetDetailedR
 // GetDetailedRequestRejectLog 获取请求日志详情-请求拒绝数
 func (*requestLogService) GetDetailedRequestRejectLog(data receiver.GetDetailedRequestLog) (error, returnee.GetDetailedRequestRejectLog) {
 	// 获取 host 信息
-	var checkApp = entity.App{Name: data.AppName}
-	if data.AppName != "" {
+	checkApp := entity.App{Model: gorm.Model{ID: data.AppId}}
+	if data.AppId != 0 {
 		if err := global.MDB.Where(&checkApp).First(&checkApp).Error; err != nil {
-			return errors.New(fmt.Sprintf("网络异常或应用 %s 不存在", data.AppName)), returnee.GetDetailedRequestRejectLog{}
+			return errors.New(fmt.Sprintf("网络异常或id为%d的应用不存在", data.AppId)), returnee.GetDetailedRequestRejectLog{}
 		}
 	}
 	// 构建请求数据

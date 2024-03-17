@@ -13,6 +13,5 @@ import (
 
 func InitBalancerRoute(routerRoot *httprouter.Router, group string) {
 	routerRoot.POST(group+"/updateAppBalancer", controller.UpdateAppBalancer)
-	routerRoot.GET(group+"/getAllBalancer", controller.GetAllBalancer)
 	routerRoot.POST(group+"/getBalancerByPage", controller.GetBalancerByPage)
 }

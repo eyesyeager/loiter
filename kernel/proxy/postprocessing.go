@@ -18,44 +18,44 @@ import (
  */
 
 // post 后置处理总入口
-func post(w http.ResponseWriter, req *http.Request, resp *http.Response, host string, entrance string, errInfo string) {
+func post(w http.ResponseWriter, req *http.Request, resp *http.Response, host string, entrance string, errInfo string, genre string) {
 	// 进入响应处理器
 	if isResponse(entrance) {
-		entryAid(w, req, resp, host)
+		entryAid(w, req, resp, host, genre)
 	}
 	// 进入异常处理器
 	if isException(entrance) {
-		entryException(w, req, host, errInfo)
+		entryException(w, req, host, errInfo, genre)
 	}
 	// 进入最终处理器
-	entryFinal(w, req, resp, host, entrance, errInfo)
+	entryFinal(w, req, resp, host, entrance, errInfo, genre)
 }
 
 // entryAid 进入响应处理器
-func entryAid(w http.ResponseWriter, req *http.Request, resp *http.Response, host string) {
+func entryAid(w http.ResponseWriter, req *http.Request, resp *http.Response, host string, genre string) {
 	if err := aid.Entry(w, req, resp, host); err != nil {
 		errMsg := fmt.Sprintf("aid execution failed. Error message: %s", err.Error())
-		statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.BadGateway, errMsg)
+		statusCode, contentType, content := utils.ResponseTemplate(constants.ResponseTitle.BadGateway, errMsg, genre)
 		utils.Response(w, statusCode, contentType, content)
 		global.GatewayLogger.Warn(errMsg)
 	}
 }
 
 // entryException 进入异常处理器
-func entryException(w http.ResponseWriter, req *http.Request, host string, errInfo string) {
+func entryException(w http.ResponseWriter, req *http.Request, host string, errInfo string, genre string) {
 	if err := exception.Entry(w, req, host, errInfo); err != nil {
 		errMsg := fmt.Sprintf("exception execution failed. Error message: %s", err.Error())
-		statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.BadGateway, errMsg)
+		statusCode, contentType, content := utils.ResponseTemplate(constants.ResponseTitle.BadGateway, errMsg, genre)
 		utils.Response(w, statusCode, contentType, content)
 		global.GatewayLogger.Warn(errMsg)
 	}
 }
 
 // entryFinal 进入最终处理器
-func entryFinal(w http.ResponseWriter, req *http.Request, resp *http.Response, host string, entrance string, errInfo string) {
+func entryFinal(w http.ResponseWriter, req *http.Request, resp *http.Response, host string, entrance string, errInfo string, genre string) {
 	if err := final.Entry(w, req, resp, host, entrance, errInfo); err != nil {
 		errMsg := fmt.Sprintf("final execution failed. Error message: %s", err.Error())
-		statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.BadGateway, errMsg)
+		statusCode, contentType, content := utils.ResponseTemplate(constants.ResponseTitle.BadGateway, errMsg, genre)
 		utils.Response(w, statusCode, contentType, content)
 		global.GatewayLogger.Warn(errMsg)
 	}

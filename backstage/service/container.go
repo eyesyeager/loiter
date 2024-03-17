@@ -30,15 +30,19 @@ func (*containerService) RefreshAllContainer(r *http.Request, userClaims utils.J
 	return nil
 }
 
-// RefreshAppServer 刷新应用与实例容器
-func (*containerService) RefreshAppServer(r *http.Request, userClaims utils.JwtCustomClaims, appId uint) error {
-	// 刷新容器
+// RefreshAppContainer 刷新应用容器
+func (*containerService) RefreshAppContainer(r *http.Request, userClaims utils.JwtCustomClaims, appId uint) error {
+	// 刷新应用类型容器
+	if err := container.RefreshAppGenre(appId); err != nil {
+		return err
+	}
+	// 刷新应用实例容器
 	if err := container.RefreshAppServer(appId); err != nil {
 		return err
 	}
 	// 记录操作日志
 	go LogService.App(r, userClaims.Uid, appId,
-		constant.BuildUniversalLog(constant.LogUniversal.RefreshContainer, "应用与实例容器"))
+		constant.BuildUniversalLog(constant.LogUniversal.RefreshContainer, "应用容器"))
 	return nil
 }
 

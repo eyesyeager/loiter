@@ -16,6 +16,7 @@ type GetAppInfoByPage struct {
 type GetAppInfoByPageInner struct {
 	AppId          uint   `json:"appId"`
 	AppName        string `json:"appName"`
+	AppGenre       string `json:"appGenre"`
 	Host           string `json:"host"`
 	Status         string `json:"status"`
 	Remarks        string `json:"remarks"`
@@ -23,6 +24,5 @@ type GetAppInfoByPageInner struct {
 	CreatedAt      string `json:"createdAt"`
 	ServerNum      int    `json:"serverNum"`
 	ValidServerNum int    `json:"validServerNum"`
-	Balancer       string `json:"balancer"`
 	Plugins        int    `json:"plugins"`
 }

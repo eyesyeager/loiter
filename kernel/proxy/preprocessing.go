@@ -20,9 +20,9 @@ import (
  */
 
 // pre 前置处理总入口
-func pre(w http.ResponseWriter, r *http.Request, host string) (error, bool) {
+func pre(w http.ResponseWriter, r *http.Request, host string, genre string) (error, bool) {
 	buildRequestId(r)
-	if err, allow := entryFilter(w, r, host); !allow {
+	if err, allow := entryFilter(w, r, host, genre); !allow {
 		return err, allow
 	}
 	return nil, true
@@ -41,12 +41,12 @@ func buildRequestId(r *http.Request) {
 }
 
 // entryFilter 进入过滤器
-func entryFilter(w http.ResponseWriter, r *http.Request, host string) (error, bool) {
+func entryFilter(w http.ResponseWriter, r *http.Request, host string, genre string) (error, bool) {
 	// 进入过滤器
-	err, allow := filter.Entry(w, r, host)
+	err, allow := filter.Entry(w, r, host, genre)
 	if err != nil {
 		errMsg := fmt.Sprintf("filter execution failed. Error message: %s", err.Error())
-		statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.BadGateway, errMsg)
+		statusCode, contentType, content := utils.ResponseTemplate(constants.ResponseTitle.BadGateway, errMsg, genre)
 		utils.Response(w, statusCode, contentType, content)
 		global.GatewayLogger.Warn(errMsg)
 	}

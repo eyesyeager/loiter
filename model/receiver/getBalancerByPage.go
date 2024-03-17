@@ -9,6 +9,6 @@ import "loiter/model/structure"
 
 type GetBalancerByPage struct {
 	structure.PageStruct        // 分页参数
-	AppName              string `json:"appName"`  // 应用名
+	AppId                uint   `json:"appId"`    // 应用名
 	Balancer             string `json:"balancer"` // 负载均衡策略
 }

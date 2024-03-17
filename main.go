@@ -2,10 +2,7 @@ package main
 
 import (
 	"loiter/bootstrap"
-	"loiter/config"
-	"loiter/constants"
 	"loiter/kernel"
-	"loiter/test"
 )
 
 /**
@@ -22,11 +19,6 @@ import (
 func main() {
 	// 启动基础服务
 	bootstrap.Start()
-
-	// 启动测试程序(仅在开发模式执行)
-	if config.Program.Mode == constants.DEVELOP {
-		test.Start()
-	}
 
 	// 启动网关
 	kernel.Start()

@@ -84,21 +84,6 @@ func (*balancerService) DeleteAppBalancer(appId uint) error {
 	}).Unscoped().Delete(&entity.AppBalancer{}).Error
 }
 
-// GetAllBalancer 获取所有负载均衡策略
-func (*balancerService) GetAllBalancer() (err error, res []returnee.GetDictionary) {
-	var balancerList []entity.Balancer
-	if err = global.MDB.Find(&balancerList).Error; err != nil {
-		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
-	}
-	for _, item := range balancerList {
-		res = append(res, returnee.GetDictionary{
-			Label: item.Name,
-			Value: item.Code,
-		})
-	}
-	return err, res
-}
-
 // GetBalancerByPage 分页获取应用负载均衡信息
 func (*balancerService) GetBalancerByPage(data receiver.GetBalancerByPage) (err error, res returnee.GetBalancerByPage) {
 	// 获取应用负载均衡明细
@@ -106,9 +91,9 @@ func (*balancerService) GetBalancerByPage(data receiver.GetBalancerByPage) (err 
 	limit, offset := utils.BuildPageSearch(data.PageStruct)
 	if err = global.MDB.Raw(`SELECT ab.id, ab.balancer BalancerCode, ab.updated_at, b.name BalancerName, a.name AppName, u.username Operator 
 				FROM app_balancer ab, balancer b, app a, user u 
-				WHERE ab.app_id = a.id AND ab.balancer = b.code AND ab.operator_id = u.id AND (? = '' OR a.name = ?) AND (? = '' OR ab.balancer = ?)
+				WHERE ab.app_id = a.id AND ab.balancer = b.code AND ab.operator_id = u.id AND (? = 0 OR a.id = ?) AND (? = '' OR ab.balancer = ?)
 				ORDER BY ab.updated_at DESC
-				LIMIT ?, ?`, data.AppName, data.AppName, data.Balancer, data.Balancer, offset, limit).Scan(&balancerPOList).Error; err != nil {
+				LIMIT ?, ?`, data.AppId, data.AppId, data.Balancer, data.Balancer, offset, limit).Scan(&balancerPOList).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}
 	// 时间处理
@@ -124,12 +109,9 @@ func (*balancerService) GetBalancerByPage(data receiver.GetBalancerByPage) (err 
 	if len(balancerPOList) < data.PageSize {
 		total = int64(len(balancerPOList))
 	} else {
-		if err = global.MDB.Model(&entity.AppBalancer{}).Where(&entity.AppBalancer{}).Count(&total).Error; err != nil {
-			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
-		}
 		if err = global.MDB.Raw(`SELECT COUNT(*) FROM app_balancer ab, app a 
-                WHERE ab.app_id = a.id AND (? = '' OR a.name = ?) AND (? = '' OR ab.balancer = ?)`,
-			data.AppName, data.AppName, data.Balancer, data.Balancer).Scan(&total).Error; err != nil {
+                WHERE ab.app_id = a.id AND (? = 0 OR a.id = ?) AND (? = '' OR ab.balancer = ?)`,
+			data.AppId, data.AppId, data.Balancer, data.Balancer).Scan(&total).Error; err != nil {
 			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 		}
 	}

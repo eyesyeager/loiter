@@ -18,7 +18,7 @@ import (
  * @date 2024/1/11 16:47
  */
 
-func NameListFilter(w http.ResponseWriter, r *http.Request, host string) (error, bool) {
+func NameListFilter(w http.ResponseWriter, r *http.Request, host string, genre string) (error, bool) {
 	genres := container.NameListByAppMap[host]
 	ip := utils.GetIp(r)
 	for _, item := range genres {
@@ -38,7 +38,7 @@ func NameListFilter(w http.ResponseWriter, r *http.Request, host string) (error,
 		}
 		if !success {
 			errMsg := fmt.Sprintf("application access with host %s is blocked by the nameList, genre: %s, ip: %s", host, item, ip)
-			statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.Forbidden, errMsg)
+			statusCode, contentType, content := utils.ResponseTemplate(constants.ResponseTitle.Forbidden, errMsg, genre)
 			utils.Response(w, statusCode, contentType, content)
 			global.GatewayLogger.Warn(errMsg)
 			go capability.NoticeFoundation.SendSiteNotice(host, "黑白名单触发拦截", errMsg, "")

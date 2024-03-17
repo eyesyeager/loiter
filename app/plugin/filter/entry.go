@@ -18,7 +18,7 @@ const (
 )
 
 // IFilter 请求过滤器方法类型
-type IFilter func(http.ResponseWriter, *http.Request, string) (error, bool)
+type IFilter func(http.ResponseWriter, *http.Request, string, string) (error, bool)
 
 // IFilterByNameMap 过滤器 by 过滤器名
 var IFilterByNameMap = make(map[string]IFilter)

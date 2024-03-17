@@ -36,5 +36,5 @@ func Register() {
 		},
 	}
 
-	IFinalByNameMap[RequestLog] = RequestLogFinal
+	IFinalByNameMap[RequestLog] = RequestLogFinal.RequestLogFinal
 }

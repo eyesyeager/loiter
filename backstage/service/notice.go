@@ -9,6 +9,7 @@ import (
 	"loiter/constants"
 	"loiter/global"
 	"loiter/model/entity"
+	"loiter/model/po"
 	"loiter/model/receiver"
 	"loiter/model/returnee"
 	"loiter/utils"
@@ -28,23 +29,25 @@ var NoticeService = noticeService{}
 
 // GetNoticeList 分页获取通知列表
 func (*noticeService) GetNoticeList(data receiver.GetNoticeList) (err error, res returnee.GetNoticeList) {
-	tx := global.MDB.Table("notice").Select("*")
-	if data.AppName != "" {
-		tx = tx.Where("app_name = ?", data.AppName)
+	// 构建请求条件
+	tx := global.MDB.Table("notice n").Select("n.id, a.name AppName, n.host, n.title, n.genre, n.content, n.remarks, n.created_at").Joins(
+		"LEFT JOIN app a on n.host = a.host")
+	if data.AppId != 0 {
+		tx = tx.Where("a.id = ?", data.AppId)
 	}
 	if data.Title != "" {
-		tx = tx.Where("title LIKE ?", "%"+data.Title+"%")
+		tx = tx.Where("n.title LIKE ?", "%"+data.Title+"%")
 	}
 	if data.Genre != "" {
-		tx = tx.Where("genre = ?", data.Genre)
+		tx = tx.Where("n.genre = ?", data.Genre)
 	}
 	if data.TimeBegin != "" {
 		data.TimeBegin += " 00:00:00"
-		tx = tx.Where("created_at >= ?", data.TimeBegin)
+		tx = tx.Where("n.created_at >= ?", data.TimeBegin)
 	}
 	if data.TimeEnd != "" {
 		data.TimeEnd += " 23:59:59"
-		tx = tx.Where("created_at <= ?", data.TimeEnd)
+		tx = tx.Where("n.created_at <= ?", data.TimeEnd)
 	}
 
 	// 查总数
@@ -53,20 +56,25 @@ func (*noticeService) GetNoticeList(data receiver.GetNoticeList) (err error, res
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}
 	// 查数据
-	var resDataPO []entity.Notice
+	var resPOList []po.GetNoticeList
 	limit, offset := utils.BuildPageSearch(data.PageStruct)
-	if err = tx.Order("created_at DESC").Limit(limit).Offset(offset).Find(&resDataPO).Error; err != nil {
+	if err = tx.Order("n.created_at DESC").Limit(limit).Offset(offset).Find(&resPOList).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}
-	// 时间格式化
+	// 数据组装
 	var resData []returnee.GetNoticeListInner
-	for _, item := range resDataPO {
+	for _, item := range resPOList {
 		var resItem returnee.GetNoticeListInner
 		_ = copier.Copy(&resItem, &item)
+		// 时间格式化
 		resItem.CreatedAt = item.CreatedAt.Format(time.DateTime)
 		// 邮件通知不返回内容
 		if resItem.Genre == constants.Notice.Email {
 			resItem.Content = ""
+		}
+		// appName处理
+		if resItem.AppName == "" {
+			resItem.AppName = item.Host
 		}
 		resData = append(resData, resItem)
 	}

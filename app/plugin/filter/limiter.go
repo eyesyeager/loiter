@@ -19,12 +19,12 @@ import (
  */
 
 // LimiterFilter 限流入口方法
-func LimiterFilter(w http.ResponseWriter, r *http.Request, host string) (error, bool) {
+func LimiterFilter(w http.ResponseWriter, r *http.Request, host string, genre string) (error, bool) {
 	if limiter, ok := container.LimiterByAppMap[host]; ok {
 		success := limiter.TryAcquire()
 		if !success {
 			errMsg := fmt.Sprintf("the application with host %s is throttled", host)
-			statusCode, contentType, content := utils.HtmlSimpleTemplate(constants.ResponseTitle.RateLimit, errMsg)
+			statusCode, contentType, content := utils.ResponseTemplate(constants.ResponseTitle.RateLimit, errMsg, genre)
 			utils.Response(w, statusCode, contentType, content)
 			global.GatewayLogger.Warn(errMsg)
 			go capability.NoticeFoundation.SendSiteNotice(host, "限流器触发拦截", errMsg, "")

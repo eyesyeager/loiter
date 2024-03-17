@@ -22,7 +22,7 @@ var LogUniversal = logUniversal{
 	},
 	AddApp: logStructure{
 		Title:   "注册应用",
-		Content: "注册信息：%s；子项创建异常：%s；",
+		Content: "注册信息：%s；备注：%s；",
 	},
 	UpdateApp: logStructure{
 		Title:   "更新应用",

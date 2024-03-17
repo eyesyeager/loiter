@@ -6,6 +6,7 @@ package returnee
  */
 
 type GetDictionary struct {
-	Label string `json:"label"`
-	Value string `json:"value"`
+	Label    string `json:"label"`
+	Value    string `json:"value"`
+	Appendix string `json:"appendix"`
 }

@@ -7,6 +7,6 @@ package receiver
  */
 
 type GetDetailedRequestLog struct {
-	AppName      string `json:"appName"`                          // 应用名称
+	AppId        uint   `json:"appId"`                            // 应用名称
 	TimeInterval string `json:"timeInterval" validate:"required"` // 间隔
 }

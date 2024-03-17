@@ -10,6 +10,7 @@ import "loiter/model/structure"
 
 type GetAppInfoByPage struct {
 	structure.PageStruct        // 分页参数
-	AppName              string `json:"appName"` // 应用名
-	Status               string `json:"status"`  // 应用状态
+	AppId                uint   `json:"appId"`    // 应用名
+	AppGenre             string `json:"appGenre"` // 应用类型
+	Status               uint8  `json:"status"`   // 应用状态
 }

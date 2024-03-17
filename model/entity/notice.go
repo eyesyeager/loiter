@@ -10,7 +10,7 @@ import "gorm.io/gorm"
 
 type Notice struct {
 	gorm.Model
-	AppName string `json:"app_name" gorm:"comment:应用名"`
+	Host    string `json:"host" gorm:"comment:主机地址"`
 	Title   string `json:"title" gorm:"comment:消息标题"`
 	Content string `json:"content" gorm:"type:TEXT;comment:消息详情"`
 	Genre   string `json:"genre" gorm:"not null;comment:类型，见constants.Notice"`

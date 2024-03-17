@@ -12,13 +12,19 @@ import (
  */
 
 func InitProcessorRoute(routerRoot *httprouter.Router, group string) {
+	// 处理器
 	routerRoot.POST(group+"/saveAppProcessor", controller.SaveAppProcessor)
 	routerRoot.POST(group+"/getProcessorByPage", controller.GetProcessorByPage)
 	routerRoot.GET(group+"/getProcessorByGenre/:genre", controller.GetProcessorByGenre)
-	routerRoot.POST(group+"/updateAppLimiter", controller.UpdateAppLimiter)
+	// 限流器
+	routerRoot.POST(group+"/saveAppLimiter", controller.SaveAppLimiter)
+	routerRoot.POST(group+"/deleteAppLimiter", controller.DeleteAppLimiter)
+	routerRoot.POST(group+"/getLimiterByPage", controller.GetLimiterByPage)
+	// 黑白名单
 	routerRoot.POST(group+"/updateAppNameList", controller.UpdateAppNameList)
 	routerRoot.POST(group+"/addNameListIp", controller.AddNameListIp)
 	routerRoot.POST(group+"/deleteNameListIp", controller.DeleteNameListIp)
+	// 请求日志
 	routerRoot.GET(group+"/getOverviewRequestLog", controller.GetOverviewRequestLog)
 	routerRoot.POST(group+"/getDetailedRequestExtremumLog", controller.GetDetailedRequestExtremumLog)
 	routerRoot.POST(group+"/getDetailedRequestNumLog", controller.GetDetailedRequestNumLog)

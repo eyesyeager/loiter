@@ -16,7 +16,7 @@ var Program = programConfig{
 	Name:                 "Loiter",             // 应用名称
 	GateWayPort:          "9500",               // 网关服务端口号
 	BackstagePort:        "9510",               // 后台服务端口号
-	StaticDirPath:        "/static",            // 静态资源存放路径
+	StaticDirPath:        "/static/",           // 静态资源存放路径
 	LogConfig:            logConfigInstance,    // 日志配置
 	MySQLConfig:          mysqlConfigInstance,  // MySQL配置
 	AESSecretKey:         "hello,bestLoiter",   // AES双向加密密钥，必须是16位

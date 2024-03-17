@@ -15,7 +15,7 @@ import (
  */
 
 // Entry 进入请求过滤器
-func Entry(w http.ResponseWriter, r *http.Request, host string) (error, bool) {
+func Entry(w http.ResponseWriter, r *http.Request, host string, genre string) (error, bool) {
 	filterNameList := container.FilterByAppMap[host]
 	// 未配置过滤器则直接放行
 	if filterNameList == nil {
@@ -28,7 +28,7 @@ func Entry(w http.ResponseWriter, r *http.Request, host string) (error, bool) {
 			global.GatewayLogger.Warn(fmt.Sprintf("there is no filter named %s, please deal with it as soon as possible!", name))
 			continue
 		}
-		err, success := iFilter(w, r, host)
+		err, success := iFilter(w, r, host, genre)
 		if err != nil {
 			return err, false
 		}

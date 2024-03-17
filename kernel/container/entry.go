@@ -14,6 +14,7 @@ import (
 // InitRegister 初始化所有注册信息
 func InitRegister() {
 	global.AppLogger.Info("start initializing all containers")
+	InitAppGenre()
 	InitAppServer()
 	InitBalancer()
 	InitProcessor()
@@ -25,6 +26,9 @@ func InitRegister() {
 // RefreshRegister 刷新所有注册信息
 func RefreshRegister(appId uint) error {
 	global.AppLogger.Info(fmt.Sprintf("start refreshing all containers under the application with appId %d", appId))
+	if err := RefreshAppGenre(appId); err != nil {
+		return err
+	}
 	if err := RefreshAppServer(appId); err != nil {
 		return err
 	}
@@ -46,6 +50,7 @@ func RefreshRegister(appId uint) error {
 
 // DeleteRegister 删除所有注册信息
 func DeleteRegister(host string) {
+	DeleteAppGenre(host)
 	DeleteAppServer(host)
 	DeleteBalancer(host)
 	DeleteProcessor(host)

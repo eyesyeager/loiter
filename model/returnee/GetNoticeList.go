@@ -16,7 +16,7 @@ type GetNoticeList struct {
 }
 
 type GetNoticeListInner struct {
-	ID        uint   `json:"id"`        // 通知id
+	Id        uint   `json:"id"`        // 通知id
 	AppName   string `json:"appName"`   // 应用名
 	Title     string `json:"title"`     // 标题
 	Genre     string `json:"genre"`     // 类型
