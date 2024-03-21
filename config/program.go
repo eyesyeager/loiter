@@ -12,20 +12,21 @@ import (
 
 // Program 程序配置
 var Program = programConfig{
-	Mode:                 constants.DEVELOP,    // 程序运行模式
-	Name:                 "Loiter",             // 应用名称
-	GateWayPort:          "9500",               // 网关服务端口号
-	BackstagePort:        "9510",               // 后台服务端口号
-	StaticDirPath:        "/static/",           // 静态资源存放路径
-	LogConfig:            logConfigInstance,    // 日志配置
-	MySQLConfig:          mysqlConfigInstance,  // MySQL配置
-	AESSecretKey:         "hello,bestLoiter",   // AES双向加密密钥，必须是16位
-	JWTSecretKey:         "hello,loiter!",      // JWT签名加密密钥
-	JWTExpire:            1000,                 // JWT签名过期时间(min)
-	EmailConfig:          emailConfigInstance,  // 邮箱配置
-	InitialPsdLen:        8,                    // 初始密码长度
-	ServerDefaultNameLen: 10,                   // 默认应用实例名长度
-	PluginConfig:         pluginConfigInstance, // 插件配置
+	Mode:                    constants.DEVELOP,                                                  // 程序运行模式
+	Name:                    "Loiter",                                                           // 应用名称
+	GateWayPort:             "9500",                                                             // 网关服务端口号
+	BackstagePort:           "9510",                                                             // 后台服务端口号
+	StaticDirPath:           string(filepath.Separator) + "static" + string(filepath.Separator), // 静态资源存放路径
+	LogConfig:               logConfigInstance,                                                  // 日志配置
+	MySQLConfig:             mysqlConfigInstance,                                                // MySQL配置
+	AESSecretKey:            "hello,bestLoiter",                                                 // AES双向加密密钥，必须是16位
+	JWTSecretKey:            "hello,loiter!",                                                    // JWT签名加密密钥
+	JWTExpire:               1000,                                                               // JWT签名过期时间(min)
+	EmailConfig:             emailConfigInstance,                                                // 邮箱配置
+	PluginConfig:            pluginConfigInstance,                                               // 插件配置
+	InitialPsdLen:           8,                                                                  // 初始密码长度
+	StaticDefaultMainFile:   "index.html",                                                       // 默认主页面地址
+	StaticDefaultErrorRoute: "404.html",                                                         // 静态应用-错误路由重定向地址
 }
 
 // logConfigInstance 日志配置
@@ -42,16 +43,16 @@ var logConfigInstance = logConfig{
 
 // mysqlConfigInstance MySQL配置
 var mysqlConfigInstance = mysqlConfig{
-	Host:                "127.0.0.1", // 主机地址
-	Port:                3306,        // 端口号
-	Database:            "loiter",    // 数据库名
-	Username:            "root",      // 用户名
-	Password:            "792734338", // 用户密码
-	Charset:             "utf8mb4",   // 编码格式
-	MaxIdleConn:         5,           // 空闲连接池中连接的最大数量
-	MaxOpenConn:         10,          // 打开数据库连接的最大数量
-	LogMode:             "info",      // 日志级别
-	EnableFileLogWriter: true,        // 是否启用日志文件
+	Host:                "192.168.204.133", // 主机地址
+	Port:                3306,              // 端口号
+	Database:            "loiter",          // 数据库名
+	Username:            "root",            // 用户名
+	Password:            "root",            // 用户密码
+	Charset:             "utf8mb4",         // 编码格式
+	MaxIdleConn:         5,                 // 空闲连接池中连接的最大数量
+	MaxOpenConn:         10,                // 打开数据库连接的最大数量
+	LogMode:             "info",            // 日志级别
+	EnableFileLogWriter: true,              // 是否启用日志文件
 }
 
 // emailConfigInstance 邮箱配置
@@ -59,7 +60,7 @@ var emailConfigInstance = emailConfig{
 	Addr:     "smtp.163.com:25",    // SMTP服务器的地址
 	Identity: "",                   // 身份证明
 	Username: "eyesyeager@163.com", // 用户名
-	Password: "VAUARZWCFWSXGEUP",   // 密码
+	Password: "",                   // 密码
 	Host:     "smtp.163.com",       // 主机地址
 }
 
@@ -102,14 +103,13 @@ type programConfig struct {
 	// email
 	EmailConfig emailConfig
 
-	// User
-	InitialPsdLen int
-
-	// 默认应用实例名长度
-	ServerDefaultNameLen int
-
 	// plugin
 	PluginConfig pluginConfig
+
+	// Other
+	InitialPsdLen           int
+	StaticDefaultMainFile   string
+	StaticDefaultErrorRoute string
 }
 
 type logConfig struct {

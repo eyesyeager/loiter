@@ -67,7 +67,6 @@ func InitAppServer() {
 
 // RefreshAppServer 刷新应用与实例容器
 func RefreshAppServer(appId uint) error {
-	global.AppLogger.Info(fmt.Sprintf("start refreshing the AppServer container under the application with appId %d", appId))
 	// 获取对应应用
 	var checkApp entity.App
 	if err := global.MDB.First(&checkApp, appId).Error; err != nil {
@@ -96,7 +95,6 @@ func RefreshAppServer(appId uint) error {
 		}
 	}
 	ServerByAppMap[checkApp.Host] = currentServerList
-	global.AppLogger.Info(fmt.Sprintf("complete the refresh of AppServer container under the application with appId %d", appId))
 	return nil
 }
 

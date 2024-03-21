@@ -36,6 +36,10 @@ var LogUniversal = logUniversal{
 		Title:   "变更应用状态",
 		Content: "应用名：%s；变更前状态：%s；变更后状态：%s；",
 	},
+	SaveStaticApp: logStructure{
+		Title:   "更新应用静态配置",
+		Content: "更新配置：%s；",
+	},
 	AddServer: logStructure{
 		Title:   "注册应用实例",
 		Content: "应用名：%s；实例名：%s；实例地址：%s；备注：%s；",
@@ -77,6 +81,7 @@ type logUniversal struct {
 	UpdateApp         logStructure
 	DeleteApp         logStructure
 	ActivateApp       logStructure
+	SaveStaticApp     logStructure
 	AddServer         logStructure
 	UpdateAppBalancer logStructure
 	RefreshContainer  logStructure

@@ -213,3 +213,112 @@ func GetAppInfoById(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 		result.FailAttachedMsg(w, err.Error())
 	}
 }
+
+// GetAppApiInfoById
+// @Summary			根据id获取api应用信息
+// @Description		权限：user
+// @Tags			app
+// @Accept			json
+// @Produce			json
+// @Security		token
+// @Param			token								header		string		true		"身份令牌"
+// @Success			200									{object}	result.Response
+// @Failure			400									{object}	result.Response
+// @Router			/app/getAppApiInfoById/:appId [get]
+func GetAppApiInfoById(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// 权限校验
+	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
+		return
+	}
+
+	// 参数校验格式转换
+	appId, err := strconv.Atoi(p.ByName("appId"))
+	if err != nil {
+		result.FailAttachedMsg(w, fmt.Sprintf("appId格式错误，error：%s", err.Error()))
+		return
+	}
+	if appId <= 0 {
+		result.FailAttachedMsg(w, fmt.Sprintf("非法参数！appId：%d", appId))
+		return
+	}
+
+	// 执行业务
+	if err, res := service.AppService.GetAppApiInfoById(uint(appId)); err == nil {
+		result.SuccessDefault(w, res)
+	} else {
+		result.FailAttachedMsg(w, err.Error())
+	}
+}
+
+// GetAppStaticInfoById
+// @Summary			根据id获取static应用信息
+// @Description		权限：user
+// @Tags			app
+// @Accept			json
+// @Produce			json
+// @Security		token
+// @Param			token								header		string		true		"身份令牌"
+// @Success			200									{object}	result.Response
+// @Failure			400									{object}	result.Response
+// @Router			/app/getAppStaticInfoById/:appId [get]
+func GetAppStaticInfoById(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// 权限校验
+	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
+		return
+	}
+
+	// 参数校验格式转换
+	appId, err := strconv.Atoi(p.ByName("appId"))
+	if err != nil {
+		result.FailAttachedMsg(w, fmt.Sprintf("appId格式错误，error：%s", err.Error()))
+		return
+	}
+	if appId <= 0 {
+		result.FailAttachedMsg(w, fmt.Sprintf("非法参数！appId：%d", appId))
+		return
+	}
+
+	// 执行业务
+	if err, res := service.AppService.GetAppStaticInfoById(uint(appId)); err == nil {
+		result.SuccessDefault(w, res)
+	} else {
+		result.FailAttachedMsg(w, err.Error())
+	}
+}
+
+// SaveStaticApp
+// @Summary			保存应用静态配置
+// @Description		权限：admin
+// @Tags			app
+// @Accept			json
+// @Produce			json
+// @Security		token
+// @Param			token								header		string		true		"身份令牌"
+// @Success			200									{object}	result.Response
+// @Failure			400									{object}	result.Response
+// @Router			/app/saveStaticApp [post]
+func SaveStaticApp(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	// 权限校验
+	userClaims, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.Admin)
+	if err != nil {
+		return
+	}
+
+	// 参数校验
+	var data receiver.SaveStaticApp
+	if err = parser.PostData(r, &data); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+	if err = validator.Checker.Struct(data); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+
+	// 执行业务
+	if err = service.AppService.SaveStaticApp(r, userClaims, data); err == nil {
+		result.SuccessDefault(w, nil)
+	} else {
+		result.FailAttachedMsg(w, err.Error())
+	}
+}

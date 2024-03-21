@@ -67,6 +67,9 @@ func (*appService) addApp(r *http.Request, userClaims utils.JwtCustomClaims, dat
 		OwnerId: userClaims.Uid,
 		Remarks: data.Remarks,
 	}
+	if data.AppGenre == constants.AppGenre.Static {
+		newApp.ErrorRoute = config.Program.StaticDefaultErrorRoute
+	}
 	if err := global.MDB.Create(&newApp).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
 	}
@@ -343,4 +346,56 @@ func (*appService) GetAppInfoById(appId uint) (err error, res returnee.GetAppInf
 		ServerList: serverList,
 		Remarks:    checkApp.Remarks,
 	}
+}
+
+// GetAppApiInfoById 根据id获取api应用信息
+func (*appService) GetAppApiInfoById(appId uint) (err error, res returnee.GetAppApiInfoById) {
+	var checkApp entity.App
+	if err = global.MDB.First(&checkApp, appId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New(fmt.Sprintf("不存在id为%d的应用", appId)), res
+		} else {
+			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
+		}
+	}
+	if checkApp.Genre != constants.AppGenre.Api {
+		return errors.New(fmt.Sprintf("id为%d的应用类型为%s，而非%s！", appId, checkApp.Genre, constants.AppGenre.Api)), res
+	}
+	return err, res
+}
+
+// GetAppStaticInfoById 根据id获取static用户信息
+func (*appService) GetAppStaticInfoById(appId uint) (err error, res returnee.GetAppStaticInfoById) {
+	var checkApp entity.App
+	if err = global.MDB.First(&checkApp, appId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New(fmt.Sprintf("不存在id为%d的应用", appId)), res
+		} else {
+			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
+		}
+	}
+	if checkApp.Genre != constants.AppGenre.Static {
+		return errors.New(fmt.Sprintf("id为%d的应用类型为%s，而非%s！", appId, checkApp.Genre, constants.AppGenre.Static)), res
+	}
+	res.ErrorRoute = checkApp.ErrorRoute
+	return err, res
+}
+
+// SaveStaticApp 保存应用静态配置
+func (*appService) SaveStaticApp(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.SaveStaticApp) error {
+	if err := global.MDB.Model(&entity.App{}).Where("id", data.AppId).Updates(entity.App{
+		ErrorRoute: data.ErrorRoute,
+	}).Error; err != nil {
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
+	}
+	// 记录操作日志
+	go func() {
+		var content = map[string]string{
+			"ErrorRoute": data.ErrorRoute,
+		}
+		marshal, _ := json.Marshal(content)
+		LogService.App(r, userClaims.Uid, data.AppId,
+			constant.BuildUniversalLog(constant.LogUniversal.SaveStaticApp, marshal))
+	}()
+	return nil
 }

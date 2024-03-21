@@ -41,7 +41,6 @@ func InitBalancer() {
 
 // RefreshBalancer 刷新负载均衡容器
 func RefreshBalancer(appId uint) error {
-	global.AppLogger.Info(fmt.Sprintf("start refreshing the Balancer container under the application with appId %d", appId))
 	// 获取有效应用负载策略
 	var appBalancerName po.GetAppBalancerName
 	if tx := global.MDB.Raw(`SELECT a.host, ab.balancer, a.status
@@ -56,7 +55,6 @@ func RefreshBalancer(appId uint) error {
 	}
 	// 刷新负载均衡容器
 	BalancerByAppMap[appBalancerName.Host] = appBalancerName.Balancer
-	global.AppLogger.Info(fmt.Sprintf("complete the refresh of Balancer container under the application with appId %d", appId))
 	return nil
 }
 

@@ -21,12 +21,17 @@ var ResponseTitle = responseTitle{
 		Title:  "403 Forbidden",
 		Status: http.StatusForbidden,
 	},
+	NotFound: ResponseTitleStruct{
+		Title:  "404 NotFound",
+		Status: http.StatusNotFound,
+	},
 }
 
 type responseTitle struct {
 	BadGateway ResponseTitleStruct
 	RateLimit  ResponseTitleStruct
 	Forbidden  ResponseTitleStruct
+	NotFound   ResponseTitleStruct
 }
 
 type ResponseTitleStruct struct {

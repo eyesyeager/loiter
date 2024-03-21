@@ -40,6 +40,10 @@ func (*containerService) RefreshAppContainer(r *http.Request, userClaims utils.J
 	if err := container.RefreshAppServer(appId); err != nil {
 		return err
 	}
+	// 刷新应用静态配置容器
+	if err := container.RefreshAppStatic(appId); err != nil {
+		return err
+	}
 	// 记录操作日志
 	go LogService.App(r, userClaims.Uid, appId,
 		constant.BuildUniversalLog(constant.LogUniversal.RefreshContainer, "应用容器"))

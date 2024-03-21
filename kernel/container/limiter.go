@@ -46,7 +46,6 @@ func InitLimiter() {
 
 // RefreshLimiter 刷新限流容器
 func RefreshLimiter(appId uint) error {
-	global.AppLogger.Info(fmt.Sprintf("start refreshing the Limiter container under the application with appId %d", appId))
 	// 获取限流配置
 	var appLimiterName po.GetAppLimiterName
 	tx := global.MDB.Raw(`SELECT a.host, al.limiter, al.parameter
@@ -67,7 +66,6 @@ func RefreshLimiter(appId uint) error {
 		return errors.New(fmt.Sprintf("failed to refresh the Limiter container for application with appId %d, error message: %s", appId, err.Error()))
 	}
 	LimiterByAppMap[appLimiterName.Host] = iLimiter
-	global.AppLogger.Info(fmt.Sprintf("complete the refresh of Limiter container under the application with appId %d", appId))
 	return nil
 }
 

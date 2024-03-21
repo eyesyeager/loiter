@@ -72,7 +72,6 @@ func InitNameList() {
 
 // RefreshNameList 刷新黑白名单容器
 func RefreshNameList(appId uint) error {
-	global.AppLogger.Info(fmt.Sprintf("start refreshing the NameList container under the application with appId %d", appId))
 	// 获取有效黑白名单容器
 	var appNameListList []po.GetAppNameList
 	tx := global.MDB.Raw(`SELECT a.host, anl.genre
@@ -107,7 +106,6 @@ func RefreshNameList(appId uint) error {
 		}
 	}
 	NameListByAppMap[appNameListList[0].Host] = newNameList
-	global.AppLogger.Info(fmt.Sprintf("complete the refresh of NameList container under the application with appId %d", appId))
 	return nil
 }
 

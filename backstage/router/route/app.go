@@ -17,4 +17,7 @@ func InitAppRoute(routerRoot *httprouter.Router, group string) {
 	routerRoot.POST(group+"/deleteApp", controller.DeleteApp)
 	routerRoot.POST(group+"/getAppInfoByPage", controller.GetAppInfoByPage)
 	routerRoot.GET(group+"/getAppInfoById/:appId", controller.GetAppInfoById)
+	routerRoot.GET(group+"/getAppApiInfoById/:appId", controller.GetAppApiInfoById)
+	routerRoot.GET(group+"/getAppStaticInfoById/:appId", controller.GetAppStaticInfoById)
+	routerRoot.POST(group+"/saveStaticApp", controller.SaveStaticApp)
 }

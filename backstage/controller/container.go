@@ -56,7 +56,7 @@ func RefreshAllContainer(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 }
 
 // RefreshAppContainer
-// @Summary			刷新应用容器（应用与实例容器、应用类型容器）
+// @Summary			刷新应用容器（应用与实例容器、应用类型、应用静态配置容器）
 // @Description		权限：admin
 // @Tags			container
 // @Accept			json

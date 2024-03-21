@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -19,23 +20,30 @@ import (
  * @date 2024/2/13 16:16
  */
 
+func init() {
+	RequestLogFinal.startTick()
+}
+
 var RequestLogFinal = requestLogFinal{
-	bufferMaxLen: 100,
+	ticker:        time.NewTicker(time.Duration(10) * time.Second),
+	bufferMaxLen:  100,
+	logBufferList: []entity.RequestLog{},
 }
 
 type requestLogFinal struct {
-	bufferMaxLen int
+	mutex         sync.Mutex
+	ticker        *time.Ticker
+	bufferMaxLen  int
+	logBufferList []entity.RequestLog
 }
-
-var logBufferList []entity.RequestLog
 
 // RequestLogFinal 请求日志插件
 func (r *requestLogFinal) RequestLogFinal(_ http.ResponseWriter, req *http.Request, _ *http.Response, host string, entrance string, errInfo string) error {
-	endTime := time.Now().UnixMilli()
-	endTimeStr := strconv.FormatInt(endTime, 10)
 	requestInfo, _ := httputil.DumpRequest(req, true)
 	startTimeStr := store.GetValue(req, store.RequestBeginTime)
 	startTime, _ := strconv.ParseInt(startTimeStr, 10, 64)
+	endTime := time.Now().UnixMilli()
+	endTimeStr := strconv.FormatInt(endTime, 10)
 	requestLogEntity := entity.RequestLog{
 		RequestId: store.GetValue(req, store.RequestId),
 		Host:      host,
@@ -49,15 +57,35 @@ func (r *requestLogFinal) RequestLogFinal(_ http.ResponseWriter, req *http.Reque
 		Entrance:  entrance,
 		ErrInfo:   errInfo,
 	}
-	logBufferList = append(logBufferList, requestLogEntity)
-	if len(logBufferList) >= r.bufferMaxLen {
-		//
+	r.logBufferList = append(r.logBufferList, requestLogEntity)
+	if len(r.logBufferList) >= r.bufferMaxLen {
+		r.persistence()
 	}
+	return nil
+}
+
+// startTick 开启定时任务
+func (r *requestLogFinal) startTick() {
 	go func() {
-		if err := global.MDB.Create(&requestLogEntity).Error; err != nil {
-			requestLogEntityJson, _ := json.Marshal(requestLogEntity)
+		for range r.ticker.C {
+			r.persistence()
+		}
+	}()
+}
+
+// persistence 持久化
+func (r *requestLogFinal) persistence() {
+	if len(r.logBufferList) == 0 {
+		return
+	}
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	container := r.logBufferList
+	r.logBufferList = []entity.RequestLog{}
+	go func() {
+		if err := global.MDB.Create(&container).Error; err != nil {
+			requestLogEntityJson, _ := json.Marshal(container)
 			global.GatewayLogger.Error(fmt.Sprintf("RequestLogFinal plugin execution failed! RequestLogEntity: %s, error: %s", string(requestLogEntityJson), err.Error()))
 		}
 	}()
-	return nil
 }

@@ -16,6 +16,7 @@ func InitRegister() {
 	global.AppLogger.Info("start initializing all containers")
 	InitAppGenre()
 	InitAppServer()
+	InitAppStatic()
 	InitBalancer()
 	InitProcessor()
 	InitLimiter()
@@ -30,6 +31,9 @@ func RefreshRegister(appId uint) error {
 		return err
 	}
 	if err := RefreshAppServer(appId); err != nil {
+		return err
+	}
+	if err := RefreshAppStatic(appId); err != nil {
 		return err
 	}
 	if err := RefreshBalancer(appId); err != nil {

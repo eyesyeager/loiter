@@ -41,7 +41,6 @@ func InitAppGenre() {
 
 // RefreshAppGenre 刷新应用类型容器
 func RefreshAppGenre(appId uint) error {
-	global.AppLogger.Info(fmt.Sprintf("start refreshing the AppGenre container under the application with appId %d", appId))
 	// 获取有效应用
 	var checkApp entity.App
 	if err := global.MDB.First(&checkApp, appId).Error; err != nil {
@@ -54,7 +53,6 @@ func RefreshAppGenre(appId uint) error {
 	}
 	// 刷新容器
 	GenreByAppMap[checkApp.Host] = checkApp.Genre
-	global.AppLogger.Info(fmt.Sprintf("complete the refresh of AppGenre container under the application with appId %d", appId))
 	return nil
 }
 
