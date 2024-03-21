@@ -5,7 +5,7 @@
         </div>
         <div class="body">
             <div class="line">
-                <div>应用类型: {{ props.data!.appGenre }}</div>
+                <div>应用类型: <span class="genre" @click="openGenreDialog">{{ props.data!.appGenre }}</span></div>
                 <div>服务实例: {{ props.data!.validServerNum + "/" + props.data!.serverNum }}</div>
             </div>
             <div class="line">
@@ -32,20 +32,28 @@
                 <template #reference><el-button class="appBtn" plain>删除</el-button></template>
             </el-popconfirm>
         </div>
+        <api-dialog :show="showApiDialog" :appId="props.data!.appId" />
+        <static-dialog :show="showStaticDialog" :appId="props.data!.appId" />
     </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import api from "@/apis/api";
 import { ElMessage } from "element-plus";
 import { responseCode, role } from "@/config";
 import { useRoleStore } from "@/store";
+import { appGenre } from "@/constants";
+import apiDialog from "./api.vue";
+import staticDialog from "./static.vue";
 
 const emit = defineEmits(["reload", "activate", "edit"]);
 const props = defineProps({
     data: Object,
 });
 const roleStore = useRoleStore();
+const showApiDialog = ref(0);
+const showStaticDialog = ref(0);
 
 // 刷新应用服务实例容器
 function refreshAppContainer() {
@@ -97,6 +105,20 @@ function deleteApp() {
     });
 }
 
+// 打开应用类型弹窗
+function openGenreDialog() {
+    if (!props.data) {
+        return;
+    }
+    if (props.data.appGenre == appGenre.api) {
+        showApiDialog.value++;
+    } else if (props.data.appGenre == appGenre.static) {
+        showStaticDialog.value++;
+    } else {
+        ElMessage({ type: "error", message: `非法应用类型 ${props.data.appGenre} !`});
+    }
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -132,6 +154,14 @@ function deleteApp() {
                 height: 25px;
                 line-height: 25px;
             }
+
+            .genre {
+                cursor: pointer;
+                transition: 0.2s;
+                &:hover {
+                    color: $warnText;
+                }
+            }
         }
 
         .remarks {
@@ -141,11 +171,13 @@ function deleteApp() {
 
     .footer {
         height: 50px;
-        line-height: 50px;
+        line-height: 45px;
         text-align: right;
 
-        &:last-child {
-            margin-right: 12px;
+        .appBtn {
+            &:last-child {
+                margin-right: 12px;
+            }
         }
     }
 }

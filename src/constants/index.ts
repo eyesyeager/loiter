@@ -10,3 +10,9 @@ export enum SaveDialog {
     add,
     update,
 }
+
+// 应用类型
+export enum appGenre {
+    api = "api",
+    static = "static",
+}

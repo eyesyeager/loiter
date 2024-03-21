@@ -102,6 +102,13 @@ function refreshLimiter(data: any) {
         ElMessage({ type: "error", message: "权限不足" });
         return;
     }
+    api.refreshLimiter([data.row.appId]).then(({code, msg}) => {
+        if (code != responseCode.success) {
+            ElMessage({ type: "error", message: "限流器容器刷新失败：" + msg });
+            return;
+        }
+        ElMessage({ type: "success", message: "限流器容器刷新成功" });
+    });
 }
 
 onMounted(() => {

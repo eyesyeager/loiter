@@ -30,7 +30,16 @@ const app = {
     },
     getAppInfoById: async (req: any) => {
         return await get("/app/getAppInfoById", req, UrlReqType.path);
-    }
+    },
+    getAppApiInfoById: async (req: any) => {
+        return await get("/app/getAppApiInfoById", req, UrlReqType.path);
+    },
+    getAppStaticInfoById: async (req: any) => {
+        return await get("/app/getAppStaticInfoById", req, UrlReqType.path);
+    },
+    saveStaticApp: async (req: any) => {
+        return await post("/app/saveStaticApp", req);
+    },
 };
 
 // 负载均衡相关接口
@@ -58,6 +67,9 @@ const processor = {
     // --------------------------- limiter ------------------------------
     getLimiterByPage: async (req: any) => {
         return await post("/processor/getLimiterByPage", req);
+    },
+    saveAppLimiter: async (req: any) => {
+        return await post("/processor/saveAppLimiter", req);
     },
     // --------------------------- requestLog ------------------------------
     getOverviewRequestLog: async () => {
@@ -144,6 +156,9 @@ const container = {
     },
     refreshProcessor: async (req: any) => {
         return await get("/container/refreshProcessor", req, UrlReqType.path);
+    },
+    refreshLimiter: async (req: any) => {
+        return await get("/container/refreshLimiter", req, UrlReqType.path);
     }
 }
 

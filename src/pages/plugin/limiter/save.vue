@@ -3,13 +3,13 @@
         <div>
             <div class="inputGroup">
                 <span class="label">应用名</span>
-                <el-select class="input" v-model="inputValue.appName" :disabled="props.flag != SaveDialog.add" filterable clearable>
+                <el-select class="input" v-model="inputValue.appId" :disabled="props.flag != SaveDialog.add" filterable clearable>
                     <el-option v-for="item in appOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
             </div>
             <div class="inputGroup">
                 <span class="label">限流器</span>
-                <el-select class="input" v-model="inputValue.limiterCode" clearable @change="changeCode">
+                <el-select class="input" v-model="inputValue.limiter" clearable @change="changeCode">
                     <el-option v-for="item in limiterOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
             </div>
@@ -55,8 +55,8 @@ const props = defineProps({
 const roleStore = useRoleStore();
 const dialogVisible = ref(false);
 const inputValue = reactive({
-    appName: "",
-    limiterCode: "",
+    appId: "",
+    limiter: "",
     mode: "",
     parameter: ""
 });
@@ -138,20 +138,38 @@ function changeCode(value: any) {
 
 // 新增/更新应用限流器
 function saveAppLimiter() {
+    // 格式校验
+    if (inputValue.parameter) {
+        try {
+            JSON.parse(inputValue.parameter);
+        } catch (_) {
+            ElMessage({ type: "error", message: "参数不为JSON格式！" });
+            return;
+        }
+    }
     // 权限校验
     if (!roleStore.checkAuth(role.admin)) {
         ElMessage({ type: "error", message: "权限不足！" });
         return;
     }
-    let param = {
-        
-    };
+    // 调用接口
+    api.saveAppLimiter({
+        ...inputValue,
+        appId: inputValue.appId ? Number(inputValue.appId) : null
+    }).then(({code, msg}) => {
+        if (code != responseCode.success) {
+            ElMessage({ type: "error", message: "保存失败：" + msg });
+            return;
+        }
+        dialogVisible.value = false;
+        emit("reload");
+    });
 }
 
 // 清空输入框
 function clearInputValue() {
-    inputValue.appName = "";
-    inputValue.limiterCode = "";
+    inputValue.appId = "";
+    inputValue.limiter = "";
     inputValue.mode = "";
     inputValue.parameter = "";
     parameterEx.value = "";
@@ -159,8 +177,8 @@ function clearInputValue() {
 
 // 初始化输入框
 function initUpdateInputValue() {
-    inputValue.appName = props.data!.appName;
-    inputValue.limiterCode = props.data!.limiterCode;
+    inputValue.appId = String(props.data!.appId);
+    inputValue.limiter = props.data!.limiterCode;
     inputValue.mode = props.data!.mode;
     inputValue.parameter = props.data!.parameter;
     changeCode(props.data!.limiterCode);
