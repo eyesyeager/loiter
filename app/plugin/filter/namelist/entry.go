@@ -6,6 +6,7 @@ import (
 	"github.com/bits-and-blooms/bloom/v3"
 	"loiter/backstage/controller/result"
 	"loiter/config"
+	"loiter/constants"
 	"loiter/global"
 )
 
@@ -15,14 +16,9 @@ import (
  * @date 2024/1/23 18:00
  */
 
-const (
-	BlackList = "black"
-	WhiteList = "white"
-)
-
 // CheckNameListGenre 校验名单类型是否合法
 func CheckNameListGenre(genre string) bool {
-	return genre == BlackList || genre == WhiteList
+	return genre == constants.NameList.Black || genre == constants.NameList.White
 }
 
 // INameList 黑白名单接口
@@ -35,9 +31,9 @@ type INameList interface {
 
 // NewNameList 创建黑白名单实例
 func NewNameList(host string, genre string) (error, INameList) {
-	if genre == BlackList {
+	if genre == constants.NameList.Black {
 		return NewBlackNameList(host)
-	} else if genre == WhiteList {
+	} else if genre == constants.NameList.White {
 		return NewWhiteNameList(host)
 	} else {
 		return errors.New(fmt.Sprintf("there is no nameList of type %s", genre)), nil

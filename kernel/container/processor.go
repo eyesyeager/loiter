@@ -31,16 +31,9 @@ var ExceptionByAppMap = make(map[string][]string)
 // FinalByAppMap 最终处理器 by AppHost
 var FinalByAppMap = make(map[string][]string)
 
-// processorByNameMap 处理器容器 by 处理器名
-var processorByNameMap = make(map[string]map[string][]string)
-
 // InitProcessor 初始化处理器容器
 func InitProcessor() {
 	global.AppLogger.Info("start initializing the Processor container")
-	processorByNameMap[constants.Processor.Filter.Code] = FilterByAppMap
-	processorByNameMap[constants.Processor.Aid.Code] = AidByAppMap
-	processorByNameMap[constants.Processor.Exception.Code] = ExceptionByAppMap
-	processorByNameMap[constants.Processor.Final.Code] = FinalByAppMap
 	// 获取处理器配置
 	var appProcessorNameList []po.GetAppProcessorName
 	if rowsAffected := global.MDB.Raw(`SELECT a.host, ap.genre, ap.codes
@@ -92,7 +85,7 @@ func RefreshProcessor(appId uint) error {
 	var appProcessorNameList []po.GetAppProcessorName
 	if err := global.MDB.Raw(`SELECT a.host, ap.genre, ap.codes
 						FROM app a, app_processor ap
-						WHERE a.id = ap.app_id`).Scan(&appProcessorNameList).Error; err != nil {
+						WHERE a.id = ap.app_id AND a.id = ?`, appId).Scan(&appProcessorNameList).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
 	}
 	// 如果不存在处理器，则清空容器项
@@ -122,7 +115,16 @@ func DeleteProcessor(host string) {
 
 // refreshProcessorChild 刷新处理器子项
 func refreshProcessorChild(processorMap map[string]string, genre string, host string) {
-	m := processorByNameMap[genre]
+	var m map[string][]string
+	if genre == constants.Processor.Filter.Code {
+		m = FilterByAppMap
+	} else if genre == constants.Processor.Aid.Code {
+		m = AidByAppMap
+	} else if genre == constants.Processor.Exception.Code {
+		m = ExceptionByAppMap
+	} else {
+		m = FinalByAppMap
+	}
 	item, ok := processorMap[genre]
 	if ok {
 		m[host] = strings.Split(item, config.Program.PluginConfig.ProcessorDelimiter)

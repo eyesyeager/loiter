@@ -22,6 +22,7 @@ func InitProcessorRoute(routerRoot *httprouter.Router, group string) {
 	routerRoot.POST(group+"/getLimiterByPage", controller.GetLimiterByPage)
 	// 黑白名单
 	routerRoot.POST(group+"/updateAppNameList", controller.UpdateAppNameList)
+	routerRoot.GET(group+"/getAppNameList/:appId", controller.GetAppNameList)
 	routerRoot.POST(group+"/addNameListIp", controller.AddNameListIp)
 	routerRoot.POST(group+"/deleteNameListIp", controller.DeleteNameListIp)
 	// 请求日志

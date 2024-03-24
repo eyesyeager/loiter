@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"loiter/backstage/constant"
 	"loiter/backstage/controller/result"
 	"loiter/config"
@@ -116,9 +117,9 @@ func (*processorService) GetProcessorByPage(data receiver.GetProcessorByPage) (e
 	var processorPOList []po.GetProcessorByPage
 	if err = global.MDB.Raw(`SELECT a.id AppId, a.name, ap.genre, ap.codes 
 						FROM app a, app_processor ap 
-						WHERE a.id = ap.app_id AND ('' = ? OR a.name = ?)
+						WHERE a.id = ap.app_id AND (0 = ? OR a.id = ?)
 						ORDER BY a.created_at DESC
-						LIMIT ?, ?`, data.AppName, data.AppName, offset, limit).Scan(&processorPOList).Error; err != nil {
+						LIMIT ?, ?`, data.AppId, data.AppId, offset, limit).Scan(&processorPOList).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}
 	// 组装inner
@@ -168,7 +169,7 @@ func (*processorService) GetProcessorByPage(data receiver.GetProcessorByPage) (e
 	}
 	// 获取总数
 	var count int64
-	checkApp := entity.App{Name: data.AppName}
+	checkApp := entity.App{Model: gorm.Model{ID: data.AppId}}
 	if err = global.MDB.Model(&checkApp).Where(checkApp).Count(&count).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}

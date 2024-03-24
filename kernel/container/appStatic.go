@@ -15,7 +15,7 @@ import (
  * @date 2024/3/21 10:02
  */
 
-var StaticByAppMap map[string]AppStatic
+var StaticByAppMap = make(map[string]AppStatic)
 
 type AppStatic struct {
 	ErrorRoute string

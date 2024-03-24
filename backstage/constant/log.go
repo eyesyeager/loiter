@@ -62,14 +62,14 @@ var LogUniversal = logUniversal{
 	},
 	UpdateAppNameList: logStructure{
 		Title:   "更新应用黑白名单配置",
-		Content: "名单类型：%s；更新类型：%s；",
+		Content: "更新配置：%s；",
 	},
 	AddNameListIp: logStructure{
-		Title:   "添加黑白名单ip",
+		Title:   "手动添加黑白名单ip",
 		Content: "应用名：%s；名单类型：%s；添加ip：%s；",
 	},
 	DeleteNameListIp: logStructure{
-		Title:   "删除黑白名单ip",
+		Title:   "手动删除黑白名单ip",
 		Content: "应用名：%s；名单类型：%s；删除ip：%s；",
 	},
 }

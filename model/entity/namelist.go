@@ -10,7 +10,8 @@ import "gorm.io/gorm"
 
 type NameList struct {
 	gorm.Model
-	AppId uint   `json:"appId" gorm:"not null;comment:应用id"`
-	Genre string `json:"genre" gorm:"not null;comment:名单类型，可选值为：black，white"`
-	Ip    string `json:"ip" gorm:"not null;comment:ip"`
+	AppId   uint   `json:"appId" gorm:"not null;comment:应用id"`
+	Genre   string `json:"genre" gorm:"not null;comment:名单类型，可选值为：black，white"`
+	Ip      string `json:"ip" gorm:"not null;comment:ip"`
+	Remarks string `json:"remarks" gorm:"type:TEXT;comment:备注"`
 }

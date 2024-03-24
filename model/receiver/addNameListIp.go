@@ -7,7 +7,7 @@ package receiver
  */
 
 type AddNameListIp struct {
-	AppId     uint   `json:"appId" validate:"required"`     // 应用id
-	Genre     string `json:"genre" validate:"required"`     // 名单类型，可选值为：white、black
-	IpListStr string `json:"ipListStr" validate:"required"` // ip拼接而成的字符串
+	AppId  uint     `json:"appId" validate:"required"`  // 应用id
+	Genre  string   `json:"genre" validate:"required"`  // 名单类型，可选值见 constants.NameList
+	IpList []string `json:"ipList" validate:"required"` // ip列表
 }

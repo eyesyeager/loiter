@@ -20,4 +20,5 @@ func InitCommonRoute(routerRoot *httprouter.Router, group string) {
 	routerRoot.GET(group+"/getAppGenreDictionary", controller.GetAppGenreDictionary)
 	routerRoot.GET(group+"/getLimiterDictionary", controller.GetLimiterDictionary)
 	routerRoot.GET(group+"/getLimiterModeDictionary", controller.GetLimiterModeDictionary)
+	routerRoot.GET(group+"/getNameListDictionary", controller.GetNameListDictionary)
 }

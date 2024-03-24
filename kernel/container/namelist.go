@@ -6,6 +6,7 @@ import (
 	"loiter/app/plugin/filter/namelist"
 	"loiter/backstage/constant"
 	"loiter/backstage/controller/result"
+	"loiter/constants"
 	"loiter/global"
 	"loiter/model/entity"
 	"loiter/model/po"
@@ -57,10 +58,10 @@ func InitNameList() {
 			global.AppLogger.Error(fmt.Sprintf("nameList container creation failed! host: %s, genre: %s, error: %s", item.Host, item.Genre, err.Error()))
 			continue
 		}
-		if item.Genre == namelist.BlackList {
+		if item.Genre == constants.NameList.Black {
 			blackContainerMap[item.Host] = nameList
 		}
-		if item.Genre == namelist.WhiteList {
+		if item.Genre == constants.NameList.White {
 			whiteContainerMap[item.Host] = nameList
 		}
 	}
@@ -98,10 +99,10 @@ func RefreshNameList(appId uint) error {
 		if err != nil {
 			return errors.New(fmt.Sprintf("黑白名单实例创建失败! host: %s，名单类型：%s，错误信息：%s", item.Host, item.Genre, err.Error()))
 		}
-		if item.Genre == namelist.BlackList {
+		if item.Genre == constants.NameList.Black {
 			BlackNameListByAppMap[item.Host] = nameList
 		}
-		if item.Genre == namelist.WhiteList {
+		if item.Genre == constants.NameList.White {
 			WhiteNameListByAppMap[item.Host] = nameList
 		}
 	}

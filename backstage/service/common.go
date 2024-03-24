@@ -197,3 +197,22 @@ func (*commonService) GetLimiterModeDictionary() (error, []returnee.GetDictionar
 	}
 	return nil, dictionaryList
 }
+
+// GetNameListDictionary 获取黑白名单字典
+func (*commonService) GetNameListDictionary() (error, []returnee.GetDictionary) {
+	var dictionaryList []returnee.GetDictionary
+	var valInfo = reflect.ValueOf(constants.NameList)
+	for i := 0; i < valInfo.NumField(); i++ {
+		val := valInfo.Field(i).Interface()
+		limiterMode := val.(string)
+		dictionaryList = append(dictionaryList, returnee.GetDictionary{
+			Label: limiterMode,
+			Value: limiterMode,
+		})
+	}
+	// 如果为空，就返回空数组，而不是nil
+	if dictionaryList == nil {
+		dictionaryList = []returnee.GetDictionary{}
+	}
+	return nil, dictionaryList
+}

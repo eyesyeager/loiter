@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"loiter/backstage/constant"
 	"loiter/backstage/controller/parser"
@@ -12,6 +13,7 @@ import (
 	"loiter/model/receiver"
 	"loiter/utils"
 	"net/http"
+	"strconv"
 )
 
 /**
@@ -281,6 +283,57 @@ func UpdateAppNameList(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	} else {
 		result.FailAttachedMsg(w, err.Error())
 	}
+}
+
+// GetAppNameList
+// @Summary			获取应用黑白名单配置
+// @Description		权限：user
+// @Tags			processor
+// @Accept			json
+// @Produce			json
+// @Security		token
+// @Param			token							header		string		true		"身份令牌"
+// @Success			200								{object}	result.Response
+// @Failure			400								{object}	result.Response
+// @Router			/processor/getAppNameList/:appId [get]
+func GetAppNameList(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// 权限校验
+	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
+		return
+	}
+
+	// 参数校验格式转换
+	appId, err := strconv.Atoi(p.ByName("appId"))
+	if err != nil {
+		result.FailAttachedMsg(w, fmt.Sprintf("appId格式错误，error：%s", err.Error()))
+		return
+	}
+	if appId <= 0 {
+		result.FailAttachedMsg(w, fmt.Sprintf("非法参数！appId：%d", appId))
+		return
+	}
+
+	// 执行业务
+	if err, res := processor.NameListService.GetAppNameList(uint(appId)); err == nil {
+		result.SuccessDefault(w, res)
+	} else {
+		result.FailAttachedMsg(w, err.Error())
+	}
+}
+
+// GetNameList
+// @Summary			获取应用黑白名单配置
+// @Description		权限：user
+// @Tags			processor
+// @Accept			json
+// @Produce			json
+// @Security		token
+// @Param			token							header		string		true		"身份令牌"
+// @Success			200								{object}	result.Response
+// @Failure			400								{object}	result.Response
+// @Router			/processor/getNameList [post]
+func GetNameList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
 }
 
 // AddNameListIp

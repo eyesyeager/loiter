@@ -7,7 +7,7 @@ package receiver
  */
 
 type UpdateAppNameList struct {
-	AppId     uint   `json:"appId" validate:"required"`     // 应用id
-	Genre     string `json:"genre" validate:"required"`     // 名单类型，可选值为：white、black
-	Turnstile int8   `json:"turnstile" validate:"required"` // 开关(取值见constant.Turnstile)
+	AppId uint `json:"appId" validate:"required"` // 应用id
+	Black bool `json:"black"`                     // 是否开启黑名单
+	White bool `json:"white"`                     // 是否开启白名单
 }

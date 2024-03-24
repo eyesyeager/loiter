@@ -8,6 +8,6 @@ import "loiter/model/structure"
  */
 
 type GetProcessorByPage struct {
-	structure.PageStruct        // 分页参数
-	AppName              string `json:"appName"` // 应用名
+	structure.PageStruct      // 分页参数
+	AppId                uint `json:"appId"` // 应用id
 }

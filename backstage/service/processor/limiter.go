@@ -76,7 +76,6 @@ func (*limiterService) SaveAppLimiter(r *http.Request, userClaims utils.JwtCusto
 // DeleteAppLimiter 删除应用限流器
 func (*limiterService) DeleteAppLimiter(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.DeleteAppLimiter) error {
 	//global.MDB.Unscoped().Delete()
-	// TODO:刷新容器
 	return nil
 }
 
@@ -89,9 +88,9 @@ func (*limiterService) GetLimiterByPage(data receiver.GetLimiterByPage) (err err
 	if err = global.MDB.Raw(`SELECT a.id AppId, a.name AppName, al.mode, al.limiter LimiterCode, l.name LimiterName, al.parameter, al.updated_at
        			FROM app a, app_limiter al, limiter l
          		WHERE a.id = al.app_id AND al.limiter = l.code 
-         		  AND ('' = ? OR a.name = ?) AND ('' = ? OR al.limiter = ?)
+         		  AND (0 = ? OR a.id = ?) AND ('' = ? OR al.limiter = ?)
 				ORDER BY a.updated_at DESC
-				LIMIT ?, ?`, data.AppName, data.AppName, data.Limiter, data.Limiter, offset, limit).Scan(&resInnerPOList).Error; err != nil {
+				LIMIT ?, ?`, data.AppId, data.AppId, data.Limiter, data.Limiter, offset, limit).Scan(&resInnerPOList).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}
 	if resInnerPOList == nil || len(resInnerPOList) == 0 {
@@ -111,8 +110,8 @@ func (*limiterService) GetLimiterByPage(data receiver.GetLimiterByPage) (err err
 		total = int64(len(resInnerList))
 	} else {
 		if err = global.MDB.Raw(`SELECT COUNT(*) FROM app a, app_limiter al 
-                WHERE a.id = al.app_id AND (? = '' OR a.name = ?) AND (? = '' OR al.limiter = ?)`,
-			data.AppName, data.AppName, data.Limiter, data.Limiter).Scan(&total).Error; err != nil {
+                WHERE a.id = al.app_id AND (? = 0 OR a.id = ?) AND (? = '' OR al.limiter = ?)`,
+			data.AppId, data.AppId, data.Limiter, data.Limiter).Scan(&total).Error; err != nil {
 			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 		}
 	}

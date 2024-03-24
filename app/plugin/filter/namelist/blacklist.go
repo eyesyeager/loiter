@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/bits-and-blooms/bloom/v3"
 	"loiter/backstage/controller/result"
+	"loiter/constants"
 	"loiter/global"
 )
 
@@ -29,7 +30,7 @@ func (l *BlackNameList) Check(ip string) (error, bool) {
 	var res int
 	if err := global.MDB.Raw(`SELECT 1 
 					FROM app a, name_list nl 
-					WHERE a.host = ? AND a.id = nl.app_id AND nl.genre = ? AND nl.ip = ?`, l.host, BlackList, ip).Scan(&res).Error; err != nil {
+					WHERE a.host = ? AND a.id = nl.app_id AND nl.genre = ? AND nl.ip = ?`, l.host, constants.NameList.Black, ip).Scan(&res).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), false
 	}
 	return nil, res != 1
@@ -37,7 +38,7 @@ func (l *BlackNameList) Check(ip string) (error, bool) {
 
 // Refresh 更新名单
 func (l *BlackNameList) Refresh() error {
-	err, bloomFilter := buildBloomFilter(l.host, BlackList)
+	err, bloomFilter := buildBloomFilter(l.host, constants.NameList.Black)
 	if err != nil {
 		return err
 	}
@@ -47,7 +48,7 @@ func (l *BlackNameList) Refresh() error {
 
 // NewBlackNameList 创建黑名单结构体
 func NewBlackNameList(host string) (error, *BlackNameList) {
-	err, bloomFilter := buildBloomFilter(host, BlackList)
+	err, bloomFilter := buildBloomFilter(host, constants.NameList.Black)
 	if err != nil {
 		return err, nil
 	}

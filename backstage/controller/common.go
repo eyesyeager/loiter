@@ -239,3 +239,28 @@ func GetLimiterModeDictionary(w http.ResponseWriter, r *http.Request, _ httprout
 		result.FailAttachedMsg(w, err.Error())
 	}
 }
+
+// GetNameListDictionary
+// @Summary			获取黑白名单字典
+// @Description		权限：user
+// @Tags			common
+// @Accept			json
+// @Produce			json
+// @Security		token
+// @Param			token					header		string		true		"身份令牌"
+// @Success			200						{object}	result.Response
+// @Failure			400						{object}	result.Response
+// @Router			/common/getNameListDictionary [get]
+func GetNameListDictionary(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	// 权限校验
+	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
+		return
+	}
+
+	// 执行业务
+	if err, res := service.CommonService.GetNameListDictionary(); err == nil {
+		result.SuccessDefault(w, res)
+	} else {
+		result.FailAttachedMsg(w, err.Error())
+	}
+}

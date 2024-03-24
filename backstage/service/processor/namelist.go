@@ -1,20 +1,21 @@
 package processor
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"loiter/app/plugin/filter/namelist"
 	"loiter/backstage/constant"
 	"loiter/backstage/controller/result"
 	"loiter/backstage/service"
-	"loiter/config"
+	"loiter/constants"
 	"loiter/global"
 	"loiter/kernel/container"
 	"loiter/model/entity"
 	"loiter/model/receiver"
+	"loiter/model/returnee"
 	"loiter/utils"
 	"net/http"
-	"strings"
 )
 
 /**
@@ -29,51 +30,42 @@ type nameListService struct {
 var NameListService = nameListService{}
 
 // UpdateAppNameList 更新应用黑白名单
-func (*nameListService) UpdateAppNameList(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.UpdateAppNameList) error {
-	// 参数合法性校验
-	if !namelist.CheckNameListGenre(data.Genre) {
-		return errors.New(fmt.Sprintf("非法genre参数：%s", data.Genre))
-	}
-	if !constant.CheckTurnstile(data.Turnstile) {
-		return errors.New(fmt.Sprintf("非法turnstile参数：%s", data.Genre))
-	}
+func (n *nameListService) UpdateAppNameList(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.UpdateAppNameList) error {
 	// 查看当前配置是否存在
-	var checkAppNameList = entity.AppNameList{
-		AppId: data.AppId,
-		Genre: data.Genre,
-	}
-	tx := global.MDB.Limit(1).Find(&checkAppNameList)
-	if tx.Error != nil {
-		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, tx.Error.Error()))
+	var checkAppNameList []entity.AppNameList
+	if err := global.MDB.Where(&entity.AppNameList{AppId: data.AppId}).Find(&checkAppNameList).Error; err != nil {
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
 	}
 	// 可行性校验
-	if data.Turnstile == constant.Turnstile.Open {
-		if tx.RowsAffected != 0 {
-			return errors.New("操作失败，该名单已处于开启状态")
-		}
-		// 插入配置
-		if err := global.MDB.Create(&entity.AppNameList{
-			AppId: data.AppId,
-			Genre: data.Genre,
-		}).Error; err != nil {
-			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, tx.Error.Error()))
-		}
-	} else if data.Turnstile == constant.Turnstile.Close {
-		if tx.RowsAffected == 0 {
-			return errors.New("操作失败，该名单已处于关闭状态")
-		}
-		// 删除配置
-		if err := global.MDB.Where(&entity.AppNameList{
-			AppId: data.AppId,
-			Genre: data.Genre,
-		}).Unscoped().Delete(&entity.AppNameList{}).Error; err != nil {
-			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, tx.Error.Error()))
-		}
+	if err := n.updateGenreNameList(data.AppId, constants.NameList.Black, data.Black, checkAppNameList); err != nil {
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
+	}
+	if err := n.updateGenreNameList(data.AppId, constants.NameList.White, data.White, checkAppNameList); err != nil {
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
 	}
 	// 打印操作日志
-	go service.LogService.App(r, userClaims.Uid, data.AppId,
-		constant.BuildUniversalLog(constant.LogUniversal.UpdateAppNameList, data.Genre, constant.GetTurnstileName(data.Turnstile)))
+	go func() {
+		marshal, _ := json.Marshal(data)
+		service.LogService.App(r, userClaims.Uid, data.AppId,
+			constant.BuildUniversalLog(constant.LogUniversal.UpdateAppNameList, marshal))
+	}()
 	return nil
+}
+
+// GetAppNameList 获取应用黑白名单状态
+func (*nameListService) GetAppNameList(appId uint) (err error, res returnee.GetAppNameList) {
+	var appNameList []entity.AppNameList
+	if err = global.MDB.Where(&entity.AppNameList{AppId: appId}).Find(&appNameList).Error; err != nil {
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
+	}
+	for _, item := range appNameList {
+		if item.Genre == constants.NameList.Black {
+			res.Black = true
+		} else {
+			res.White = true
+		}
+	}
+	return nil, res
 }
 
 // AddNameListIp 添加黑白名单ip
@@ -88,9 +80,8 @@ func (*nameListService) AddNameListIp(r *http.Request, userClaims utils.JwtCusto
 		return errors.New(fmt.Sprintf("获取id为%d的应用信息失败，请检查应用是否有效或网络是否正常", data.AppId))
 	}
 	// 构建黑白名单实体
-	ipList := strings.Split(data.IpListStr, config.Program.PluginConfig.NameListIpDelimiter)
 	var nameListEntityList []entity.NameList
-	for _, item := range ipList {
+	for _, item := range data.IpList {
 		nameListEntityList = append(nameListEntityList, entity.NameList{
 			AppId: data.AppId,
 			Genre: data.Genre,
@@ -104,10 +95,10 @@ func (*nameListService) AddNameListIp(r *http.Request, userClaims utils.JwtCusto
 	// 刷新布隆过滤器
 	var iNameList namelist.INameList
 	var ok bool
-	if data.Genre == namelist.BlackList {
+	if data.Genre == constants.NameList.Black {
 		iNameList, ok = container.BlackNameListByAppMap[checkApp.Host]
 	}
-	if data.Genre == namelist.WhiteList {
+	if data.Genre == constants.NameList.White {
 		iNameList, ok = container.WhiteNameListByAppMap[checkApp.Host]
 	}
 	if ok {
@@ -116,8 +107,11 @@ func (*nameListService) AddNameListIp(r *http.Request, userClaims utils.JwtCusto
 		}
 	}
 	// 打印操作日志
-	go service.LogService.Universal(r, userClaims.Uid,
-		constant.BuildUniversalLog(constant.LogUniversal.AddNameListIp, checkApp.Name, data.Genre, data.IpListStr))
+	go func() {
+		marshal, _ := json.Marshal(data.IpList)
+		service.LogService.Universal(r, userClaims.Uid,
+			constant.BuildUniversalLog(constant.LogUniversal.AddNameListIp, checkApp.Name, data.Genre, marshal))
+	}()
 	return nil
 }
 
@@ -143,10 +137,10 @@ func (*nameListService) DeleteNameListIp(r *http.Request, userClaims utils.JwtCu
 	// 刷新布隆过滤器
 	var iNameList namelist.INameList
 	var ok bool
-	if data.Genre == namelist.BlackList {
+	if data.Genre == constants.NameList.Black {
 		iNameList, ok = container.BlackNameListByAppMap[checkApp.Host]
 	}
-	if data.Genre == namelist.WhiteList {
+	if data.Genre == constants.NameList.White {
 		iNameList, ok = container.WhiteNameListByAppMap[checkApp.Host]
 	}
 	if ok {
@@ -157,5 +151,39 @@ func (*nameListService) DeleteNameListIp(r *http.Request, userClaims utils.JwtCu
 	// 打印操作日志
 	go service.LogService.Universal(r, userClaims.Uid,
 		constant.BuildUniversalLog(constant.LogUniversal.DeleteNameListIp, checkApp.Name, data.Genre, data.Ip))
+	return nil
+}
+
+// updateGenreNameList 更新应用单个类型的名单状态
+func (*nameListService) updateGenreNameList(appId uint, genre string, status bool, checkAppNameList []entity.AppNameList) error {
+	// 判断该类型是否已经存在
+	alreadyExist := false
+	for _, item := range checkAppNameList {
+		if item.Genre == genre {
+			alreadyExist = true
+			continue
+		}
+	}
+	// 如果两者状态相同，则无需操作
+	if status == alreadyExist {
+		return nil
+	}
+	if status {
+		// 插入操作
+		if err := global.MDB.Create(&entity.AppNameList{
+			AppId: appId,
+			Genre: genre,
+		}).Error; err != nil {
+			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
+		}
+	} else {
+		// 删除操作
+		if err := global.MDB.Where(&entity.AppNameList{
+			AppId: appId,
+			Genre: genre,
+		}).Unscoped().Delete(&entity.AppNameList{}).Error; err != nil {
+			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
+		}
+	}
 	return nil
 }
