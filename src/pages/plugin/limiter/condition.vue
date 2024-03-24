@@ -1,11 +1,11 @@
 <template>
     <div class="condition">
-        <span class="label">应用名</span>
-        <el-select class="appName" v-model="inputValue.appName" filterable clearable>
+        <span class="label">应用</span>
+        <el-select class="select" v-model="inputValue.appId" filterable clearable>
             <el-option v-for="item in appOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
         <span class="label">限流器</span>
-        <el-select class="appName" v-model="inputValue.limiter" filterable clearable>
+        <el-select class="select" v-model="inputValue.limiter" filterable clearable>
             <el-option v-for="item in limiterOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
         <el-button class="search" plain @click="search">查询</el-button>
@@ -23,7 +23,7 @@ const emit = defineEmits([ "search" ]);
 const appOptions = reactive<OptionsInterface[]>([]);
 const limiterOptions = reactive<OptionsInterface[]>([]);
 const inputValue = reactive({
-    appName: "",
+    appId: "",
     limiter: ""
 });
 
@@ -87,7 +87,7 @@ onMounted(() => {
         margin-right: 10px;
     }
 
-    .appName {
+    .select {
         width: 200px;
         margin-right: 10px;
     }

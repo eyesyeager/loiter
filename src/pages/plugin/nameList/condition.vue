@@ -8,14 +8,12 @@
                 </el-select>
             </div>
             <div class="inputGroup">
-                <span class="label">类型:</span>
-                <el-select class="input" v-model="inputValue.genre" clearable placeholder="">
-                    <el-option v-for="item in noticeOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
+                <span class="label">ip:</span>
+                <el-input class="input" v-model="inputValue.ip" clearable />
             </div>
             <div class="inputGroup">
-                <span class="label">标题:</span>
-                <el-input class="input" v-model="inputValue.title" clearable />
+                <span class="label">备注:</span>
+                <el-input class="input" v-model="inputValue.remarks" clearable />
             </div>
         </div>
         <div class="line">
@@ -33,29 +31,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, onMounted, reactive } from "vue";
 import api from "@/apis/api";
 import { ElMessage } from "element-plus";
 import { responseCode } from "@/config";
 import { OptionsInterface } from "@/d.ts/common";
 
 const emit = defineEmits(["search"]);
+const appOptions = reactive<OptionsInterface[]>([]);
+const timeRange = ref<Date[]>([]);
 const inputValue = reactive({
     appId: "",
-    genre: "",
-    title: "",
+    ip: "",
+    remarks: ""
 });
-const appOptions = reactive<OptionsInterface[]>([]);
-const noticeOptions = reactive<OptionsInterface[]>([]);
-const timeRange = ref<Date[]>([]);
-
-// 重置表单
-function reset() {
-    inputValue.appId = "";
-    inputValue.genre = "";
-    inputValue.title = "";
-    timeRange.value = [];
-}
 
 // 获取所有应用信息
 function getAppDictionary() {
@@ -68,37 +57,27 @@ function getAppDictionary() {
             appOptions[index] = {
                 "label": item.label,
                 "value": item.value
-            }
+            };
         });
     });
 }
 
-// 获取通知类型字典
-function getNoticeDictionary() {
-    api.getNoticeDictionary().then(({ code, msg, data }) => {
-        if (code != responseCode.success) {
-            ElMessage({ type: "error", message: "应用信息获取失败：" + msg });
-            return;
-        }
-        data.forEach((item: any, index: number) => {
-            noticeOptions[index] = {
-                "label": item.label,
-                "value": item.value
-            }
-        });
-    });
+// 重置表单
+function reset() {
+    inputValue.appId = "";
+    inputValue.ip = "";
+    inputValue.remarks = "";
+    timeRange.value = [];
 }
 
-// 通知父组件执行查询
+// 通知父组件进行查询
 function search() {
     emit("search", inputValue, timeRange.value);
 }
 
 onMounted(() => {
     getAppDictionary();
-    getNoticeDictionary();
 });
-
 </script>
 
 <style lang="scss" scoped>

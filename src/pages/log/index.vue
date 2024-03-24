@@ -71,8 +71,8 @@ function search(inputValue: any, timeRange: any) {
     condition.operatorName = inputValue.operatorName;
     condition.title = inputValue.title;
     condition.content = inputValue.content;
-    condition.timeBegin = timeRange[0] ? moment(timeRange.value[0]).format("YYYY-MM-DD") : "";
-    condition.timeEnd = timeRange[1] ? moment(timeRange.value[1]).format("YYYY-MM-DD") : "";
+    condition.timeBegin = timeRange[0] ? moment(timeRange[0]).format("YYYY-MM-DD") : "";
+    condition.timeEnd = timeRange[1] ? moment(timeRange[1]).format("YYYY-MM-DD") : "";
     getUniversalLog();
 }
 

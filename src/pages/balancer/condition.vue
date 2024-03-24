@@ -1,6 +1,6 @@
 <template>
     <div class="condition">
-        <span class="label">应用名</span>
+        <span class="label">应用</span>
         <el-select class="appName" v-model="inputValue.appId" filterable clearable>
             <el-option v-for="item in appOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>

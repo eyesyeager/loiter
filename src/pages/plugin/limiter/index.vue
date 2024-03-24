@@ -34,7 +34,7 @@ import { Plus } from "@element-plus/icons-vue";
 import { SaveDialog } from "@/constants";
 
 let condition = {
-    appName: "",
+    appId: "",
     limit: "",
 };
 const roleStore = useRoleStore();
@@ -56,7 +56,7 @@ const limiterData = ref();
 
 // 处理请求参数，再获取通知数据
 function search(inputValue: any) {
-    condition.appName = inputValue.appName;
+    condition.appId = inputValue.appId;
     condition.limit = inputValue.limit;
     getLimiterByPage();
 }
@@ -64,7 +64,8 @@ function search(inputValue: any) {
 // 分页获取限流器配置
 function getLimiterByPage() {
     api.getLimiterByPage({
-        ...condition,
+        appId: condition.appId ? Number(condition.appId) : null,
+        limit: condition.limit,
         pageNo: pageNo.value,
         pageSize: pageSize.value
     }).then(({code, msg, data}) => {

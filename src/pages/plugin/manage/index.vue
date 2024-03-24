@@ -34,7 +34,7 @@ import { responseCode, role } from "@/config";
 import { useRoleStore } from "@/store";
 
 let condition = {
-    appName: "",
+    appId: "",
 };
 const roleStore = useRoleStore();
 const pageNo = ref(1);
@@ -68,7 +68,7 @@ function getProcessorDictionary() {
 // 分页获取应用插件信息
 function getProcessorByPage() {
     api.getProcessorByPage({
-        ...condition,
+        appId: condition.appId ? Number(condition.appId) : null,
         pageNo: pageNo.value,
         pageSize: pageSize.value
     }).then(({code, msg, data}) => {
@@ -83,7 +83,7 @@ function getProcessorByPage() {
 
 // 处理请求参数，再获取通知数据
 function search(inputValue: any) {
-    condition.appName = inputValue.appName;
+    condition.appId = inputValue.appId;
     getProcessorByPage();
 }
 

@@ -49,8 +49,8 @@ function search(inputValue: any, timeRange: any) {
     condition.appId = inputValue.appId;
     condition.genre = inputValue.genre;
     condition.title = inputValue.title;
-    condition.timeBegin = timeRange[0] ? moment(timeRange.value[0]).format("YYYY-MM-DD") : "";
-    condition.timeEnd = timeRange[1] ? moment(timeRange.value[1]).format("YYYY-MM-DD") : "";
+    condition.timeBegin = timeRange[0] ? moment(timeRange[0]).format("YYYY-MM-DD") : "";
+    condition.timeEnd = timeRange[1] ? moment(timeRange[1]).format("YYYY-MM-DD") : "";
     getNoticeList();
 }
 

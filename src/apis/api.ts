@@ -71,6 +71,16 @@ const processor = {
     saveAppLimiter: async (req: any) => {
         return await post("/processor/saveAppLimiter", req);
     },
+    // --------------------------- namelist ------------------------------
+    getAppNameList: async (req: any) => {
+        return await get("/processor/getAppNameList", req, UrlReqType.path);
+    },
+    updateAppNameList: async (req: any) => {
+        return await post("/processor/updateAppNameList", req);
+    },
+    addNameListIp: async (req: any) => {
+        return await post("/processor/addNameListIp", req);
+    },
     // --------------------------- requestLog ------------------------------
     getOverviewRequestLog: async () => {
         return await get("/processor/getOverviewRequestLog");
@@ -133,6 +143,9 @@ const common = {
     },
     getLimiterModeDictionary: async () => {
         return await get("/common/getLimiterModeDictionary");
+    },
+    getNameListDictionary: async () => {
+        return await get("/common/getNameListDictionary");
     }
 }
 

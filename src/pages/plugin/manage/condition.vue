@@ -1,7 +1,7 @@
 <template>
     <div class="condition">
         <span class="label">应用名</span>
-        <el-select class="appName" v-model="inputValue.appName" filterable clearable>
+        <el-select class="appName" v-model="inputValue.appId" filterable clearable>
             <el-option v-for="item in appOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
         <el-button class="search" plain @click="search">查询</el-button>
@@ -18,7 +18,7 @@ import { OptionsInterface } from "@/d.ts/common";
 const emit = defineEmits([ "search" ]);
 const appOptions = reactive<OptionsInterface[]>([]);
 const inputValue = reactive({
-    appName: "",
+    appId: "",
 });
 
 // 获取所有应用信息
