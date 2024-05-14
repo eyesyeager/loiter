@@ -18,7 +18,7 @@ import (
 
 // CheckNameListGenre 校验名单类型是否合法
 func CheckNameListGenre(genre string) bool {
-	return genre == constants.NameList.Black || genre == constants.NameList.White
+	return genre == constants.NameList.Black.Value || genre == constants.NameList.White.Value
 }
 
 // INameList 黑白名单接口
@@ -31,9 +31,9 @@ type INameList interface {
 
 // NewNameList 创建黑白名单实例
 func NewNameList(host string, genre string) (error, INameList) {
-	if genre == constants.NameList.Black {
+	if genre == constants.NameList.Black.Value {
 		return NewBlackNameList(host)
-	} else if genre == constants.NameList.White {
+	} else if genre == constants.NameList.White.Value {
 		return NewWhiteNameList(host)
 	} else {
 		return errors.New(fmt.Sprintf("there is no nameList of type %s", genre)), nil

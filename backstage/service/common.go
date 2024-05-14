@@ -204,10 +204,10 @@ func (*commonService) GetNameListDictionary() (error, []returnee.GetDictionary) 
 	var valInfo = reflect.ValueOf(constants.NameList)
 	for i := 0; i < valInfo.NumField(); i++ {
 		val := valInfo.Field(i).Interface()
-		limiterMode := val.(string)
+		nameListStruct := val.(constants.NameListStruct)
 		dictionaryList = append(dictionaryList, returnee.GetDictionary{
-			Label: limiterMode,
-			Value: limiterMode,
+			Label: nameListStruct.Label,
+			Value: nameListStruct.Value,
 		})
 	}
 	// 如果为空，就返回空数组，而不是nil

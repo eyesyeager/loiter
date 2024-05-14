@@ -24,9 +24,9 @@ func NameListFilter(w http.ResponseWriter, r *http.Request, host string, genre s
 		var err error
 		var success bool
 		// 黑白名单校验
-		if item == constants.NameList.White { // 白名单校验
+		if item == constants.NameList.White.Value { // 白名单校验
 			err, success = checkWhiteNameList(host, ip)
-		} else if item == constants.NameList.Black { // 黑名单校验
+		} else if item == constants.NameList.Black.Value { // 黑名单校验
 			err, success = checkBlackNameList(host, ip)
 		} else {
 			return errors.New(fmt.Sprintf("there is no nameList of type %s", item)), false

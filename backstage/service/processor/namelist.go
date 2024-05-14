@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/jinzhu/copier"
+	"gorm.io/gorm"
 	"loiter/app/plugin/filter/namelist"
 	"loiter/backstage/constant"
 	"loiter/backstage/controller/result"
@@ -12,10 +14,12 @@ import (
 	"loiter/global"
 	"loiter/kernel/container"
 	"loiter/model/entity"
+	"loiter/model/po"
 	"loiter/model/receiver"
 	"loiter/model/returnee"
 	"loiter/utils"
 	"net/http"
+	"time"
 )
 
 /**
@@ -37,10 +41,10 @@ func (n *nameListService) UpdateAppNameList(r *http.Request, userClaims utils.Jw
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
 	}
 	// 可行性校验
-	if err := n.updateGenreNameList(data.AppId, constants.NameList.Black, data.Black, checkAppNameList); err != nil {
+	if err := n.updateGenreNameList(data.AppId, constants.NameList.Black.Value, data.Black, checkAppNameList); err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
 	}
-	if err := n.updateGenreNameList(data.AppId, constants.NameList.White, data.White, checkAppNameList); err != nil {
+	if err := n.updateGenreNameList(data.AppId, constants.NameList.White.Value, data.White, checkAppNameList); err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
 	}
 	// 打印操作日志
@@ -52,14 +56,67 @@ func (n *nameListService) UpdateAppNameList(r *http.Request, userClaims utils.Jw
 	return nil
 }
 
-// GetAppNameList 获取应用黑白名单状态
-func (*nameListService) GetAppNameList(appId uint) (err error, res returnee.GetAppNameList) {
+// GetNameList 获取应用黑白名单
+func (*nameListService) GetNameList(data receiver.GetNameList) (err error, res returnee.GetNameList) {
+	// 构建请求条件
+	tx := global.MDB.Table("name_list nl").Select(" nl.id, a.name AppName, a.id AppId, nl.ip, nl.remarks, nl.created_at").Joins(
+		"LEFT JOIN app a on nl.app_id = a.id")
+	if data.AppId != 0 {
+		tx = tx.Where("a.id = ?", data.AppId)
+	}
+	if data.Genre != "" {
+		tx = tx.Where("nl.genre = ?", data.Genre)
+	}
+	if data.Ip != "" {
+		tx = tx.Where("nl.ip = ?", data.Ip)
+	}
+	if data.Remarks != "" {
+		tx = tx.Where("nl.remarks LIKE ?", "%"+data.Remarks+"%")
+	}
+	if data.TimeBegin != "" {
+		data.TimeBegin += " 00:00:00"
+		tx = tx.Where("nl.created_at >= ?", data.TimeBegin)
+	}
+	if data.TimeEnd != "" {
+		data.TimeEnd += " 23:59:59"
+		tx = tx.Where("nl.created_at <= ?", data.TimeEnd)
+	}
+
+	// 查总数
+	var total int64
+	if err = tx.Count(&total).Error; err != nil {
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
+	}
+	// 查数据
+	var resInnerPOList []po.GetNameList
+	limit, offset := utils.BuildPageSearch(data.PageStruct)
+	if err = tx.Order("nl.created_at DESC").Limit(limit).Offset(offset).Find(&resInnerPOList).Error; err != nil {
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
+	}
+	// 数据组装
+	var resData []returnee.GetNameListInner
+	for _, item := range resInnerPOList {
+		var resItem returnee.GetNameListInner
+		_ = copier.Copy(&resItem, &item)
+		// 时间格式化
+		resItem.CreatedAt = item.CreatedAt.Format(time.DateTime)
+		resData = append(resData, resItem)
+	}
+
+	res.PageStruct = data.PageStruct
+	res.Total = total
+	res.Data = resData
+	return err, res
+}
+
+// GetAppNameListStatus 获取应用黑白名单状态
+func (*nameListService) GetAppNameListStatus(appId uint) (err error, res returnee.GetAppNameList) {
 	var appNameList []entity.AppNameList
 	if err = global.MDB.Where(&entity.AppNameList{AppId: appId}).Find(&appNameList).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}
 	for _, item := range appNameList {
-		if item.Genre == constants.NameList.Black {
+		if item.Genre == constants.NameList.Black.Value {
 			res.Black = true
 		} else {
 			res.White = true
@@ -95,10 +152,10 @@ func (*nameListService) AddNameListIp(r *http.Request, userClaims utils.JwtCusto
 	// 刷新布隆过滤器
 	var iNameList namelist.INameList
 	var ok bool
-	if data.Genre == constants.NameList.Black {
+	if data.Genre == constants.NameList.Black.Value {
 		iNameList, ok = container.BlackNameListByAppMap[checkApp.Host]
 	}
-	if data.Genre == constants.NameList.White {
+	if data.Genre == constants.NameList.White.Value {
 		iNameList, ok = container.WhiteNameListByAppMap[checkApp.Host]
 	}
 	if ok {
@@ -128,6 +185,7 @@ func (*nameListService) DeleteNameListIp(r *http.Request, userClaims utils.JwtCu
 	}
 	// 删除ip
 	if err := global.MDB.Where(&entity.NameList{
+		Model: gorm.Model{ID: data.Id},
 		AppId: data.AppId,
 		Genre: data.Genre,
 		Ip:    data.Ip,
@@ -137,10 +195,10 @@ func (*nameListService) DeleteNameListIp(r *http.Request, userClaims utils.JwtCu
 	// 刷新布隆过滤器
 	var iNameList namelist.INameList
 	var ok bool
-	if data.Genre == constants.NameList.Black {
+	if data.Genre == constants.NameList.Black.Value {
 		iNameList, ok = container.BlackNameListByAppMap[checkApp.Host]
 	}
-	if data.Genre == constants.NameList.White {
+	if data.Genre == constants.NameList.White.Value {
 		iNameList, ok = container.WhiteNameListByAppMap[checkApp.Host]
 	}
 	if ok {

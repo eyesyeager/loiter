@@ -7,7 +7,8 @@ package receiver
  */
 
 type DeleteNameListIp struct {
+	Id    uint   `json:"id" validate:"required"`    // ip id
+	Ip    string `json:"ip" validate:"required"`    // ip
 	AppId uint   `json:"appId" validate:"required"` // 应用id
 	Genre string `json:"genre" validate:"required"` // 名单类型，可选值为：white、black
-	Ip    string `json:"ip" validate:"required"`    // 待删除ip
 }

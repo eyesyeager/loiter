@@ -58,10 +58,10 @@ func InitNameList() {
 			global.AppLogger.Error(fmt.Sprintf("nameList container creation failed! host: %s, genre: %s, error: %s", item.Host, item.Genre, err.Error()))
 			continue
 		}
-		if item.Genre == constants.NameList.Black {
+		if item.Genre == constants.NameList.Black.Value {
 			blackContainerMap[item.Host] = nameList
 		}
-		if item.Genre == constants.NameList.White {
+		if item.Genre == constants.NameList.White.Value {
 			whiteContainerMap[item.Host] = nameList
 		}
 	}
@@ -99,10 +99,10 @@ func RefreshNameList(appId uint) error {
 		if err != nil {
 			return errors.New(fmt.Sprintf("黑白名单实例创建失败! host: %s，名单类型：%s，错误信息：%s", item.Host, item.Genre, err.Error()))
 		}
-		if item.Genre == constants.NameList.Black {
+		if item.Genre == constants.NameList.Black.Value {
 			BlackNameListByAppMap[item.Host] = nameList
 		}
-		if item.Genre == constants.NameList.White {
+		if item.Genre == constants.NameList.White.Value {
 			WhiteNameListByAppMap[item.Host] = nameList
 		}
 	}

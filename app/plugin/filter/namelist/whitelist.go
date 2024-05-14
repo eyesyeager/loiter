@@ -30,7 +30,7 @@ func (l *WhiteNameList) Check(ip string) (error, bool) {
 	var res int
 	if err := global.MDB.Raw(`SELECT 1 
 					FROM app a, name_list nl 
-					WHERE a.host = ? AND a.id = nl.app_id AND nl.genre = ? AND nl.ip = ?`, l.host, constants.NameList.White, ip).Scan(&res).Error; err != nil {
+					WHERE a.host = ? AND a.id = nl.app_id AND nl.genre = ? AND nl.ip = ?`, l.host, constants.NameList.White.Value, ip).Scan(&res).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), false
 	}
 	return nil, res == 1
@@ -38,7 +38,7 @@ func (l *WhiteNameList) Check(ip string) (error, bool) {
 
 // Refresh 更新名单
 func (l *WhiteNameList) Refresh() error {
-	err, bloomFilter := buildBloomFilter(l.host, constants.NameList.White)
+	err, bloomFilter := buildBloomFilter(l.host, constants.NameList.White.Value)
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func (l *WhiteNameList) Refresh() error {
 
 // NewWhiteNameList 创建黑名单结构体
 func NewWhiteNameList(host string) (error, *WhiteNameList) {
-	err, bloomFilter := buildBloomFilter(host, constants.NameList.White)
+	err, bloomFilter := buildBloomFilter(host, constants.NameList.White.Value)
 	if err != nil {
 		return err, nil
 	}

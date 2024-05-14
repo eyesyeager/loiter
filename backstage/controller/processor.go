@@ -285,7 +285,7 @@ func UpdateAppNameList(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 }
 
-// GetAppNameList
+// GetAppNameListStatus
 // @Summary			获取应用黑白名单配置
 // @Description		权限：user
 // @Tags			processor
@@ -295,8 +295,8 @@ func UpdateAppNameList(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 // @Param			token							header		string		true		"身份令牌"
 // @Success			200								{object}	result.Response
 // @Failure			400								{object}	result.Response
-// @Router			/processor/getAppNameList/:appId [get]
-func GetAppNameList(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+// @Router			/processor/getAppNameListStatus/:appId [get]
+func GetAppNameListStatus(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// 权限校验
 	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
 		return
@@ -314,7 +314,7 @@ func GetAppNameList(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 	}
 
 	// 执行业务
-	if err, res := processor.NameListService.GetAppNameList(uint(appId)); err == nil {
+	if err, res := processor.NameListService.GetAppNameListStatus(uint(appId)); err == nil {
 		result.SuccessDefault(w, res)
 	} else {
 		result.FailAttachedMsg(w, err.Error())
@@ -322,7 +322,7 @@ func GetAppNameList(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 }
 
 // GetNameList
-// @Summary			获取应用黑白名单配置
+// @Summary			获取黑白名单配置
 // @Description		权限：user
 // @Tags			processor
 // @Accept			json
@@ -332,8 +332,35 @@ func GetAppNameList(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 // @Success			200								{object}	result.Response
 // @Failure			400								{object}	result.Response
 // @Router			/processor/getNameList [post]
-func GetNameList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func GetNameList(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// 权限校验
+	if _, err := foundation.AuthFoundation.TokenAnalysis(w, r, constant.Role.User); err != nil {
+		return
+	}
 
+	// 参数校验
+	var data receiver.GetNameList
+	if err := parser.PostData(r, &data); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+	if err := validator.Checker.Struct(data); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+
+	// 分页处理
+	if err := utils.CheckPageStruct(data.PageStruct); err != nil {
+		result.FailAttachedMsg(w, err.Error())
+		return
+	}
+
+	// 执行业务
+	if err, res := processor.NameListService.GetNameList(data); err == nil {
+		result.SuccessDefault(w, res)
+	} else {
+		result.FailAttachedMsg(w, err.Error())
+	}
 }
 
 // AddNameListIp

@@ -7,11 +7,22 @@ package constants
  */
 
 var NameList = nameList{
-	Black: "black",
-	White: "white",
+	Black: NameListStruct{
+		Label: "黑名单",
+		Value: "black",
+	},
+	White: NameListStruct{
+		Label: "白名单",
+		Value: "white",
+	},
 }
 
 type nameList struct {
-	Black string
-	White string
+	Black NameListStruct
+	White NameListStruct
+}
+
+type NameListStruct struct {
+	Label string
+	Value string
 }
