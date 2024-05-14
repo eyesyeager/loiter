@@ -75,14 +75,20 @@ const processor = {
         return await post("/processor/deleteAppLimiter", req);
     },
     // --------------------------- namelist ------------------------------
-    getAppNameList: async (req: any) => {
-        return await get("/processor/getAppNameList", req, UrlReqType.path);
+    getAppNameListStatus: async (req: any) => {
+        return await get("/processor/getAppNameListStatus", req, UrlReqType.path);
+    },
+    getNameList: async (req: any) => {
+        return await post("/processor/getNameList", req);
     },
     updateAppNameList: async (req: any) => {
         return await post("/processor/updateAppNameList", req);
     },
     addNameListIp: async (req: any) => {
         return await post("/processor/addNameListIp", req);
+    },
+    deleteNameListIp: async (req: any) => {
+        return await post("/processor/deleteNameListIp", req);
     },
     // --------------------------- requestLog ------------------------------
     getOverviewRequestLog: async () => {

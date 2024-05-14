@@ -4,7 +4,7 @@
             <div>
                 <div class="inputGroup">
                     <span class="label">应用名</span>
-                    <el-select class="input" v-model="inputValue.appId" clearable @change="getAppNameList">
+                    <el-select class="input" v-model="inputValue.appId" clearable @change="getAppNameListStatus">
                         <el-option v-for="option in appOptions" :key="option.value" :label="option.label" :value="option.value" />
                     </el-select>
                 </div>
@@ -76,11 +76,11 @@ function getAppDictionary() {
 }
 
 // 获取应用名单状态
-function getAppNameList(appId: any) {
+function getAppNameListStatus(appId: any) {
     if (!appId) {
         clearInputValue();
     }
-    api.getAppNameList([appId]).then(({code, msg, data}) => {
+    api.getAppNameListStatus([appId]).then(({code, msg, data}) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "应用黑白名单状态获取失败：" + msg });
             return;
