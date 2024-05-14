@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jinzhu/copier"
+	"gorm.io/gorm"
 	"loiter/backstage/constant"
 	"loiter/backstage/controller/result"
 	"loiter/backstage/service"
 	"loiter/global"
+	"loiter/kernel/container"
 	"loiter/model/entity"
 	"loiter/model/po"
 	"loiter/model/receiver"
@@ -75,7 +77,23 @@ func (*limiterService) SaveAppLimiter(r *http.Request, userClaims utils.JwtCusto
 
 // DeleteAppLimiter 删除应用限流器
 func (*limiterService) DeleteAppLimiter(r *http.Request, userClaims utils.JwtCustomClaims, data receiver.DeleteAppLimiter) error {
-	//global.MDB.Unscoped().Delete()
+	var checkApp entity.App
+	if err := global.MDB.First(&checkApp, data.AppId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New(fmt.Sprintf("不存在id为%d的应用", data.AppId))
+		} else {
+			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
+		}
+	}
+	// 删除数据库数据
+	if err := global.MDB.Where(&entity.AppLimiter{AppId: data.AppId}).Unscoped().Delete(&entity.AppLimiter{}).Error; err != nil {
+		return err
+	}
+	// 删除容器数据
+	container.DeleteLimiter(checkApp.Host)
+	// 记录操作日志
+	go service.LogService.App(r, userClaims.Uid, data.AppId,
+		constant.BuildUniversalLog(constant.LogUniversal.DeleteAppLimiter))
 	return nil
 }
 

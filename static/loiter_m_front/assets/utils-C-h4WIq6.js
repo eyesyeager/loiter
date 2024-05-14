@@ -1,0 +1,1 @@
+import{h as n}from"./moment-Cl4UOzQZ.js";function a(t){open(t)}function o(t){return t==null?n().format("YYYY-MM-DD"):n().add(t,"days").format("YYYY-MM-DD")}function e(t){return t==null||t==""?[]:t.split(/\r?\n/)}function u(t){return/^(\d{1,3}\.){3}\d{1,3}$/.test(t)}export{e as a,u as c,o as g,a as j};

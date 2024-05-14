@@ -60,6 +60,10 @@ var LogUniversal = logUniversal{
 		Title:   "更新应用限流器配置",
 		Content: "原限流器名：%s；原限流器参数：%s；更新限流器名：%s；更新限流器参数：%s；",
 	},
+	DeleteAppLimiter: logStructure{
+		Title:   "删除应用限流器配置",
+		Content: "",
+	},
 	UpdateAppNameList: logStructure{
 		Title:   "更新应用黑白名单配置",
 		Content: "更新配置：%s；",
@@ -87,6 +91,7 @@ type logUniversal struct {
 	RefreshContainer  logStructure
 	SaveAppProcessor  logStructure
 	UpdateAppLimiter  logStructure
+	DeleteAppLimiter  logStructure
 	UpdateAppNameList logStructure
 	AddNameListIp     logStructure
 	DeleteNameListIp  logStructure
