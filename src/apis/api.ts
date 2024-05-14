@@ -71,6 +71,9 @@ const processor = {
     saveAppLimiter: async (req: any) => {
         return await post("/processor/saveAppLimiter", req);
     },
+    deleteAppLimiter: async (req: any) => {
+        return await post("/processor/deleteAppLimiter", req);
+    },
     // --------------------------- namelist ------------------------------
     getAppNameList: async (req: any) => {
         return await get("/processor/getAppNameList", req, UrlReqType.path);

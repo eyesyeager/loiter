@@ -8,10 +8,13 @@
                 <el-table-column prop="content" label="操作" :align="'center'">
                     <template #default="scope">
                         <el-button size="small" @click="openEditDialog(scope)">编辑</el-button>
+                        <el-popconfirm title="该操作将直接改变容器，请确保限流插件已关闭！" @confirm="deleteLimiter(scope)">
+                            <template #reference><el-button size="small">删除</el-button></template>
+                        </el-popconfirm>
                         <el-popconfirm title="确认刷新容器吗?" @confirm="refreshLimiter(scope)">
                             <template #reference><el-button size="small">刷新容器</el-button></template>
                         </el-popconfirm>
-                    </template>
+                    </template> 
                 </el-table-column>
             </el-table>
             <el-pagination class="pagination" :current-page="pageNo" :page-size="pageSize" :total="totalNum"
@@ -109,6 +112,22 @@ function refreshLimiter(data: any) {
             return;
         }
         ElMessage({ type: "success", message: "限流器容器刷新成功" });
+    });
+}
+
+// 删除应用限流器
+function deleteLimiter(data: any) {
+    if (!roleStore.checkAuth(role.admin)) {
+        ElMessage({ type: "error", message: "权限不足" });
+        return;
+    }
+    api.deleteAppLimiter({ appId: data.row.appId }).then(({code, msg}) => {
+        if (code != responseCode.success) {
+            ElMessage({ type: "error", message: "限流器容器删除失败：" + msg });
+            return;
+        }
+        ElMessage({ type: "success", message: "限流器容器删除成功" });
+        getLimiterByPage();
     });
 }
 
