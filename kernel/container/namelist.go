@@ -106,6 +106,13 @@ func RefreshNameList(appId uint) error {
 			WhiteNameListByAppMap[item.Host] = nameList
 		}
 	}
+	if len(appNameListList) == 1 {
+		if appNameListList[0].Genre == constants.NameList.Black.Value {
+			delete(WhiteNameListByAppMap, appNameListList[0].Host)
+		} else {
+			delete(BlackNameListByAppMap, appNameListList[0].Host)
+		}
+	}
 	NameListByAppMap[appNameListList[0].Host] = newNameList
 	return nil
 }

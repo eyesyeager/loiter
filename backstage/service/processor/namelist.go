@@ -140,9 +140,10 @@ func (*nameListService) AddNameListIp(r *http.Request, userClaims utils.JwtCusto
 	var nameListEntityList []entity.NameList
 	for _, item := range data.IpList {
 		nameListEntityList = append(nameListEntityList, entity.NameList{
-			AppId: data.AppId,
-			Genre: data.Genre,
-			Ip:    item,
+			AppId:   data.AppId,
+			Genre:   data.Genre,
+			Ip:      item,
+			Remarks: data.Remarks,
 		})
 	}
 	// 添加ip
@@ -242,6 +243,10 @@ func (*nameListService) updateGenreNameList(appId uint, genre string, status boo
 		}).Unscoped().Delete(&entity.AppNameList{}).Error; err != nil {
 			return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error()))
 		}
+	}
+	// 刷新容器
+	if err := container.RefreshNameList(appId); err != nil {
+		global.AppLogger.Error(err.Error())
 	}
 	return nil
 }
