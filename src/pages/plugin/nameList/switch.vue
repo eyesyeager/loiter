@@ -22,7 +22,9 @@
             <template #footer>
                 <div class="dialog-footer">
                     <el-button @click="dialogVisible = false">取消</el-button>
-                    <el-button type="primary" @click="updateAppNameList">保存</el-button>
+                    <el-popconfirm title="操作将立即生效，确认保存吗?" @confirm="updateAppNameList">
+                        <template #reference><el-button type="primary">保存</el-button></template>
+                    </el-popconfirm>
                 </div>
             </template>
         </el-dialog>

@@ -18,11 +18,17 @@
                     <span class="label">IP 地址</span>
                     <el-input class="input" type="textarea" v-model="inputValue.ipList" :rows="6" clearable placeholder="不同ip请换行区分"/>
                 </div>
+                <div class="inputGroup">
+                    <span class="label">备注</span>
+                    <el-input class="input" type="textarea" v-model="inputValue.remarks" :rows="3" clearable placeholder="备注"/>
+                </div>
             </div>
             <template #footer>
                 <div class="dialog-footer">
                     <el-button @click="dialogVisible = false">取消</el-button>
-                    <el-button type="primary" @click="addNameListIp">保存</el-button>
+                    <el-popconfirm title="操作将立即生效，确认保存吗?" @confirm="addNameListIp">
+                        <template #reference><el-button type="primary">保存</el-button></template>
+                    </el-popconfirm>
                 </div>
             </template>
         </el-dialog>
@@ -49,7 +55,8 @@ const dialogVisible = ref(false);
 const inputValue = reactive({
     appId: "",
     genre: "",
-    ipList: ""
+    ipList: "",
+    remarks: ""
 });
 
 // 监听父组件传值变化，控制弹窗展示
@@ -98,6 +105,7 @@ function clearInputValue() {
     inputValue.appId = "";
     inputValue.genre = "";
     inputValue.ipList = "";
+    inputValue.remarks = "";
 }
 
 // 更新应用黑白名单状态
@@ -108,6 +116,10 @@ function addNameListIp() {
         return;
     }
     // 参数校验
+    if (!inputValue.appId) {
+        ElMessage({ type: "error", message: "请先选择目标应用！" });
+        return;
+    }
     if (inputValue.ipList == null) {
         ElMessage({ type: "error", message: "IP地址必填！" });
         return;
@@ -121,9 +133,10 @@ function addNameListIp() {
     }
     // 添加ip
     api.addNameListIp({
-        appId: inputValue.appId ? Number(inputValue.appId) : null,
+        appId: Number(inputValue.appId),
         genre: inputValue.genre,
-        ipList: inputValue.ipList.split(/\r?\n/)
+        ipList: inputValue.ipList.split(/\r?\n/),
+        remarks: inputValue.remarks
     }).then(({code, msg}) => {
         if (code != responseCode.success) {
             ElMessage({ type: "error", message: "添加IP失败：" + msg });

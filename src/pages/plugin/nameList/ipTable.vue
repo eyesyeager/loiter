@@ -5,7 +5,7 @@
             <el-table-column v-for="item in tableColumn" :prop="item.prop" :label="item.label" :align="'center'" />
             <el-table-column prop="content" label="操作" :align="'center'">
                 <template #default="scope">
-                    <el-popconfirm title="确认删除吗?" @confirm="deleteNameListIp(scope)">
+                    <el-popconfirm title="操作将立即生效，确认删除吗?" @confirm="deleteNameListIp(scope)">
                         <template #reference><el-button size="small">删除</el-button></template>
                     </el-popconfirm>
                 </template>
@@ -29,6 +29,7 @@ const props = defineProps({
     condition: Object,
     refresh: Number
 });
+const roleStore = useRoleStore();
 const tableData = ref([]);
 const tableColumn = ref([
     { prop: "appName", label: "应用名" },
@@ -82,6 +83,11 @@ function handlePageChange(page: number) {
 
 // 删除名单ip
 function deleteNameListIp(data: any) {
+    // 权限校验
+        if (!roleStore.checkAuth(role.admin)) {
+        ElMessage({ type: "error", message: "权限不足！" });
+        return;
+    }
     api.deleteNameListIp({
         appId: data.row.appId,
         id: data.row.id,
