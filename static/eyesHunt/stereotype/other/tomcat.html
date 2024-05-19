@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>tomcat 架构 | 耶瞳职库</title>
+    <meta name="generator" content="VuePress 1.9.10">
+    <link rel="icon" href="/img/favicon.png">
+    <script src="/script/statistics.js"></script>
+    <script src="/script/console.js"></script>
+    <meta name="description" content="耶瞳职库，再不学就要失业了">
+    
+    <link rel="preload" href="/assets/css/0.styles.58b00068.css" as="style"><link rel="preload" href="/assets/js/app.e1d38c41.js" as="script"><link rel="preload" href="/assets/js/2.ccf64a40.js" as="script"><link rel="preload" href="/assets/js/1.ff36f1ce.js" as="script"><link rel="preload" href="/assets/js/115.fb07f653.js" as="script"><link rel="prefetch" href="/assets/js/10.05dae71d.js"><link rel="prefetch" href="/assets/js/100.fb3d4a6b.js"><link rel="prefetch" href="/assets/js/101.7d607fdc.js"><link rel="prefetch" href="/assets/js/102.ee2d116c.js"><link rel="prefetch" href="/assets/js/103.b8b835d6.js"><link rel="prefetch" href="/assets/js/104.893253b2.js"><link rel="prefetch" href="/assets/js/105.bbbfb931.js"><link rel="prefetch" href="/assets/js/106.951d9da2.js"><link rel="prefetch" href="/assets/js/107.c93f5de5.js"><link rel="prefetch" href="/assets/js/108.8b79d46d.js"><link rel="prefetch" href="/assets/js/109.44a71d8d.js"><link rel="prefetch" href="/assets/js/11.9ef2020a.js"><link rel="prefetch" href="/assets/js/110.45c28aa0.js"><link rel="prefetch" href="/assets/js/111.1a54f6a9.js"><link rel="prefetch" href="/assets/js/112.6b8237dc.js"><link rel="prefetch" href="/assets/js/113.4cc54908.js"><link rel="prefetch" href="/assets/js/114.cfe5914d.js"><link rel="prefetch" href="/assets/js/116.52e5791a.js"><link rel="prefetch" href="/assets/js/117.35b71c87.js"><link rel="prefetch" href="/assets/js/118.06ca1c5a.js"><link rel="prefetch" href="/assets/js/119.39911a0d.js"><link rel="prefetch" href="/assets/js/12.6f5a3671.js"><link rel="prefetch" href="/assets/js/120.e4dd4eb0.js"><link rel="prefetch" href="/assets/js/121.5aa985f7.js"><link rel="prefetch" href="/assets/js/122.9204d776.js"><link rel="prefetch" href="/assets/js/123.53b3bc5d.js"><link rel="prefetch" href="/assets/js/124.505a1825.js"><link rel="prefetch" href="/assets/js/125.bb09dc4e.js"><link rel="prefetch" href="/assets/js/126.d376fb4b.js"><link rel="prefetch" href="/assets/js/127.5dbe04cf.js"><link rel="prefetch" href="/assets/js/128.5251e742.js"><link rel="prefetch" href="/assets/js/129.92395fd3.js"><link rel="prefetch" href="/assets/js/13.55d1ddfd.js"><link rel="prefetch" href="/assets/js/130.1f2abc8d.js"><link rel="prefetch" href="/assets/js/131.a4dc1572.js"><link rel="prefetch" href="/assets/js/132.fe417fec.js"><link rel="prefetch" href="/assets/js/133.26d84358.js"><link rel="prefetch" href="/assets/js/134.9bae45d3.js"><link rel="prefetch" href="/assets/js/135.f4334d70.js"><link rel="prefetch" href="/assets/js/136.b9133e25.js"><link rel="prefetch" href="/assets/js/137.4404c47d.js"><link rel="prefetch" href="/assets/js/14.7d6475ac.js"><link rel="prefetch" href="/assets/js/15.bade5a53.js"><link rel="prefetch" href="/assets/js/16.bdf52384.js"><link rel="prefetch" href="/assets/js/17.cfe35a34.js"><link rel="prefetch" href="/assets/js/18.94d03c89.js"><link rel="prefetch" href="/assets/js/19.437ee15d.js"><link rel="prefetch" href="/assets/js/20.ca3c2e96.js"><link rel="prefetch" href="/assets/js/21.3a9a9f37.js"><link rel="prefetch" href="/assets/js/22.392bccf8.js"><link rel="prefetch" href="/assets/js/23.af691550.js"><link rel="prefetch" href="/assets/js/24.916ac209.js"><link rel="prefetch" href="/assets/js/25.718b6d13.js"><link rel="prefetch" href="/assets/js/26.56a69cea.js"><link rel="prefetch" href="/assets/js/27.478d4f53.js"><link rel="prefetch" href="/assets/js/28.b115be10.js"><link rel="prefetch" href="/assets/js/29.488fca25.js"><link rel="prefetch" href="/assets/js/3.9f6b3b4e.js"><link rel="prefetch" href="/assets/js/30.40f0dcc3.js"><link rel="prefetch" href="/assets/js/31.96122f56.js"><link rel="prefetch" href="/assets/js/32.b9eda3a1.js"><link rel="prefetch" href="/assets/js/33.55da7336.js"><link rel="prefetch" href="/assets/js/34.7ace5cdd.js"><link rel="prefetch" href="/assets/js/35.666cd4b6.js"><link rel="prefetch" href="/assets/js/36.1394eebd.js"><link rel="prefetch" href="/assets/js/37.6cbcd728.js"><link rel="prefetch" href="/assets/js/38.7a68a97a.js"><link rel="prefetch" href="/assets/js/39.32d96cdb.js"><link rel="prefetch" href="/assets/js/4.8e2a25d9.js"><link rel="prefetch" href="/assets/js/40.4dac9d29.js"><link rel="prefetch" href="/assets/js/41.62a7f5a9.js"><link rel="prefetch" href="/assets/js/42.d89fc9bd.js"><link rel="prefetch" href="/assets/js/43.71e5e6bb.js"><link rel="prefetch" href="/assets/js/44.203f7f19.js"><link rel="prefetch" href="/assets/js/45.1ebfb4a7.js"><link rel="prefetch" href="/assets/js/46.d75ebd2d.js"><link rel="prefetch" href="/assets/js/47.cdcaa0bb.js"><link rel="prefetch" href="/assets/js/48.aed0339e.js"><link rel="prefetch" href="/assets/js/49.a3ba2fb4.js"><link rel="prefetch" href="/assets/js/5.c429486a.js"><link rel="prefetch" href="/assets/js/50.e94adb4b.js"><link rel="prefetch" href="/assets/js/51.6ba3d73f.js"><link rel="prefetch" href="/assets/js/52.b6f1b461.js"><link rel="prefetch" href="/assets/js/53.991d59cc.js"><link rel="prefetch" href="/assets/js/54.c2e6c2fe.js"><link rel="prefetch" href="/assets/js/55.417a9a65.js"><link rel="prefetch" href="/assets/js/56.32781dfe.js"><link rel="prefetch" href="/assets/js/57.4f393e70.js"><link rel="prefetch" href="/assets/js/58.0beecda2.js"><link rel="prefetch" href="/assets/js/59.a63b6dfd.js"><link rel="prefetch" href="/assets/js/6.beb44280.js"><link rel="prefetch" href="/assets/js/60.8dfcf03e.js"><link rel="prefetch" href="/assets/js/61.1fe9d14e.js"><link rel="prefetch" href="/assets/js/62.45358503.js"><link rel="prefetch" href="/assets/js/63.67657d2f.js"><link rel="prefetch" href="/assets/js/64.82f19936.js"><link rel="prefetch" href="/assets/js/65.d3a04345.js"><link rel="prefetch" href="/assets/js/66.53ea5948.js"><link rel="prefetch" href="/assets/js/67.2d4edf55.js"><link rel="prefetch" href="/assets/js/68.ef3f7aa5.js"><link rel="prefetch" href="/assets/js/69.56362da6.js"><link rel="prefetch" href="/assets/js/7.3b16f0e9.js"><link rel="prefetch" href="/assets/js/70.104e1293.js"><link rel="prefetch" href="/assets/js/71.cc5bdea6.js"><link rel="prefetch" href="/assets/js/72.70236fa4.js"><link rel="prefetch" href="/assets/js/73.573dbdea.js"><link rel="prefetch" href="/assets/js/74.1be41fbb.js"><link rel="prefetch" href="/assets/js/75.c7410bfb.js"><link rel="prefetch" href="/assets/js/76.2c665a29.js"><link rel="prefetch" href="/assets/js/77.625f82ee.js"><link rel="prefetch" href="/assets/js/78.ff6a7ea7.js"><link rel="prefetch" href="/assets/js/79.1985583b.js"><link rel="prefetch" href="/assets/js/80.d265d5b5.js"><link rel="prefetch" href="/assets/js/81.74b4621f.js"><link rel="prefetch" href="/assets/js/82.15b7c14d.js"><link rel="prefetch" href="/assets/js/83.7637a0f4.js"><link rel="prefetch" href="/assets/js/84.949b34ad.js"><link rel="prefetch" href="/assets/js/85.93dccc96.js"><link rel="prefetch" href="/assets/js/86.01c14aed.js"><link rel="prefetch" href="/assets/js/87.0ff1318b.js"><link rel="prefetch" href="/assets/js/88.b90d420d.js"><link rel="prefetch" href="/assets/js/89.28f92555.js"><link rel="prefetch" href="/assets/js/90.24991471.js"><link rel="prefetch" href="/assets/js/91.127fb5d4.js"><link rel="prefetch" href="/assets/js/92.a4e2fda5.js"><link rel="prefetch" href="/assets/js/93.988d3aef.js"><link rel="prefetch" href="/assets/js/94.3e2515a8.js"><link rel="prefetch" href="/assets/js/95.cb59d6fe.js"><link rel="prefetch" href="/assets/js/96.3577f8f0.js"><link rel="prefetch" href="/assets/js/97.00ee8a0e.js"><link rel="prefetch" href="/assets/js/98.164b95f4.js"><link rel="prefetch" href="/assets/js/99.1a5bcb9c.js"><link rel="prefetch" href="/assets/js/vendors~docsearch.5a4296f1.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.58b00068.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">耶瞳职库</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  主页
+</a></div><div class="nav-item"><a href="/vitae/" class="nav-link">
+  简历
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="八股" class="dropdown-title"><span class="title">八股</span> <span class="arrow down"></span></button> <button type="button" aria-label="八股" class="mobile-dropdown-title"><span class="title">八股</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/stereotype/java/" class="nav-link">
+  Java
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/spring/" class="nav-link">
+  Spring
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/mysql/" class="nav-link">
+  MySQL
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/redis/" class="nav-link">
+  Redis
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/mq/" class="nav-link">
+  消息队列
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/operating-system/" class="nav-link">
+  操作系统
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/network/" class="nav-link">
+  计算机网络
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/linux/" class="nav-link">
+  Linux
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/other/" class="nav-link router-link-active">
+  其他
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="手撕" class="dropdown-title"><span class="title">手撕</span> <span class="arrow down"></span></button> <button type="button" aria-label="手撕" class="mobile-dropdown-title"><span class="title">手撕</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/handTearing/algorithm-interview/" class="nav-link">
+  面试算法
+</a></li><li class="dropdown-item"><!----> <a href="/handTearing/algorithm-written-test/" class="nav-link">
+  笔试算法
+</a></li><li class="dropdown-item"><!----> <a href="/handTearing/brain-teaser/" class="nav-link">
+  智力题
+</a></li><li class="dropdown-item"><!----> <a href="/handTearing/multi-threading/" class="nav-link">
+  多线程
+</a></li><li class="dropdown-item"><!----> <a href="/handTearing/design-patterns/" class="nav-link">
+  设计模式
+</a></li></ul></div></div><div class="nav-item"><a href="/design/" class="nav-link">
+  系统设计
+</a></div><div class="nav-item"><a href="/project/" class="nav-link">
+  项目
+</a></div><div class="nav-item"><a href="/work/" class="nav-link">
+  工作
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="面经" class="dropdown-title"><span class="title">面经</span> <span class="arrow down"></span></button> <button type="button" aria-label="面经" class="mobile-dropdown-title"><span class="title">面经</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/interview/alibaba/" class="nav-link">
+  阿里巴巴
+</a></li><li class="dropdown-item"><!----> <a href="/interview/tencent/" class="nav-link">
+  腾讯
+</a></li><li class="dropdown-item"><!----> <a href="/interview/bytedance/" class="nav-link">
+  字节跳动
+</a></li><li class="dropdown-item"><!----> <a href="/interview/baidu/" class="nav-link">
+  百度
+</a></li><li class="dropdown-item"><!----> <a href="/interview/meituan/" class="nav-link">
+  美团
+</a></li><li class="dropdown-item"><!----> <a href="/interview/kuaishou/" class="nav-link">
+  快手
+</a></li><li class="dropdown-item"><!----> <a href="/interview/huawei/" class="nav-link">
+  华为
+</a></li><li class="dropdown-item"><!----> <a href="/interview/other/" class="nav-link">
+  其他
+</a></li></ul></div></div><div class="nav-item"><a href="/miscellany/" class="nav-link">
+  杂言
+</a></div><div class="nav-item"><a href="https://github.com/YuJiZhao/eyesHunt" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="其他" class="dropdown-title"><span class="title">其他</span> <span class="arrow down"></span></button> <button type="button" aria-label="其他" class="mobile-dropdown-title"><span class="title">其他</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="http://space.eyescode.top" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  耶瞳空间
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="http://stars.eyescode.top" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  耶瞳星空
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  主页
+</a></div><div class="nav-item"><a href="/vitae/" class="nav-link">
+  简历
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="八股" class="dropdown-title"><span class="title">八股</span> <span class="arrow down"></span></button> <button type="button" aria-label="八股" class="mobile-dropdown-title"><span class="title">八股</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/stereotype/java/" class="nav-link">
+  Java
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/spring/" class="nav-link">
+  Spring
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/mysql/" class="nav-link">
+  MySQL
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/redis/" class="nav-link">
+  Redis
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/mq/" class="nav-link">
+  消息队列
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/operating-system/" class="nav-link">
+  操作系统
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/network/" class="nav-link">
+  计算机网络
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/linux/" class="nav-link">
+  Linux
+</a></li><li class="dropdown-item"><!----> <a href="/stereotype/other/" class="nav-link router-link-active">
+  其他
+</a></li></ul></div></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="手撕" class="dropdown-title"><span class="title">手撕</span> <span class="arrow down"></span></button> <button type="button" aria-label="手撕" class="mobile-dropdown-title"><span class="title">手撕</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/handTearing/algorithm-interview/" class="nav-link">
+  面试算法
+</a></li><li class="dropdown-item"><!----> <a href="/handTearing/algorithm-written-test/" class="nav-link">
+  笔试算法
+</a></li><li class="dropdown-item"><!----> <a href="/handTearing/brain-teaser/" class="nav-link">
+  智力题
+</a></li><li class="dropdown-item"><!----> <a href="/handTearing/multi-threading/" class="nav-link">
+  多线程
+</a></li><li class="dropdown-item"><!----> <a href="/handTearing/design-patterns/" class="nav-link">
+  设计模式
+</a></li></ul></div></div><div class="nav-item"><a href="/design/" class="nav-link">
+  系统设计
+</a></div><div class="nav-item"><a href="/project/" class="nav-link">
+  项目
+</a></div><div class="nav-item"><a href="/work/" class="nav-link">
+  工作
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="面经" class="dropdown-title"><span class="title">面经</span> <span class="arrow down"></span></button> <button type="button" aria-label="面经" class="mobile-dropdown-title"><span class="title">面经</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/interview/alibaba/" class="nav-link">
+  阿里巴巴
+</a></li><li class="dropdown-item"><!----> <a href="/interview/tencent/" class="nav-link">
+  腾讯
+</a></li><li class="dropdown-item"><!----> <a href="/interview/bytedance/" class="nav-link">
+  字节跳动
+</a></li><li class="dropdown-item"><!----> <a href="/interview/baidu/" class="nav-link">
+  百度
+</a></li><li class="dropdown-item"><!----> <a href="/interview/meituan/" class="nav-link">
+  美团
+</a></li><li class="dropdown-item"><!----> <a href="/interview/kuaishou/" class="nav-link">
+  快手
+</a></li><li class="dropdown-item"><!----> <a href="/interview/huawei/" class="nav-link">
+  华为
+</a></li><li class="dropdown-item"><!----> <a href="/interview/other/" class="nav-link">
+  其他
+</a></li></ul></div></div><div class="nav-item"><a href="/miscellany/" class="nav-link">
+  杂言
+</a></div><div class="nav-item"><a href="https://github.com/YuJiZhao/eyesHunt" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="其他" class="dropdown-title"><span class="title">其他</span> <span class="arrow down"></span></button> <button type="button" aria-label="其他" class="mobile-dropdown-title"><span class="title">其他</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="http://space.eyescode.top" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  耶瞳空间
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="http://stars.eyescode.top" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  耶瞳星空
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <!----></nav>  <ul class="sidebar-links"><li><a href="/stereotype/other/" aria-current="page" class="sidebar-link">前言</a></li><li><a href="/stereotype/other/tomcat.html" aria-current="page" class="active sidebar-link">Tomcat问题</a></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="tomcat-架构"><a href="#tomcat-架构" class="header-anchor">#</a> tomcat 架构</h1> <p><img src="http://hunt-cdn.eyescode.top/content/7cb7f95a-31f6-b571-bad6-71642ed4e3ef.png" alt="架构图"></p> <ul><li>Server：服务器。Tomcat 就是一个 Server 服务器</li> <li>Service：在服务器中可以有多个 Service，只不过在我们常用的这套 Catalina 容器的 Tomcat 中只包含一个 Service，在 Service 中包含连接器和容器。一个完整的 Service 才能完成对请求的接收和处理</li> <li>连接器：Coyote 是连接器具体的实现。用于与新来的请求建立连接并解析数据。因为 Tomcat 支持的 IO 模型有 NIO、NIO2、APR，而支持的应用层协议有 HTTP1.1、HTTP2、AJP。所以针对不同的 IO 模型和应用层协议请求，在一个 Service 中可以有多个连接器来适用不同的协议的IO请求
+<ul><li>EndPoint：Coyote 通信端点，即通信监听的接口，是具体 Socket 接收和发送处理器，是用来实现 TCP/IP 传输协议的</li> <li>Acceptor：用于接收请求的 socket</li> <li>Executor：线程池，在接收到请求的 socket 后会从线程池中分配一条来执行后面的操作</li> <li>Processor ：Coyote 协议处理接口，是用来实现 HTTP 应用层协议的，接收 EndPoint 、容器传来的 Socket 字节流，解析成 request 或 response 对象</li> <li>ProtocolHandler：Coyote 协议接口，通过 EndPoint 和 Processor，实现针对具体协议的处理能力</li> <li>Adapter：容器只负责处理数据，对于请求协议不同的数据，容器会无法处理，所以在 ProtocolHandler 处理生成的 request 对象后，还需要将其转成 Tomcat 定义好的统一格式的 ServletRequest 对象，Adapter 就是用来进行这样的操作的</li></ul></li> <li>容器： Tomcat 的核心组件， 用于处理请求并返回数据。Catalina 是其具体的实现
+<ul><li>Engine：表示整个 Catalina 的 Servlet 引擎，用来管理多个虚拟站点，一个 Service 最多只能有一个 Engine。但是一个 Engine 可以包含多个 Host</li> <li>Host：表示一个主机地址，或者说一个站点，一个 Host 下有可以配置多个 Context</li> <li>Context：表示一个 web 应用，一个 Web 应用可以包含多个 Wrapper</li> <li>Wrapper：表示一个 Servlet，是容器中的最底层组件</li></ul></li></ul> <hr> <p>摘自：</p> <ul><li><a href="https://topjavaer.cn/web/tomcat.html" target="_blank" rel="noopener noreferrer">Tomcat基础知识总结<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul> <p>站长略有修改</p></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">Last Updated:</span> <span class="time">8/27/2023, 11:33:10 PM</span></div></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/stereotype/other/" class="prev router-link-active">
+        前言
+      </a></span> <!----></p></div> </main></div><div class="global-ui"><!----></div></div>
+    <script src="/assets/js/app.e1d38c41.js" defer></script><script src="/assets/js/2.ccf64a40.js" defer></script><script src="/assets/js/1.ff36f1ce.js" defer></script><script src="/assets/js/115.fb07f653.js" defer></script>
+  </body>
+</html>

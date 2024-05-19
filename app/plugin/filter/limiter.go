@@ -27,7 +27,8 @@ func LimiterFilter(w http.ResponseWriter, r *http.Request, host string, genre st
 			statusCode, contentType, content := utils.ResponseTemplate(constants.ResponseTitle.RateLimit, errMsg, genre)
 			utils.Response(w, statusCode, contentType, content)
 			global.GatewayLogger.Warn(errMsg)
-			go capability.NoticeFoundation.SendSiteNotice(host, "限流器触发拦截", errMsg, "")
+			go capability.NoticeFoundation.SendSiteNotice(host, "限流器触发拦截", errMsg,
+				fmt.Sprintf("请求路径：%s；", r.URL.Path))
 		}
 		return nil, success
 	}

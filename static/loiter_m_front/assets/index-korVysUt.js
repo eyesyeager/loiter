@@ -1,1 +1,0 @@
-import{_ as r}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{a as e,c as o}from"./index-PF-Fl51z.js";const c={},t={class:"error"};function s(n,_){return e(),o("div",t," error ")}const i=r(c,[["render",s]]);export{i as default};

@@ -43,8 +43,8 @@ var logConfigInstance = logConfig{
 
 // mysqlConfigInstance MySQL配置
 var mysqlConfigInstance = mysqlConfig{
-	Host:                "192.168.204.133", // 主机地址
-	Port:                3306,              // 端口号
+	Host:                "192.168.106.128", // 主机地址
+	Port:                15000,             // 端口号
 	Database:            "loiter",          // 数据库名
 	Username:            "root",            // 用户名
 	Password:            "root",            // 用户密码
@@ -60,7 +60,7 @@ var emailConfigInstance = emailConfig{
 	Addr:     "smtp.163.com:25",    // SMTP服务器的地址
 	Identity: "",                   // 身份证明
 	Username: "eyesyeager@163.com", // 用户名
-	Password: "",                   // 密码
+	Password: "VAUARZWCFWSXGEUP",   // 密码
 	Host:     "smtp.163.com",       // 主机地址
 }
 
