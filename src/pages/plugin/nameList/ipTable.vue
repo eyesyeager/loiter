@@ -23,6 +23,7 @@ import api from "@/apis/api";
 import { ElMessage } from "element-plus";
 import { responseCode, role } from "@/config";
 import { useRoleStore } from "@/store";
+import { useSearchStore } from "./store";
 
 const props = defineProps({
     genre: Object,
@@ -30,6 +31,7 @@ const props = defineProps({
     refresh: Number
 });
 const roleStore = useRoleStore();
+const searchStore = useSearchStore();
 const tableData = ref([]);
 const tableColumn = ref([
     { prop: "appName", label: "应用名" },
@@ -46,6 +48,15 @@ const pageSizes = [10, 50, 100, 200];
 // 监听父组件传值变化，控制表格刷新
 watch(
     () => props.refresh,
+    _ => {
+        pageNo.value = 1;
+        getNameList();
+    }
+);
+
+// 监听add组件通知变化，控制表格刷新
+watch(
+    () => searchStore.flag,
     _ => {
         pageNo.value = 1;
         getNameList();
@@ -84,7 +95,7 @@ function handlePageChange(page: number) {
 // 删除名单ip
 function deleteNameListIp(data: any) {
     // 权限校验
-        if (!roleStore.checkAuth(role.admin)) {
+    if (!roleStore.checkAuth(role.admin)) {
         ElMessage({ type: "error", message: "权限不足！" });
         return;
     }

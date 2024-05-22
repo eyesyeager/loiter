@@ -43,8 +43,10 @@ import { responseCode, role } from "@/config";
 import { OptionsInterface } from "@/d.ts/common";
 import { useRoleStore } from "@/store";
 import { getListByWrap, checkIPv4 } from "@/utils/utils";
+import { useSearchStore } from "./store";
 
 const emit = defineEmits(["reload"]);
+const searchStore = useSearchStore();
 const roleStore = useRoleStore();
 const appOptions = reactive<OptionsInterface[]>([]);
 const nameListOptions = reactive<OptionsInterface[]>([]);
@@ -108,7 +110,7 @@ function clearInputValue() {
     inputValue.remarks = "";
 }
 
-// 更新应用黑白名单状态
+// 添加应用黑白名单IP
 function addNameListIp() {
     // 权限校验
     if (!roleStore.checkAuth(role.admin)) {
@@ -144,7 +146,8 @@ function addNameListIp() {
         }
         ElMessage({ type: "success", message: "IP添加成功" });
         dialogVisible.value = false;
-        // TODO：通知父组件刷新IP列表
+        // 通知刷新IP列表
+        searchStore.switch();
     });
 }
 
