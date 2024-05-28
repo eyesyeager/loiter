@@ -49,7 +49,7 @@ const layout = "prev, pager, next";
 const tableColumn = [
     { prop: "appName", label: "应用名" },
     { prop: "limiterName", label: "限流器" },
-    { prop: "mode", label: "方式" },
+    // { prop: "mode", label: "方式" },
     { prop: "parameter", label: "参数配置" },
     { prop: "updatedAt", label: "更新时间" },
 ];

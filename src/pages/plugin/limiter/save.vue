@@ -13,12 +13,13 @@
                     <el-option v-for="item in limiterOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
             </div>
-            <div class="inputGroup">
+            <!-- 暂时不使用该功能 -->
+            <!-- <div class="inputGroup">
                 <span class="label">限流模式</span>
                 <el-select class="input" v-model="inputValue.mode" clearable>
                     <el-option v-for="item in limiterModeOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
-            </div>
+            </div> -->
             <div class="inputGroup">
                 <span class="label">参数示例</span>
                 <el-input class="input" v-model="parameterEx" type="textarea" autosize disabled />
@@ -57,7 +58,7 @@ const dialogVisible = ref(false);
 const inputValue = reactive({
     appId: "",
     limiter: "",
-    mode: "",
+    mode: "global",
     parameter: ""
 });
 const parameterEx = ref("");
@@ -163,6 +164,7 @@ function saveAppLimiter() {
         }
         dialogVisible.value = false;
         emit("reload");
+        ElMessage({ type: "success", message: "保存成功" });
     });
 }
 
@@ -170,7 +172,7 @@ function saveAppLimiter() {
 function clearInputValue() {
     inputValue.appId = "";
     inputValue.limiter = "";
-    inputValue.mode = "";
+    // inputValue.mode = "";
     inputValue.parameter = "";
     parameterEx.value = "";
 }
@@ -179,7 +181,7 @@ function clearInputValue() {
 function initUpdateInputValue() {
     inputValue.appId = String(props.data!.appId);
     inputValue.limiter = props.data!.limiterCode;
-    inputValue.mode = props.data!.mode;
+    // inputValue.mode = props.data!.mode;
     inputValue.parameter = props.data!.parameter;
     changeCode(props.data!.limiterCode);
 }
@@ -187,7 +189,7 @@ function initUpdateInputValue() {
 onMounted(() => {
     getAppDictionary();
     getLimiterDictionary();
-    getLimiterModeDictionary();
+    // getLimiterModeDictionary();
 });
 
 </script>
