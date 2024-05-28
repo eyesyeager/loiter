@@ -1,11 +1,11 @@
 // 网站相关配置
 const site = {
-    name: "Loiter",                                         // 网站名称
-    slogen: "尘世闲游，无意逐鹿",                              // 网站标语
-    github: "https://www.github.com/YuJiZhao/loiter",       // 项目Github仓库地址
-    document: "http://space.eyescode.top",                  // 项目文档地址
-    establishment: "2023",                                  // 项目成立年份
-    author: "耶瞳",                                          // 项目作者
+    name: "Loiter",                                             // 网站名称
+    slogen: "尘世闲游，无意逐鹿",                                 // 网站标语
+    github: "https://www.github.com/YuJiZhao/loiter",           // 项目Github仓库地址
+    document: "https://www.github.com/YuJiZhao/loiter",         // 项目文档地址
+    establishment: "2023",                                      // 项目成立年份
+    author: "耶瞳",                                             // 项目作者
 
     usernameMaxLen: 10,  // 用户名最大长度
     usernameMinLen: 2,   // 用户名最小长度
