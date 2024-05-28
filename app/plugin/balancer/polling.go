@@ -46,7 +46,5 @@ func pollingBalancer(host string) (error, string) {
 
 // pollingActuator 顺序轮询负载策略执行器
 func pollingActuator(serverWeight []container.ServerWeight, cursor int) (string, int) {
-	// 为了避免指针越界，此处应该先加一取余，再访问切片
-	cursor = (cursor + 1) % len(serverWeight)
-	return serverWeight[cursor].Server, cursor
+	return serverWeight[cursor].Server, (cursor + 1) % len(serverWeight)
 }

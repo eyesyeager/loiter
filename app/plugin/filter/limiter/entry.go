@@ -28,8 +28,15 @@ func NewLimiterFilter(name string, param string) (error, ILimiter) {
 		}
 		return nil, NewFixedWinLimiter(parameter)
 	} else if name == LimiterConfig.SlidingWinLimiter.Code {
-		//NewSlidingWinLimiter()
-		return nil, nil
+		var parameter SlidingWinParameter
+		if err := json.Unmarshal([]byte(param), &parameter); err != nil {
+			return errors.New(fmt.Sprintf("The parameters of the SlidingWinLimiter are not in this format: %s", param)), nil
+		}
+		limiter, err := NewSlidingWinLimiter(parameter)
+		if err != nil {
+			return err, nil
+		}
+		return nil, limiter
 	} else if name == LimiterConfig.LeakyBucketLimiter.Code {
 		var parameter LeakyBucketParameter
 		if err := json.Unmarshal([]byte(param), &parameter); err != nil {
@@ -63,7 +70,7 @@ var LimiterConfig = limiterConfig{
 		Model:     gorm.Model{ID: 2},
 		Code:      "SlidingWinLimiter",
 		Name:      "滑动窗口",
-		Parameter: "",
+		Parameter: "{\n  \t\"limit\": 1,  // 窗口请求上限\n\t\"window\": 1000,  // 窗口时间大小(ms)\n\t\"smallWindow\": 200  // 小窗口时间大小(ms)\n}",
 		Remarks:   "",
 	},
 	LeakyBucketLimiter: entity.Limiter{
