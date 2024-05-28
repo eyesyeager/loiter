@@ -43,25 +43,25 @@ var logConfigInstance = logConfig{
 
 // mysqlConfigInstance MySQL配置
 var mysqlConfigInstance = mysqlConfig{
-	Host:                "192.168.106.128", // 主机地址
-	Port:                15000,             // 端口号
-	Database:            "loiter",          // 数据库名
-	Username:            "root",            // 用户名
-	Password:            "root",            // 用户密码
-	Charset:             "utf8mb4",         // 编码格式
-	MaxIdleConn:         5,                 // 空闲连接池中连接的最大数量
-	MaxOpenConn:         10,                // 打开数据库连接的最大数量
-	LogMode:             "info",            // 日志级别
-	EnableFileLogWriter: true,              // 是否启用日志文件
+	Host:                "127.0.0.1", // 主机地址
+	Port:                3306,        // 端口号
+	Database:            "loiter",    // 数据库名
+	Username:            "root",      // 用户名
+	Password:            "root",      // 用户密码
+	Charset:             "utf8mb4",   // 编码格式
+	MaxIdleConn:         5,           // 空闲连接池中连接的最大数量
+	MaxOpenConn:         10,          // 打开数据库连接的最大数量
+	LogMode:             "info",      // 日志级别
+	EnableFileLogWriter: true,        // 是否启用日志文件
 }
 
 // emailConfigInstance 邮箱配置
 var emailConfigInstance = emailConfig{
-	Addr:     "smtp.163.com:25",    // SMTP服务器的地址
-	Identity: "",                   // 身份证明
-	Username: "eyesyeager@163.com", // 用户名
-	Password: "VAUARZWCFWSXGEUP",   // 密码
-	Host:     "smtp.163.com",       // 主机地址
+	Addr:     "", // SMTP服务器的地址
+	Identity: "", // 身份证明
+	Username: "", // 用户名
+	Password: "", // 密码
+	Host:     "", // 主机地址
 }
 
 // pluginConfigInstance 插件配置
