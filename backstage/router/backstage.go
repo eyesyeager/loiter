@@ -2,7 +2,10 @@ package router
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"loiter/backstage/router/route"
+	"loiter/config"
+	"net/http"
 )
 
 /**
@@ -13,6 +16,7 @@ import (
 
 // InitRouter 初始化路由
 func InitRouter(routerRoot *httprouter.Router) {
+	// 后台程序
 	route.InitUserRoute(routerRoot, "/user")
 	route.InitLogRoute(routerRoot, "/log")
 	route.InitAppRoute(routerRoot, "/app")
@@ -21,4 +25,16 @@ func InitRouter(routerRoot *httprouter.Router) {
 	route.InitProcessorRoute(routerRoot, "/processor")
 	route.InitCommonRoute(routerRoot, "/common")
 	route.InitNoticeRoute(routerRoot, "/notice")
+
+	// 监控数据
+	if config.Program.PrometheusConfig.Enabled {
+		routerRoot.GET(config.Program.PrometheusConfig.Path, adaptHandler(promhttp.Handler()))
+	}
+}
+
+// 适配 httprouter
+func adaptHandler(handler http.Handler) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		handler.ServeHTTP(w, r)
+	}
 }

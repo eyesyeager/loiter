@@ -27,6 +27,7 @@ var Program = programConfig{
 	InitialPsdLen:           8,                                                                  // 初始密码长度
 	StaticDefaultMainFile:   "index.html",                                                       // 默认主页面地址
 	StaticDefaultErrorRoute: "404.html",                                                         // 静态应用-错误路由重定向地址
+	PrometheusConfig:        prometheusConfigInstance,                                           // 监控运行数据
 }
 
 // logConfigInstance 日志配置
@@ -77,6 +78,11 @@ var pluginConfigInstance = pluginConfig{
 	NameListIpDelimiter:          ";",          // 过滤器-黑白名单插件配置-后台接收ip操作相关请求使用的分隔符
 }
 
+var prometheusConfigInstance = prometheusConfig{
+	Enabled: false,
+	Path:    "/metrics/prometheus",
+}
+
 type programConfig struct {
 	// Develop
 	Mode int
@@ -105,6 +111,9 @@ type programConfig struct {
 
 	// plugin
 	PluginConfig pluginConfig
+
+	// metrics
+	PrometheusConfig prometheusConfig
 
 	// Other
 	InitialPsdLen           int
@@ -154,4 +163,9 @@ type pluginConfig struct {
 	NameListBloomCapacity        uint
 	NameListBloomMisjudgmentRate float64
 	NameListIpDelimiter          string
+}
+
+type prometheusConfig struct {
+	Enabled bool
+	Path    string
 }

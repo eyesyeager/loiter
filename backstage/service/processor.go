@@ -112,14 +112,24 @@ func (*processorService) DeleteAppProcessor(appId uint) error {
 
 // GetProcessorByPage 分页获取应用处理器
 func (*processorService) GetProcessorByPage(data receiver.GetProcessorByPage) (err error, res returnee.GetProcessorByPage) {
-	// 获取应用信息
+	// 获取拼装应用
 	limit, offset := utils.BuildPageSearch(data.PageStruct)
+	var appIdList []uint
+	if err = global.MDB.Raw(`SELECT id FROM app a
+          				WHERE 0 = ? OR a.id = ?
+						ORDER BY a.created_at DESC
+						LIMIT ?, ?`, data.AppId, data.AppId, offset, limit).Scan(&appIdList).Error; err != nil {
+		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
+	}
+	if len(appIdList) == 0 {
+		return err, res
+	}
+	// 拼接应用信息
 	var processorPOList []po.GetProcessorByPage
 	if err = global.MDB.Raw(`SELECT a.id AppId, a.name, ap.genre, ap.codes 
 						FROM app a, app_processor ap 
-						WHERE a.id = ap.app_id AND (0 = ? OR a.id = ?)
-						ORDER BY a.created_at DESC
-						LIMIT ?, ?`, data.AppId, data.AppId, offset, limit).Scan(&processorPOList).Error; err != nil {
+						WHERE a.id = ap.app_id AND (0 = ? OR a.id = ?) AND a.id IN (?)
+						ORDER BY a.created_at DESC`, data.AppId, data.AppId, appIdList).Scan(&processorPOList).Error; err != nil {
 		return errors.New(fmt.Sprintf(result.CommonInfo.DbOperateError, err.Error())), res
 	}
 	// 组装inner
